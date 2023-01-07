@@ -10,5 +10,17 @@
         "type": "tarball",
         "url": "https://github.com/NixOS/nixpkgs/archive/2dea8991d89b9f1e78d874945f78ca15f6954289.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "vim-plug": {
+        "branch": "master",
+        "description": ":hibiscus: Minimalist Vim Plugin Manager",
+        "homepage": "",
+        "owner": "junegunn",
+        "repo": "vim-plug",
+        "rev": "ddce935b16fbaaf02ac96f9f238deb04d4d33a31",
+        "sha256": "14fpa2z4cpb7if1wf4xkn7zqydhf7iz531lv3y5kvx3hp0yh02qi",
+        "type": "tarball",
+        "url": "https://github.com/junegunn/vim-plug/archive/ddce935b16fbaaf02ac96f9f238deb04d4d33a31.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     }
 }
