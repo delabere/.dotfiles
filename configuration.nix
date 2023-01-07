@@ -3,6 +3,7 @@ let
   home = builtins.getEnv "HOME";
   sources = import ./nix/sources.nix;
   nixpkgs = sources.nixpkgs;
+  vim-plug = sources.vim-plug;
 in
 {
   home = {
@@ -49,11 +50,20 @@ in
     userEmail = "jack.rickards@hotmail.co.uk";
   };
 
+  programs.neovim =
+    {
+      enable = true;
+      vimAlias = true;
+
+      plugins = [ pkgs.vimPlugins.vim-plug ];
+    };
+
   home.packages = with pkgs; [
     bat
     go
-    neovim
-    (nerdfonts.override { fonts = [ "FiraCode" ]; })
+    (nerdfonts.override {
+      fonts = [ "FiraCode" ];
+    })
     ripgrep
     stow
     tldr
@@ -62,5 +72,7 @@ in
     zsh
     lazygit
   ];
+
+  home.file.".local/share/nvim/site/autoload/plug.vim".source = "${vim-plug}/plug.vim";
 }
 
