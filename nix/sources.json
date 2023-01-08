@@ -1,4 +1,16 @@
 {
+    "home-manager": {
+        "branch": "master",
+        "description": "Manage a user environment using Nix  [maintainer=@rycee] ",
+        "homepage": "https://nix-community.github.io/home-manager/",
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "rev": "9e565f0d9d41c19a94f55af205c328ec5177fc0a",
+        "sha256": "1dhlf26jdpal1ykw6hfz5a1vrbpjh1qc57k8mwxynywmscc157qg",
+        "type": "tarball",
+        "url": "https://github.com/nix-community/home-manager/archive/9e565f0d9d41c19a94f55af205c328ec5177fc0a.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "nixpkgs": {
         "branch": "nixos-22.11",
         "description": "Nix Packages collection",
