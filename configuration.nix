@@ -19,29 +19,37 @@ in
 
   programs.autojump.enable = true;
 
-  programs.bash = {
-    enable = true;
+ programs.bash = {
+   enable = true;
 
-    bashrcExtra = ''
-      if [ -f ~/.bashrc.local ]; then
-        source ~/.bashrc.local
-      fi
-      if [ -f ~/.bashrc.work ]; then
-        source ~/.bashrc.work
-      fi
-    '';
-  };
+   bashrcExtra = ''
+     if [ -f ~/.bashrc.local ]; then
+       source ~/.bashrc.local
+     fi
+     if [ -f ~/.bashrc.work ]; then
+       source ~/.bashrc.work
+     fi
+   '';
+ };
 
-  programs.zsh = {
-    enable = true;
+ programs.zsh = {
+   enable = true;
+   dotDir = ".config/zsh";
 
-    initExtra = ''
-    '';
-  };
 
+   initExtra = ''
+     if [ -f ~/.bashrc.local ]; then
+       source ~/.bashrc.local
+     fi
+     if [ -f ~/.bashrc.work ]; then
+       source ~/.bashrc.work
+     fi
+   '';
+ };
   programs.direnv.enable = true;
   programs.fzf.enable = true;
   programs.starship.enable = true;
+  # programs.zsh.oh-my-zsh.enable = true;
 
   programs.home-manager = {
     enable = true;
