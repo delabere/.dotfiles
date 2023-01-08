@@ -39,7 +39,7 @@ local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protoc
 
 -- get the work directory as a plenary path
 local path = require("plenary.path")
-local p = path.new(os.getenv("HOME") .. "/src/wearedev/")
+local p = path.new(os.getenv("HOME") .. "/src/github.com/monzo/wearedev")
 
 -- Check if the directory exists
 local work_profile = path.exists(p)

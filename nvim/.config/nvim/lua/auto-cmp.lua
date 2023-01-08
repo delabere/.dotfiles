@@ -40,7 +40,7 @@ local kind_icons = {
 -- Check if the directory exists
 -- get the work directory as a plenary path
 local path = require("plenary.path")
-local p = path.new(os.getenv("HOME") .. "/src/wearedev/")
+local p = path.new(os.getenv("HOME") .. "/src/github.com/monzo/wearedev")
 
 -- Check if the directory exists
 local work_profile = path.exists(p)
@@ -127,7 +127,7 @@ cmp.setup({
         ['<TAB>'] = cmp.mapping.confirm({ select = true }),
     },
     completion = {
-        COMPLETION_RELATED_CONFIGURATION_GOES_HERE
+        -- COMPLETION_RELATED_CONFIGURATION_GOES_HERE
     },
     matching = {
         disallow_fuzzy_matching = false,
