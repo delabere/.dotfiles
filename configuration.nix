@@ -1,12 +1,13 @@
 { config, pkgs, ... }:
 let
+  user = builtins.getEnv "USER";
   home = builtins.getEnv "HOME";
   sources = import ./nix/sources.nix;
   vim-plug = sources.vim-plug;
 in
 {
   home = {
-    username = "delabere";
+    username = user;
     stateVersion = "22.11";
     homeDirectory = home;
     sessionVariables = {
