@@ -37,38 +37,15 @@ end
 local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
 
-
--- local lfs = require("lfs")
+-- get the work directory as a plenary path
 local path = require("plenary.path")
--- get the home directory for the system
-local homedir = os.getenv("HOME")
--- get the work directory
-local workdir = homedir .. "/src/wearedev/"
--- create a path object from it
-local p = path.new(workdir)
+local p = path.new(os.getenv("HOME") .. "/src/wearedev/")
 
 -- Check if the directory exists
-local entries = path.exists(p)
-if entries == false then
-    local servers = { 'pyright', 'gopls' }
-    for _, lsp in ipairs(servers) do
-        require('lspconfig')[lsp].setup {
-            on_attach = on_attach,
-            capabilities = capabilities,
-        }
-    end
-    -- The directory does not exist
-    -- here we should do whatever config is our standard
-else
-    -- The directory exists
-    local servers = { 'pyright', }
-    for _, lsp in ipairs(servers) do
-        require('lspconfig')[lsp].setup {
-            on_attach = on_attach,
-            capabilities = capabilities,
-        }
-    end
-    -- TODO: add this back in
+local work_profile = path.exists(p)
+
+-- for work, we have a specific setup for our language server
+if work_profile == true then
     local lspconfig = require 'lspconfig'
     local monzo_lsp = require 'monzo.lsp'
     lspconfig.gopls.setup(
@@ -77,6 +54,19 @@ else
             capabilities = capabilities,
         })
     )
+else -- otherwise we are happy with defaults
+    require('lspconfig')['gopls'].setup {
+        on_attach = on_attach,
+        capabilities = capabilities,
+    }
+end
+
+local servers = { 'pyright', }
+for _, lsp in ipairs(servers) do
+    require('lspconfig')[lsp].setup {
+        on_attach = on_attach,
+        capabilities = capabilities,
+    }
 end
 
 local runtime_path = vim.split(package.path, ';')

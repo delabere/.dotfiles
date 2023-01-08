@@ -36,22 +36,19 @@ local kind_icons = {
 -- local cmp = require'cmp'
 -- local cmp_types = require('cmp.types')
 
--- local lfs = require("lfs")
-local path = require("plenary.path")
--- get the home directory for the system
-local homedir = os.getenv("HOME")
--- get the work directory
-local workdir = homedir .. "/src/wearedev/"
--- create a path object from it
-local p = path.new(workdir)
 
 -- Check if the directory exists
-local entries = path.exists(p)
-if entries == false then
-    -- The directory does not exist
-    -- here we should do whatever config is our standard
-else
+-- get the work directory as a plenary path
+local path = require("plenary.path")
+local p = path.new(os.getenv("HOME") .. "/src/wearedev/")
+
+-- Check if the directory exists
+local work_profile = path.exists(p)
+
+-- for work, we have a specific setup for our language server
+if work_profile == true then
     require 'monzo.cmp'
+else -- otherwise we are happy with defaults
 end
 
 
