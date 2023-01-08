@@ -2,7 +2,6 @@
 let
   home = builtins.getEnv "HOME";
   sources = import ./nix/sources.nix;
-  nixpkgs = sources.nixpkgs;
   vim-plug = sources.vim-plug;
 in
 {
@@ -11,7 +10,7 @@ in
     stateVersion = "22.11";
     homeDirectory = home;
     sessionVariables = {
-      NIX_PATH = "nixpkgs=${nixpkgs}";
+      NIX_PATH = "nixpkgs=${sources.nixpkgs}";
     };
   };
 
@@ -23,6 +22,9 @@ in
     enable = true;
 
     bashrcExtra = ''
+      if [ -f ~/.bashrc.local ]; then
+        source ~/.bashrc.local
+      fi
       if [ -f ~/.bashrc.work ]; then
         source ~/.bashrc.work
       fi
@@ -42,6 +44,7 @@ in
 
   programs.home-manager = {
     enable = true;
+    path = "${sources.home-manager}";
   };
 
   programs.git = {
@@ -61,6 +64,7 @@ in
   home.packages = with pkgs; [
     bat
     go
+    gopls
     (nerdfonts.override {
       fonts = [ "FiraCode" ];
     })
@@ -71,6 +75,7 @@ in
     xclip
     zsh
     lazygit
+    sumneko-lua-language-server
   ];
 
   home.file.".local/share/nvim/site/autoload/plug.vim".source = "${vim-plug}/plug.vim";

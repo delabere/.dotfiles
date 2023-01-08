@@ -1,7 +1,6 @@
 let
   sources = import ./nix/sources.nix;
-  nixpkgs = sources.nixpkgs;
-  pkgs = import nixpkgs { };
+  pkgs = import ./nixpkgs.nix;
 in
 pkgs.mkShell {
   buildInputs = with pkgs; [
@@ -9,5 +8,5 @@ pkgs.mkShell {
     niv
   ];
 
-  NIX_PATH = "nixpkgs=${builtins.toString nixpkgs}";
+  NIX_PATH = "nixpkgs=${builtins.toString sources.nixpkgs}";
 }
