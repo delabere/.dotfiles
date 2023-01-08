@@ -77,6 +77,7 @@ in
     zsh
     lazygit
     sumneko-lua-language-server
+    ranger
   ];
 
   home.file.".local/share/nvim/site/autoload/plug.vim".source = "${vim-plug}/plug.vim";
