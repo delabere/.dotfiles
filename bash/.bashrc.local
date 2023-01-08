@@ -1,1 +1,5 @@
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+function home-manager-rebuild() {
+  home-manager -f $HOME/.dotfiles/configuration.nix switch "$@"
+}
+
+alias cat="bat --decorations=never"
