@@ -36,6 +36,12 @@ in
    enable = true;
    dotDir = ".config/zsh";
 
+        # oh-my-zsh = {
+        #   enable = true;
+        #   plugins = [
+        #   ];
+        #   theme = "agnoster";
+        # };
 
    initExtra = ''
      if [ -f ~/.bashrc.local ]; then
