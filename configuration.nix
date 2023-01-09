@@ -1,12 +1,13 @@
 { config, pkgs, ... }:
 let
+  user = builtins.getEnv "USER";
   home = builtins.getEnv "HOME";
   sources = import ./nix/sources.nix;
   vim-plug = sources.vim-plug;
 in
 {
   home = {
-    username = "delabere";
+    username = user;
     stateVersion = "22.11";
     homeDirectory = home;
     sessionVariables = {
@@ -18,29 +19,43 @@ in
 
   programs.autojump.enable = true;
 
-  programs.bash = {
-    enable = true;
+ programs.bash = {
+   enable = true;
 
-    bashrcExtra = ''
-      if [ -f ~/.bashrc.local ]; then
-        source ~/.bashrc.local
-      fi
-      if [ -f ~/.bashrc.work ]; then
-        source ~/.bashrc.work
-      fi
-    '';
-  };
+   bashrcExtra = ''
+     if [ -f ~/.bashrc.local ]; then
+       source ~/.bashrc.local
+     fi
+     if [ -f ~/.bashrc.work ]; then
+       source ~/.bashrc.work
+     fi
+   '';
+ };
 
-  programs.zsh = {
-    enable = true;
+ programs.zsh = {
+   enable = true;
+   dotDir = ".config/zsh";
 
-    initExtra = ''
-    '';
-  };
+        # oh-my-zsh = {
+        #   enable = true;
+        #   plugins = [
+        #   ];
+        #   theme = "agnoster";
+        # };
 
+   initExtra = ''
+     if [ -f ~/.bashrc.local ]; then
+       source ~/.bashrc.local
+     fi
+     if [ -f ~/.bashrc.work ]; then
+       source ~/.bashrc.work
+     fi
+   '';
+ };
   programs.direnv.enable = true;
   programs.fzf.enable = true;
   programs.starship.enable = true;
+  # programs.zsh.oh-my-zsh.enable = true;
 
   programs.home-manager = {
     enable = true;
@@ -76,6 +91,7 @@ in
     zsh
     lazygit
     sumneko-lua-language-server
+    ranger
   ];
 
   home.file.".local/share/nvim/site/autoload/plug.vim".source = "${vim-plug}/plug.vim";

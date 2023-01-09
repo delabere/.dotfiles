@@ -67,6 +67,16 @@ if you are getting this then you need to remove it and re-build
 $ rm '/Users/jackrickards/.local/share/nvim/site/autoload/plug.vim'  
 ```
 
+
+to uninstall all existing packages in case of conflicts
+```sh
+error: files '/nix/store/sf772yr5aj7fj09s8nx1cf8d5ciazi0z-home-manager-path/bin/stow' and '/nix/store/q75csv5n423979cnkvadb3vrwbv8ngd7-stow-2.3.1/bin/stow' have the same priority 5; use 'nix-env --set-flag priority NUMBER INSTALLED_PKGNAME' or type 'nix profile install --help' if using 'nix profile' to find out howto change the priority of one of the conflicting packages (0 being the highest priority)
+```
+
+```sh
+nix-env -e '.*'
+```
+
 ## install stow
 `brew install stow` - other package managers are available
 ## stow 'em
