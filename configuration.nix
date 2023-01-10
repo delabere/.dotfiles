@@ -17,81 +17,69 @@ in
 
   fonts.fontconfig.enable = true;
 
-  programs.autojump.enable = true;
-
- programs.bash = {
-   enable = true;
-
-   bashrcExtra = ''
-     if [ -f ~/.bashrc.local ]; then
-       source ~/.bashrc.local
-     fi
-     if [ -f ~/.bashrc.work ]; then
-       source ~/.bashrc.work
-     fi
-   '';
- };
-
- programs.zsh = {
-   enable = true;
-   dotDir = ".config/zsh";
-
-        # oh-my-zsh = {
-        #   enable = true;
-        #   plugins = [
-        #   ];
-        #   theme = "agnoster";
-        # };
-
-   initExtra = ''
-     if [ -f ~/.bashrc.local ]; then
-       source ~/.bashrc.local
-     fi
-     if [ -f ~/.bashrc.work ]; then
-       source ~/.bashrc.work
-     fi
-   '';
- };
-  programs.direnv.enable = true;
-  programs.fzf.enable = true;
-  programs.starship.enable = true;
-  # programs.zsh.oh-my-zsh.enable = true;
-
   programs.home-manager = {
     enable = true;
     path = "${sources.home-manager}";
   };
 
-  programs.git = {
-    enable = true;
-    userName = "delabere";
-    userEmail = "jack.rickards@hotmail.co.uk";
-  };
 
-  programs.neovim =
-    {
+  programs.zsh = {
+   enable = true;
+   dotDir = ".config/zsh";
+
+   initExtra = ''
+          # brew is installed here on m1 macs
+          [[ $OSTYPE == 'darwin'* ]] && export PATH=/opt/homebrew/bin:$PATH
+
+          # any .zshrc found can be sourced; its probably a work machine
+          [ -f "$HOME/.zshrc" ] && source ~/.zshrc
+
+          # allows easy resetting of home-manager          
+          function home-manager-rebuild() {
+            home-manager -f $HOME/.dotfiles/configuration.nix switch "$@"
+          }
+       '';
+        
+   envExtra = ''
+          # work configuration
+          [ -f $HOME/src/github.com/monzo/starter-pack/zshenv ] && source $HOME/src/github.com/monzo/starter-pack/zshenv
+       '';
+        };
+  
+  programs = {
+    direnv.enable = true;
+    fzf.enable = true;
+    starship.enable = true;
+    autojump.enable = true;
+
+    bat = {
       enable = true;
-      vimAlias = true;
-
-      plugins = [ pkgs.vimPlugins.vim-plug ];
+      config.theme = "TwoDark";
     };
 
+    neovim = {
+      enable = true;
+      vimAlias = true;
+      plugins = [ pkgs.vimPlugins.vim-plug ];
+    };
+  };
+
   home.packages = with pkgs; [
-    bat
     go
     gopls
-    (nerdfonts.override {
-      fonts = [ "FiraCode" ];
-    })
+    jq
+    lazygit
+    ranger
     ripgrep
     stow
+    sumneko-lua-language-server
     tldr
     tree
     xclip
     zsh
-    lazygit
-    sumneko-lua-language-server
-    ranger
+    (nerdfonts.override {
+      fonts = [ "FiraCode" ];
+    })
   ];
 
   home.file.".local/share/nvim/site/autoload/plug.vim".source = "${vim-plug}/plug.vim";
