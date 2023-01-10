@@ -38,6 +38,13 @@ in
           function home-manager-rebuild() {
             home-manager -f $HOME/.dotfiles/configuration.nix switch "$@"
           }
+
+          function ship2prod() {
+              shipper deploy $1 --s101 --skip-confirm-rollout && shipper deploy $1 --prod --skip-confirm-rollout
+          }
+
+          alias lg='lazygit'
+          alias gcm='git checkout master && git pull'
        '';
         
    envExtra = ''
