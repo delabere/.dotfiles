@@ -43,6 +43,13 @@ in
               shipper deploy $1 --s101 --skip-confirm-rollout && shipper deploy $1 --prod --skip-confirm-rollout
           }
 
+          function todo() {
+              [ ! -d "$HOME/notes" ] && mkdir "$HOME/notes" 
+              [ ! -f "$HOME/notes.todo.md" ] && touch "$HOME/notes/todo.md" 
+              nvim "$HOME/notes/todo.md"
+          }
+
+
           alias lg='lazygit'
           alias gcm='git checkout master && git pull'
        '';
