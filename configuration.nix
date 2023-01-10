@@ -17,81 +17,93 @@ in
 
   fonts.fontconfig.enable = true;
 
-  programs.autojump.enable = true;
+  
+  programs = {
+    home-manager = {
+      enable = true;
+      path = "${sources.home-manager}";
+    };
 
- programs.bash = {
-   enable = true;
 
-   bashrcExtra = ''
-     if [ -f ~/.bashrc.local ]; then
-       source ~/.bashrc.local
-     fi
-     if [ -f ~/.bashrc.work ]; then
-       source ~/.bashrc.work
-     fi
-   '';
- };
+    zsh = {
+      enable = true;
+      dotDir = ".config/zsh";
+      # enableAutosuggestions = true;
+      # enableCompletion = true;
 
- programs.zsh = {
-   enable = true;
-   dotDir = ".config/zsh";
+      initExtra = ''
+          # brew is installed here on m1 macs
+          [[ $OSTYPE == 'darwin'* ]] && export PATH=/opt/homebrew/bin:$PATH
 
-        # oh-my-zsh = {
-        #   enable = true;
-        #   plugins = [
-        #   ];
-        #   theme = "agnoster";
-        # };
+          # any .zshrc found can be sourced; its probably a work machine
+          [ -f "$HOME/.zshrc" ] && source ~/.zshrc
 
-   initExtra = ''
-     if [ -f ~/.bashrc.local ]; then
-       source ~/.bashrc.local
-     fi
-     if [ -f ~/.bashrc.work ]; then
-       source ~/.bashrc.work
-     fi
-   '';
- };
-  programs.direnv.enable = true;
-  programs.fzf.enable = true;
-  programs.starship.enable = true;
-  # programs.zsh.oh-my-zsh.enable = true;
+          # allows easy resetting of home-manager          
+          function rebuild-home-manager() {
+            home-manager -f $HOME/.dotfiles/configuration.nix switch "$@"
+          }
 
-  programs.home-manager = {
-    enable = true;
-    path = "${sources.home-manager}";
-  };
+          function ship2prod() {
+              shipper deploy $1 --s101 --skip-confirm-rollout && shipper deploy $1 --prod --skip-confirm-rollout
+          }
 
-  programs.git = {
-    enable = true;
-    userName = "delabere";
-    userEmail = "jack.rickards@hotmail.co.uk";
-  };
+          function todo() {
+              [ ! -d "$HOME/notes" ] && mkdir "$HOME/notes" 
+              [ ! -f "$HOME/notes.todo.md" ] && touch "$HOME/notes/todo.md" 
+              nvim "$HOME/notes/todo.md"
+          }
 
-  programs.neovim =
-    {
+
+          alias lg='lazygit'
+          alias gcm='git checkout master && git pull'
+          alias ls='lsd'
+      '';
+
+      envExtra = ''
+          # work configuration
+          [ -f $HOME/src/github.com/monzo/starter-pack/zshenv ] && source $HOME/src/github.com/monzo/starter-pack/zshenv
+      '';
+    };
+    direnv.enable = true;
+    fzf.enable = true;
+    starship.enable = true;
+    autojump.enable = true;
+
+    bat = {
+      enable = true;
+      config.theme = "TwoDark";
+    };
+
+    neovim = {
       enable = true;
       vimAlias = true;
-
       plugins = [ pkgs.vimPlugins.vim-plug ];
     };
 
+    tmux = {
+      enable = true;
+    };
+
+  };
+
   home.packages = with pkgs; [
-    bat
+    lsd
     go
     gopls
-    (nerdfonts.override {
-      fonts = [ "FiraCode" ];
-    })
+    jq
+    lazygit
+    ranger
     ripgrep
     stow
+    sumneko-lua-language-server
     tldr
     tree
     xclip
     zsh
-    lazygit
-    sumneko-lua-language-server
-    ranger
+    thefuck
+    (nerdfonts.override {
+      fonts = [ "FiraCode" ];
+    })
   ];
 
   home.file.".local/share/nvim/site/autoload/plug.vim".source = "${vim-plug}/plug.vim";
