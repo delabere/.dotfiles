@@ -17,17 +17,21 @@ in
 
   fonts.fontconfig.enable = true;
 
-  programs.home-manager = {
-    enable = true;
-    path = "${sources.home-manager}";
-  };
+  
+  programs = {
+    home-manager = {
+      enable = true;
+      path = "${sources.home-manager}";
+    };
 
 
-  programs.zsh = {
-   enable = true;
-   dotDir = ".config/zsh";
+    zsh = {
+      enable = true;
+      dotDir = ".config/zsh";
+      # enableAutosuggestions = true;
+      # enableCompletion = true;
 
-   initExtra = ''
+      initExtra = ''
           # brew is installed here on m1 macs
           [[ $OSTYPE == 'darwin'* ]] && export PATH=/opt/homebrew/bin:$PATH
 
@@ -35,7 +39,7 @@ in
           [ -f "$HOME/.zshrc" ] && source ~/.zshrc
 
           # allows easy resetting of home-manager          
-          function home-manager-rebuild() {
+          function rebuild-home-manager() {
             home-manager -f $HOME/.dotfiles/configuration.nix switch "$@"
           }
 
@@ -52,15 +56,14 @@ in
 
           alias lg='lazygit'
           alias gcm='git checkout master && git pull'
-       '';
-        
-   envExtra = ''
+          alias ls='lsd'
+      '';
+
+      envExtra = ''
           # work configuration
           [ -f $HOME/src/github.com/monzo/starter-pack/zshenv ] && source $HOME/src/github.com/monzo/starter-pack/zshenv
-       '';
-        };
-  
-  programs = {
+      '';
+    };
     direnv.enable = true;
     fzf.enable = true;
     starship.enable = true;
@@ -76,9 +79,15 @@ in
       vimAlias = true;
       plugins = [ pkgs.vimPlugins.vim-plug ];
     };
+
+    tmux = {
+      enable = true;
+    };
+
   };
 
   home.packages = with pkgs; [
+    lsd
     go
     gopls
     jq
@@ -91,6 +100,7 @@ in
     tree
     xclip
     zsh
+    thefuck
     (nerdfonts.override {
       fonts = [ "FiraCode" ];
     })
