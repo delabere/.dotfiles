@@ -28,6 +28,7 @@ in
     zsh = {
       enable = true;
       dotDir = ".config/zsh";
+      # haven't quite managed to get these working
       # enableAutosuggestions = true;
       # enableCompletion = true;
 
@@ -56,7 +57,6 @@ in
 
           alias lg='lazygit'
           alias gcm='git checkout master && git pull'
-          alias ls='lsd'
       '';
 
       envExtra = ''
@@ -64,10 +64,14 @@ in
           [ -f $HOME/src/github.com/monzo/starter-pack/zshenv ] && source $HOME/src/github.com/monzo/starter-pack/zshenv
       '';
     };
+
     direnv.enable = true;
     fzf.enable = true;
     starship.enable = true;
     autojump.enable = true;
+    lsd.enable = true;
+    lsd.enableAliases = true;
+    jq.enable = true;
 
     bat = {
       enable = true;
@@ -87,10 +91,8 @@ in
   };
 
   home.packages = with pkgs; [
-    lsd
     go
     gopls
-    jq
     lazygit
     ranger
     ripgrep
