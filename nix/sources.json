@@ -23,6 +23,18 @@
         "url": "https://github.com/NixOS/nixpkgs/archive/2dea8991d89b9f1e78d874945f78ca15f6954289.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
+    "tpm": {
+        "branch": "master",
+        "description": "Tmux Plugin Manager",
+        "homepage": null,
+        "owner": "tmux-plugins",
+        "repo": "tpm",
+        "rev": "fc412cbdf765175ea9f3380db6b9e1b1603a68a7",
+        "sha256": "04hligaqjhh80a94kf4ilni2lnl00yvwxvpmj2qyfgwrmm1c3pky",
+        "type": "tarball",
+        "url": "https://github.com/tmux-plugins/tpm/archive/fc412cbdf765175ea9f3380db6b9e1b1603a68a7.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "vim-plug": {
         "branch": "master",
         "description": ":hibiscus: Minimalist Vim Plugin Manager",
