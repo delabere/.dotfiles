@@ -84,13 +84,14 @@ in
       plugins = [ pkgs.vimPlugins.vim-plug ];
     };
 
-    tmux = {
-      enable = true;
-    };
+    # tmux = {
+    #   enable = true;
+    # };
 
   };
 
   home.packages = with pkgs; [
+    tmux
     go
     gopls
     lazygit
