@@ -4,6 +4,7 @@ let
   home = builtins.getEnv "HOME";
   sources = import ./nix/sources.nix;
   vim-plug = sources.vim-plug;
+  tpm = sources.tpm;
 in
 {
   home = {
@@ -81,12 +82,7 @@ in
     neovim = {
       enable = true;
       vimAlias = true;
-      plugins = [ pkgs.vimPlugins.vim-plug ];
     };
-
-    # tmux = {
-    #   enable = true;
-    # };
 
   };
 
@@ -110,5 +106,6 @@ in
   ];
 
   home.file.".local/share/nvim/site/autoload/plug.vim".source = "${vim-plug}/plug.vim";
+  home.file.".tmux/plugins/tpm".source = "${tpm}";
 }
 
