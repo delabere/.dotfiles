@@ -12,6 +12,7 @@
 " │ │ │  lua/plugin-dev.lua
 " │ │ └  lua/telescope-plug.lua
 
+nmap <leader>t <Plug>PlenaryTestFile
 
 filetype plugin indent on
 
@@ -31,8 +32,8 @@ Plug 'christoomey/vim-tmux-navigator'
 " post install (yarn install | npm install) then load plugin only for editing supported files
 " Plug 'prettier/vim-prettier', { 'do': 'yarn install --frozen-lockfile --production' }
 
-" Plug 'delabere/protodef'
-Plug '/Users/jackrickards/jacksrc/protodef'
+Plug 'delabere/protodef'
+" Plug '/Users/jackrickards/jacksrc/protodef'
 
 " surround vim
 Plug 'tpope/vim-surround'
@@ -153,7 +154,7 @@ endfunction
 " let g:gitgutter_preview_win_floating = 1
 
 " mapping for protodef plugin
-" nmap gp :Protodef<CR>
+nmap <silent> <leader>gp :Protodef<CR>
 " let g:sneak#label = 1 " puts a char on the matches to help you nav
 " let g:sneak#s_next = 1 " press 's' again to go to next match, 'S' to go back
 " let g:sneak#use_ic_scs = 1 " casing determined by ignorecase
