@@ -1,4 +1,4 @@
-" these are all the linked files, for easy access use 'gf' on any of them
+ " these are all the linked files, for easy access use 'gf' on any of them
 " │ │ │  plugin/coc.vim
 " │ │ │  plugin/go.vim
 " │ │ │  lua/autosave-plug.lua
@@ -9,6 +9,7 @@
 " │ │ │  lua/auto-cmp.lua
 " │ │ │  lua/diagnostics.lua
 " │ │ │  lua/dap-debug.lua
+" │ │ │  lua/plugin-dev.lua
 " │ │ └  lua/telescope-plug.lua
 
 
@@ -30,7 +31,8 @@ Plug 'christoomey/vim-tmux-navigator'
 " post install (yarn install | npm install) then load plugin only for editing supported files
 " Plug 'prettier/vim-prettier', { 'do': 'yarn install --frozen-lockfile --production' }
 
-Plug 'delabere/protodef'
+" Plug 'delabere/protodef'
+Plug '/Users/jackrickards/jacksrc/protodef'
 
 " surround vim
 Plug 'tpope/vim-surround'
@@ -128,6 +130,7 @@ Plug 'ray-x/navigator.lua'
 " Plug 'Pocco81/auto-save.nvim'
 call plug#end()
 
+lua require('plugin-dev')
 lua require('mapsandsets-plug')
 lua require('nvimtree-plug')
 lua require('autosave-plug')
