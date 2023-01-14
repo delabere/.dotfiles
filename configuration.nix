@@ -82,7 +82,6 @@ in
     neovim = {
       enable = true;
       vimAlias = true;
-      plugins = [ pkgs.vimPlugins.vim-plug ];
     };
 
   };
