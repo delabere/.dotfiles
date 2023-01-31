@@ -27,6 +27,13 @@ local on_attach = function(client, bufnr)
     vim.keymap.set('n', '<Leader>t', '<cmd>GoTest<cr>')
     vim.keymap.set('n', '<Leader>x', '<cmd>GoCodeAction<cr>')
     vim.keymap.set('v', '<Leader>x', '<cmd>GoCodeAction<cr>')
+    local path = client.workspace_folders[1].name
+
+    -- for better imports sorting in wearedev
+    if string.find(path, "monzo/wearedev") then
+        client.config.settings.gopls['local'] = 'github.com/monzo/wearedev'
+    end
+    client.notify("workspace/didChangeConfiguration", { settings = client.config.settings })
 
     -- this line 👇 tells lspconfig to ignore all the above mappings and instead use those
     -- provided by the navigator plugin
