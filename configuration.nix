@@ -99,6 +99,7 @@ in
     tree
     xclip
     zsh
+    watch 
     thefuck
     (nerdfonts.override {
       fonts = [ "FiraCode" ];
