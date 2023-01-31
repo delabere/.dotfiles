@@ -1,7 +1,5 @@
 -- open up the tree
 vim.keymap.set('n', '<Leader>e', ':NvimTreeToggle<CR>')
-vim.keymap.set('n', '<Leader>f', ':NvimTreeFocus<CR>')
-
 
 require 'nvim-tree'.setup {
     update_focused_file = {
