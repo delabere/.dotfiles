@@ -18,10 +18,10 @@ vim.keymap.set('n', '<Right>', '<NOP>')
 vim.keymap.set('n', 'zz', ':update<CR>')
 
 -- Use ctrl-[hjkl] to select the active split!
-vim.keymap.set('n', '<c-k>', ':wincmd k<CR>', { silent = true })
-vim.keymap.set('n', '<c-j>', ':wincmd j<CR>', { silent = true })
-vim.keymap.set('n', '<c-h>', ':wincmd h<CR>', { silent = true })
-vim.keymap.set('n', '<c-l>', ':wincmd l<CR>', { silent = true })
+-- vim.keymap.set('n', '<c-k>', ':wincmd k<CR>', { silent = true })
+-- vim.keymap.set('n', '<c-j>', ':wincmd j<CR>', { silent = true })
+-- vim.keymap.set('n', '<c-h>', ':wincmd h<CR>', { silent = true })
+-- vim.keymap.set('n', '<c-l>', ':wincmd l<CR>', { silent = true })
 
 -- arrow keys to resize windows
 vim.keymap.set('n', '<Up>', ':resize -2<CR>')
@@ -59,7 +59,7 @@ vim.opt.encoding = 'UTF-8'
 vim.opt.hidden = true -- preserve background buffers
 vim.opt.hlsearch = true -- highlights search terms
 vim.opt.number = true -- linenumbers
-vim.opt.relativenumber = true -- sets relative numbers 
+vim.opt.relativenumber = true -- sets relative numbers
 vim.opt.laststatus = 2
 vim.opt.vb = true
 vim.opt.ruler = true
@@ -86,11 +86,11 @@ vim.cmd("xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>")
 
 -- put temp undo and backup files in their own directory
 -- otherwise git will track them inside your repos
-local prefix = vim.env.XDG_CONFIG_HOME or vim.fn.expand("~/.config")
+-- local prefix = vim.env.XDG_CONFIG_HOME or vim.fn.expand("~/.config")
 
-vim.opt.undodir = { prefix .. "/nvim/.undo//"}
-vim.opt.backupdir = {prefix .. "/nvim/.backup//"}
-vim.opt.directory = { prefix .. "/nvim/.swp//"}
+-- vim.opt.undodir = { prefix .. "/nvim/.undo//"}
+-- vim.opt.backupdir = {prefix .. "/nvim/.backup//"}
+-- vim.opt.directory = { prefix .. "/nvim/.swp//"}
 
 -- Enable to copy to clipboard for operations like yank, delete, change and put
 -- http://stackoverflow.com/questions/20186975/vim-mac-how-to-copy-to-clipboard-without-pbcopy
@@ -101,10 +101,10 @@ end
 
 
 --This enables us to undo files even if you exit Vim.
-if vim.fn.has('persistent_undo') == 1 then
-    vim.opt.undofile = true
-    vim.opt.undodir = '~/.config/vim/tmp/undo//'
-end
+-- if vim.fn.has('persistent_undo') == 1 then
+--     vim.opt.undofile = true
+--     vim.opt.undodir = '~/.config/vim/tmp/undo//'
+-- end
 
 -- Colorscheme
 vim.api.nvim_command("syntax enable")
@@ -112,5 +112,3 @@ vim.api.nvim_command("set t_Co=256")
 vim.g.rehash256 = 1
 vim.g.molokai_original = 1
 vim.api.nvim_command("colorscheme gruvbox-material")
-
-
