@@ -45,10 +45,6 @@ in
             home-manager -f $HOME/.dotfiles/configuration.nix switch "$@"
           }
 
-          function ship2prod() {
-              shipper deploy $1 --s101 --skip-confirm-rollout && shipper deploy $1 --prod --skip-confirm-rollout
-          }
-
           function todo() {
               [ ! -d "$HOME/notes" ] && mkdir "$HOME/notes" 
               [ ! -f "$HOME/notes.todo.md" ] && touch "$HOME/notes/todo.md" 
