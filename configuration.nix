@@ -51,6 +51,13 @@ in
               nvim "$HOME/notes/todo.md"
           }
 
+          s101 () {
+            vpn && shipper deploy --s101 $1 --disable-progressive-rollouts
+          }
+
+          prod () {
+            vpn && shipper deploy --prod $1
+          }
 
           alias lg='lazygit'
           alias gcm='git checkout master && git pull'
