@@ -307,5 +307,6 @@ require "octo".setup({
         }
     }
 })
+
 EOF
 
