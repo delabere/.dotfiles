@@ -73,7 +73,7 @@ vim.opt.wildmenu = true
 vim.opt.autochdir = true
 vim.api.nvim_command("set noswapfile")
 vim.opt.scrolloff = 16 -- starts page scrolling when n lines from top/bottom
-vim.api.nvim_command("set nofoldenable")
+vim.api.nvim_command("set nofoldenable") -- no folds please
 vim.opt.signcolumn = 'yes' --creates a dedicated column for git status so line numbers still show up
 vim.opt.ignorecase = true --ignore case in searching
 vim.opt.splitbelow = true --force new splits to go to the right of current window--
