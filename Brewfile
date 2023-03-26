@@ -1,0 +1,6 @@
+cask "iterm2"
+cask "whatsapp"
+cask "rectangle"
+cask "thor"
+cask "1Password"
+cask "google-drive"
