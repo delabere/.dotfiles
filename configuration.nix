@@ -39,6 +39,9 @@ in
 
           # any .zshrc found can be sourced; its probably a work machine
           [ -f "$HOME/.zshrc" ] && source ~/.zshrc
+          
+          # add adb to path (for work)
+          export PATH="$PATH:$HOME/Library/Android/sdk/platform-tools"
 
           # allows easy resetting of home-manager          
           function rebuild-home-manager() {
@@ -104,6 +107,7 @@ in
     zsh
     watch 
     thefuck
+    python39
     (nerdfonts.override {
       fonts = [ "FiraCode" ];
     })
