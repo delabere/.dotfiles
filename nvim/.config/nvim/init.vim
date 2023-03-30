@@ -72,7 +72,6 @@ Plug 'morhetz/gruvbox' 							" a different theme
 Plug 'sainnhe/gruvbox-material'
 
 " helps when you want to search all of wearedev not just the current dir
-Plug 'airblade/vim-rooter' " used to find current project dir
 " Plug 'airblade/vim-rooter' " used to find current project dir
 
 Plug '907th/vim-auto-save' " auto save all open buffers on any file change
@@ -124,6 +123,10 @@ Plug 'ray-x/guihua.lua'
 Plug 'neovim/nvim-lspconfig'
 Plug 'ray-x/guihua.lua', {'do': 'cd lua/fzy && make' }
 Plug 'ray-x/navigator.lua'
+"
+" :MasonUpdate updates registry contents
+Plug 'williamboman/mason.nvim', { 'do': ':MasonUpdate' }
+Plug 'williamboman/mason-lspconfig.nvim'
 
 " Plug 'Pocco81/auto-save.nvim'
 call plug#end()
@@ -136,7 +139,11 @@ lua require('autosave-plug')
 lua require('monzo-plug')
 lua require('auto-cmp')
 lua require('diagnostics')
+
+lua require("mason").setup()
+lua require("mason-lspconfig").setup()
 lua require('lsp-config')
+
 lua require('dap-debug')
 lua require('go').setup()
 lua require('navigator').setup({lsp={ disable_lsp = {'gopls'}, disply_diagnostic_qf = false }, treesitter_analysis = false})

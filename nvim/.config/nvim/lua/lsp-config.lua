@@ -68,7 +68,7 @@ else -- otherwise we are happy with defaults
     }
 end
 
-local servers = { 'pyright', }
+local servers = { 'pyright', 'tsserver' }
 for _, lsp in ipairs(servers) do
     require('lspconfig')[lsp].setup {
         on_attach = on_attach,
