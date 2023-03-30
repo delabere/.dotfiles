@@ -73,6 +73,7 @@ Plug 'sainnhe/gruvbox-material'
 
 " helps when you want to search all of wearedev not just the current dir
 Plug 'airblade/vim-rooter' " used to find current project dir
+" Plug 'airblade/vim-rooter' " used to find current project dir
 
 Plug '907th/vim-auto-save' " auto save all open buffers on any file change
 Plug 'djoshea/vim-autoread' " auto read any changes to open buffers without prompt
