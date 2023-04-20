@@ -13,6 +13,14 @@ vim.keymap.set(
   { noremap = true, silent = true, desc = "Resume" }
 )
 
+-- mapping for protodef plugin
+vim.keymap.set(
+  "n",
+  "<leader>gp",
+  require("protodef").protodef,
+  { noremap = true, silent = true, desc = "ProtoDefinition" }
+)
+
 -- No more Arrow Keys, deal with it
 vim.keymap.set("n", "<Up>", "<NOP>")
 vim.keymap.set("n", "<Down>", "<NOP>")
@@ -20,13 +28,13 @@ vim.keymap.set("n", "<Left>", "<NOP>")
 vim.keymap.set("n", "<Right>", "<NOP>")
 
 -- save current buffer
-vim.keymap.set("n", "zz", ":update<CR>")
+vim.keymap.set("n", "zz", ":update<CR>", { silent = true })
 
 -- arrow keys to resize windows
-vim.keymap.set("n", "<Up>", ":resize -2<CR>")
-vim.keymap.set("n", "<Down>", ":resize +2<CR>")
-vim.keymap.set("n", "<Left>", ":vertical resize -2<CR>")
-vim.keymap.set("n", "<Right>", ":vertical resize +2<CR>")
+vim.keymap.set("n", "<Up>", ":resize -2<CR>", { silent = true })
+vim.keymap.set("n", "<Down>", ":resize +2<CR>", { silent = true })
+vim.keymap.set("n", "<Left>", ":vertical resize -2<CR>", { silent = true })
+vim.keymap.set("n", "<Right>", ":vertical resize +2<CR>", { silent = true })
 
 -- easy way to get into this config file from nvim
 vim.keymap.set("n", "<Leader>v", ":e $MYVIMRC<CR>")
