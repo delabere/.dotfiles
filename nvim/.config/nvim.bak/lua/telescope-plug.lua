@@ -10,6 +10,7 @@ vim.keymap.set('n', '<Leader>fo', '<cmd>Telescope oldfiles<cr>')
 --    require 'telescope.builtin'.find_files(opts)
 --end
 
+require('telescope').load_extension('dap')
 -- allows telescope to search from the git repo not just the current dir
 -- vim.g.rooter_patterns = { '.git', '.svn', 'package.json', '!node_modules' }
 require("telescope").setup({
