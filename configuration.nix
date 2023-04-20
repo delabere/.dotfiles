@@ -55,11 +55,11 @@ in
           }
 
           s101 () {
-            vpn && shipper deploy --s101 $1 --disable-progressive-rollouts
+            shipper deploy --s101 $1 --disable-progressive-rollouts
           }
 
           prod () {
-            vpn && shipper deploy --prod $1
+            shipper deploy --prod $1
           }
 
           alias lg='lazygit'
