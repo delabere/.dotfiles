@@ -1,5 +1,10 @@
 return {
   "neovim/nvim-lspconfig",
+
+  dependencies = {
+    { "nvim-lua/plenary.nvim" },
+    { "~/src/github.com/monzo/wearedev/tools/editors/nvim/nvim-monzo" },
+  },
   config = function()
     local on_attach = function(client, bufnr)
       local opts = { noremap = true, silent = true }
@@ -45,7 +50,7 @@ return {
 
       -- this line 👇 tells lspconfig to ignore all the above mappings and instead use those
       -- provided by the navigator plugin
-      require("navigator.lspclient.mapping").setup({ bufnr = bufnr, client = client })
+      -- require("navigator.lspclient.mapping").setup({ bufnr = bufnr, client = client })
     end
 
     local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
