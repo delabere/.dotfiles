@@ -1,4 +1,4 @@
-local M = {
+return {
   "neovim/nvim-lspconfig",
   config = function()
     local on_attach = function(client, bufnr)
@@ -112,5 +112,3 @@ local M = {
     })
   end,
 }
-
-return M
