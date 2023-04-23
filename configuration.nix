@@ -18,7 +18,7 @@ in
 
   fonts.fontconfig.enable = true;
 
-  
+
   programs = {
     home-manager = {
       enable = true;
@@ -34,8 +34,8 @@ in
       # enableCompletion = true;
 
       initExtra = ''
-          # brew is installed here on m1 macs
-          [[ $OSTYPE == 'darwin'* ]] && export PATH=/opt/homebrew/bin:$PATH
+        # brew is installed here on m1 macs
+        [[ $OSTYPE == 'darwin'* ]] && export PATH=/opt/homebrew/bin:$PATH
 
           # any .zshrc found can be sourced; its probably a work machine
           [ -f "$HOME/.zshrc" ] && source ~/.zshrc
@@ -43,16 +43,16 @@ in
           # add adb to path (for work)
           export PATH="$PATH:$HOME/Library/Android/sdk/platform-tools"
 
-          # allows easy resetting of home-manager          
-          function rebuild-home-manager() {
-            home-manager -f $HOME/.dotfiles/configuration.nix switch "$@"
-          }
+        # allows easy resetting of home-manager          
+        function rebuild-home-manager() {
+          home-manager -f $HOME/.dotfiles/configuration.nix switch "$@"
+        }
 
-          function todo() {
-              [ ! -d "$HOME/notes" ] && mkdir "$HOME/notes" 
-              [ ! -f "$HOME/notes.todo.md" ] && touch "$HOME/notes/todo.md" 
-              nvim "$HOME/notes/todo.md"
-          }
+        function todo() {
+            [ ! -d "$HOME/notes" ] && mkdir "$HOME/notes" 
+            [ ! -f "$HOME/notes.todo.md" ] && touch "$HOME/notes/todo.md" 
+            nvim "$HOME/notes/todo.md"
+        }
 
           s101 () {
             shipper deploy --s101 $1 --disable-progressive-rollouts
@@ -62,13 +62,18 @@ in
             shipper deploy --prod $1
           }
 
-          alias lg='lazygit'
-          alias gcm='git checkout master && git pull'
+        alias lg='lazygit'
+        alias gcm='git checkout master && git pull'
+        
+        # for pyenv
+        export PYENV_ROOT="$HOME/.pyenv"
+        command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+        eval "$(pyenv init -)"
       '';
 
       envExtra = ''
-          # work configuration
-          [ -f $HOME/src/github.com/monzo/starter-pack/zshenv ] && source $HOME/src/github.com/monzo/starter-pack/zshenv
+        # work configuration
+        [ -f $HOME/src/github.com/monzo/starter-pack/zshenv ] && source $HOME/src/github.com/monzo/starter-pack/zshenv
       '';
     };
 
@@ -105,10 +110,11 @@ in
     tree
     xclip
     zsh
-    watch 
+    watch
     thefuck
     python39
     nodejs
+    niv
     nodePackages.vscode-html-languageserver-bin
     (nerdfonts.override {
       fonts = [ "FiraCode" "Hack" ];
