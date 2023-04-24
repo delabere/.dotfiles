@@ -69,6 +69,13 @@ in
         export PYENV_ROOT="$HOME/.pyenv"
         command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
         eval "$(pyenv init -)"
+  
+        # The next line updates PATH for the Google Cloud SDK.
+        if [ -f '/Users/delabere/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/delabere/Downloads/google-cloud-sdk/path.zsh.inc'; fi
+
+        # The next line enables shell command completion for gcloud.
+        if [ -f '/Users/delabere/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/delabere/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
+
       '';
 
       envExtra = ''
@@ -115,6 +122,7 @@ in
     python39
     nodejs
     niv
+    delve
     nodePackages.vscode-html-languageserver-bin
     (nerdfonts.override {
       fonts = [ "FiraCode" "Hack" ];
