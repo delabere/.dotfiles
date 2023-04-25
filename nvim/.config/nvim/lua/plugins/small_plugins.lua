@@ -23,6 +23,14 @@ return {
 
   { "delabere/protodef" },
 
+  {
+    "fatih/vim-go",
+    make = ":GoInstallBinaries",
+    config = function()
+      vim.g.go_gopls_enabled = false -- or false to disable
+    end,
+  },
+
   -- -- Use <tab> for completion and snippets (supertab)
   -- -- first: disable default <tab> and <s-tab> behavior in LuaSnip
   -- {
