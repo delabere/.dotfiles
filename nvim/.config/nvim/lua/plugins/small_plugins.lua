@@ -155,4 +155,13 @@ return {
   { "ruanyl/vim-gh-line" },
   { "folke/zen-mode.nvim" },
   { "iamcco/markdown-preview.nvim" },
+
+  { -- the default blue for todo's is a little garish
+    "folke/todo-comments.nvim",
+    opts = {
+      keywords = {
+        TODO = { icon = " ", color = "hint" },
+      },
+    },
+  },
 }
