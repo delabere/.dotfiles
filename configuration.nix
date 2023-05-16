@@ -30,8 +30,8 @@ in
       enable = true;
       dotDir = ".config/zsh";
       # haven't quite managed to get these working
-      # enableAutosuggestions = true;
-      # enableCompletion = true;
+      enableAutosuggestions = true;
+      enableCompletion = true;
 
       initExtra = ''
         # brew is installed here on m1 macs
@@ -50,17 +50,23 @@ in
 
         function todo() {
             [ ! -d "$HOME/notes" ] && mkdir "$HOME/notes" 
-            [ ! -f "$HOME/notes.todo.md" ] && touch "$HOME/notes/todo.md" 
+            [ ! -f "$HOME/notes/todo.md" ] && touch "$HOME/notes/todo.md" 
             nvim "$HOME/notes/todo.md"
         }
 
-          s101 () {
-            shipper deploy --s101 $1 --disable-progressive-rollouts
-          }
+        function note() {
+            [ ! -d "$HOME/notes" ] && mkdir -p "$HOME/notes" 
+            [ ! -f "$HOME/notes/$1.md" ] && touch "$HOME/notes/$1.md" 
+            nvim "$HOME/notes/$1.md"
+        }
 
-          prod () {
-            shipper deploy --prod $1
-          }
+        s101 () {
+          shipper deploy --s101 $1 --disable-progressive-rollouts
+        }
+
+        prod () {
+          shipper deploy --prod $1
+        }
 
         alias lg='lazygit'
         alias gcm='git checkout master && git pull'

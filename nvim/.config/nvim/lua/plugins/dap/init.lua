@@ -35,7 +35,6 @@ local M = {
     require("nvim-dap-virtual-text").setup()
     require("dap-go").setup()
     require("dapui").setup({
-
       icons = { expanded = "▾", collapsed = "▸" },
       mappings = {
         -- Use a table to apply multiple mappings

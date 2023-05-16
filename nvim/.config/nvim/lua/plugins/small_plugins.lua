@@ -86,7 +86,6 @@ return {
   -- navigate between other tmux panes
   {
     "christoomey/vim-tmux-navigator",
-
     keys = {
       { "<C-h>", "<C-U>TmuxNavigateRight<cr>", desc = "Tmux Navigate Right" },
       { "<C-k>", "<C-U>TmuxNavigateUp<cr>", desc = "Tmux Navigate Up" },
@@ -97,15 +96,22 @@ return {
 
   { "tpope/vim-surround" },
 
+  -- { "907th/vim-auto-save" },
+
   -- auto save all open buffers on any file change
   -- {
   --   "907th/vim-auto-save",
   --
   --   config = function()
   --     vim.g.auto_save = 1
-  --     vim.g.auto_save_in_insert_mode = 0
-  --     vim.g.auto_save_silent = 1
+  --     vim.g.auto_save_events = { "InsertLeave" }
   --   end,
+  --
+  --   -- ExitPre,
+  --   -- FocusLost,
+  --   -- InsertEnter,
+  --   -- QuitPre,
+  --   -- BufLeave,
   -- },
   --
   -- add more treesitter parsers
@@ -146,4 +152,6 @@ return {
   -- debugger configuration for go
   { "leoluz/nvim-dap-go" },
   { "ruanyl/vim-gh-line" },
+  { "folke/zen-mode.nvim" },
+  { "iamcco/markdown-preview.nvim" },
 }
