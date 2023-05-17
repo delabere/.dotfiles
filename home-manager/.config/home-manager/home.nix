@@ -35,7 +35,7 @@
     #   echo "Hello, ${config.home.username}!"
     # '')
     #(pkgs.nerdfonts.override { fonts = [ "FantasqueSansMono" ]; })
-    pkgs.tmux
+    # pkgs.tmux
     pkgs.go
     pkgs.gopls
     pkgs.lazygit
@@ -63,17 +63,17 @@
   programs = {
     zsh = {
       enable = true;
-      dotDir = " .config/zsh ";
+      dotDir = ".config/zsh";
       # haven't quite managed to get these working
       #enableAutosuggestions = true;
       #enableCompletion = true;
 
       initExtra = ''
-                    # brew is installed here on m1 macs
-                    [[ $OSTYPE == 'darwin'* ]] && export PATH=/opt/homebrew/bin:$PATH
+        # brew is installed here on m1 macs
+        [[ $OSTYPE == 'darwin'* ]] && export PATH=/opt/homebrew/bin:$PATH
 
-                    # any .zshrc found can be sourced; its probably a work machine
-                    [ -f "$HOME/.zshrc " ] && source ~/.zshrc
+        # any .zshrc found can be sourced; its probably a work machine
+        [ -f "$HOME/.zshrc" ] && source ~/.zshrc
 
         # allows easy resetting of home-manager
         function rebuild-home-manager() {
@@ -120,6 +120,7 @@
         # work configuration
         [ -f $HOME/src/github.com/monzo/starter-pack/zshenv ] && source $HOME/src/github.com/monzo/starter-pack/zshenv
       '';
+
     };
     direnv.enable = true;
     fzf.enable = true;
@@ -139,100 +140,83 @@
       vimAlias = true;
     };
 
+    tmux = {
+      enable = true;
+      prefix = "C-a";
+
+      plugins = with pkgs; [
+        #     #  tmuxPlugins.resurrect
+        #     #  tmuxPlugins.better-mouse-mode
+        #     #  tmuxPlugins.catppuccin
+        #     #  tmuxPlugins.sensible
+        tmuxPlugins.vim-tmux-navigator
+        #     #  tmuxPlugins.continuum
+      ];
+
+      extraConfig = ''
+        set -g default-terminal "screen-256color"
+
+        # if you want to rebind the default "tmux" key
+        # set -g prefix C-a
+        unbind C-b
+        set-option -g prefix C-a
+        bind-key C-a send-prefix
+
+        # let copying use defauly clipboard
+        unbind C-y
+        unbind C-p
+        bind C-y run "tmux save-buffer - | xclip -i -sel clipboard"
+        bind C-p run "tmux set-buffer "$(xclip -o -sel clipboard)"; tmux paste-buffer"
+
+        # change window splits key
+        unbind %
+        bind v split-window -h
+
+        unbind '"'
+        bind s split-window -v
+
+        unbind r
+        bind r source-file ~/.tmux.conf
+
+        # pane resizing with vi binds
+        bind -r j resize-pane -D 5
+        bind -r k resize-pane -U 5
+        bind -r l resize-pane -R 5
+        bind -r h resize-pane -L 5
+        # maximise window
+        bind -r m resize-pane -Z
+
+        # enable mouse
+        set -g mouse on
+
+        set-window-option -g mode-keys vi
+
+        # vi bindings for copy mode
+        bind-key -T copy-mode-vi 'v' send -X begin-selection # start selecting text with "v"
+        bind-key -T copy-mode-vi 'y' send -X copy-selection # copy text with "y"
+
+        # enable mouse pane resizing
+        unbind -T copy-mode-vi MouseDragEnd1Pane # don't exit copy mode after dragging with mouse
+
+        # tpm plugin
+        set -g @plugin 'tmux-plugins/tpm'
+
+        # list of tmux plugins
+        set -g @plugin 'christoomey/vim-tmux-navigator' # for navigating panes and vim/nvim with Ctrl-hjkl
+        set -g @plugin 'jimeh/tmux-themepack' # to configure tmux theme
+        set -g @plugin 'tmux-plugins/tmux-resurrect' # persist tmux sessions after computer restart
+        set -g @plugin 'tmux-plugins/tmux-continuum' # automatically saves sessions for you every 15 minutes
+
+        # set -g @themepack 'powerline/default/cyan' # use this theme for tmux
+
+        set -g @resurrect-capture-pane-contents 'on' # allow tmux-ressurect to capture pane contents
+        set -g @continuum-restore 'on' # enable tmux-continuum functionality
+
+        # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
+        run '~/.tmux/plugins/tpm/tpm'
+      '';
+    };
   };
-
-  programs.tmux = {
-    enable = true;
-
-
-    plugins = with pkgs; [
-      tmuxPlugins.better-mouse-mode
-      # tmuxPlugins.catppuccin
-      tmuxPlugins.sensible
-      tmuxPlugins.vim-tmux-navigator
-      tmuxPlugins.continuum
-    ];
-
-    extraConfig = ''
-          set - g default-terminal "screen-256color"
-
-          # if you want to rebind the default "tmux" key
-          # set -g prefix C-a
-          unbind
-          C-b
-          set-option - g prefix C-a
-          bind-key
-          C-a
-          send-prefix
-
-          # let copying use defauly clipboard
-          unbind
-          C-y
-          unbind
-          C-p
-          bind
-          C-y
-          run "tmux save-buffer - | xclip -i -sel clipboard"
-          bind
-          C-p
-          run "tmux set-buffer "$
-          (xclip - o - sel clipboard) "; tmux paste-buffer"
-
-          # change window splits key
-          unbind %
-          bind
-          v
-          split-window - h
-
-          unbind '"'
-          bind s split-window -v
-
-          unbind r
-          bind r source-file ~/.tmux.conf
-
-          # pane resizing with vi binds
-          bind -r j resize-pane -D 5
-          bind -r k resize-pane -U 5
-          bind -r l resize-pane -R 5
-          bind -r h resize-pane -L 5
-          # maximise window
-          bind -r m resize-pane -Z
-
-          # enable mouse
-          set -g mouse on
-
-          set-window-option -g mode-keys vi
-
-          # vi bindings for copy mode
-          bind-key -T copy-mode-vi 'v' send -X begin-selection # start selecting text with "
-          v "
-      bind-key -T copy-mode-vi 'y' send -X copy-selection # copy text with "
-          y "
-
-                      # enable mouse pane resizing
-                      unbind -T copy-mode-vi MouseDragEnd1Pane # don't exit copy mode after dragging with mouse
-
-                      # tpm plugin
-                      set -g @plugin 'tmux-plugins/tpm'
-
-                      # list of tmux plugins
-                      set -g @plugin 'christoomey/vim-tmux-navigator' # for navigating panes and vim/nvim with Ctrl-hjkl
-                      set -g @plugin 'jimeh/tmux-themepack' # to configure tmux theme
-                      set -g @plugin 'tmux-plugins/tmux-resurrect' # persist tmux sessions after computer restart
-                      set -g @plugin 'tmux-plugins/tmux-continuum' # automatically saves sessions for you every 15 minutes
-
-                      # set -g @themepack 'powerline/default/cyan' # use this theme for tmux
-
-                      set -g @resurrect-capture-pane-contents 'on' # allow tmux-ressurect to capture pane contents
-                      set -g @continuum-restore 'on' # enable tmux-continuum functionality
-
-                      # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
-                      run '~/.tmux/plugins/tpm/tpm'
-
-    '';
-  };
-
-
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
@@ -266,9 +250,3 @@
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 }
-
-
-
-
-
-
