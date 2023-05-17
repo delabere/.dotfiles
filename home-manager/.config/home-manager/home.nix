@@ -154,15 +154,7 @@
       ];
 
       extraConfig = ''
-        set -g default-terminal "screen-256color"
-
-        # if you want to rebind the default "tmux" key
-        # set -g prefix C-a
-        unbind C-b
-        set-option -g prefix C-a
-        bind-key C-a send-prefix
-
-        # let copying use defauly clipboard
+        # let copying use default clipboard
         unbind C-y
         unbind C-p
         bind C-y run "tmux save-buffer - | xclip -i -sel clipboard"
