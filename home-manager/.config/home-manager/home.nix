@@ -91,15 +91,7 @@
             [ ! -f "$HOME/notes/$1.md" ] && touch "$HOME/notes/$1.md"
             nvim "$HOME/notes/$1.md"
         }
-
-        s101 () {
-          shipper deploy --s101 $1 --disable-progressive-rollouts
-        }
-
-        prod () {
-          shipper deploy --prod $1
-        }
-
+        
         alias lg='lazygit'
         alias gcm='git checkout master && git pull'
 
@@ -113,15 +105,24 @@
 
         # The next line enables shell command completion for gcloud.
         if [ -f '/Users/delabere/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/delabere/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
+       
+        
+        # work related stuff
+        s101 () {
+          shipper deploy --s101 $1 --disable-progressive-rollouts
+        }
 
+        prod () {
+          shipper deploy --prod $1
+        }
       '';
 
       envExtra = ''
         # work configuration
         [ -f $HOME/src/github.com/monzo/starter-pack/zshenv ] && source $HOME/src/github.com/monzo/starter-pack/zshenv
       '';
-
     };
+
     direnv.enable = true;
     fzf.enable = true;
     starship.enable = true;
