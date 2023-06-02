@@ -1,6 +1,17 @@
--- my own prododef plugin
 return {
-
+  { -- github PR reviews in nvim
+    "pwntester/octo.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-telescope/telescope.nvim",
+      "nvim-tree/nvim-web-devicons",
+    },
+    config = function()
+      require("octo").setup({
+        use_local_fs = true,
+      })
+    end,
+  },
   {
     "jose-elias-alvarez/null-ls.nvim",
     event = { "BufReadPre", "BufNewFile" },

@@ -1,10 +1,12 @@
 { config, pkgs, ... }:
-
+let
+user = builtins.getEnv "USER";
+in
 {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
-  home.username = "delabere";
-  home.homeDirectory = "/Users/delabere";
+  home.username = "jackrickards";
+  home.homeDirectory = "/Users/jackrickards";
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
@@ -109,12 +111,14 @@
         
         # work related stuff
         s101 () {
-          shipper deploy --s101 $1 --disable-progressive-rollouts
+          shipper deploy --s101 $1
         }
 
         prod () {
           shipper deploy --prod $1
         }
+
+        JAVA_HOME=$(/usr/libexec/java_home -v 19)
       '';
 
       envExtra = ''
