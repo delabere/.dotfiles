@@ -1,5 +1,6 @@
 return {
-  { -- github PR reviews in nvim
+  {
+    -- github PR reviews in nvim
     "pwntester/octo.nvim",
     dependencies = {
       "nvim-lua/plenary.nvim",
