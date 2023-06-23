@@ -93,6 +93,10 @@ in
             [ ! -f "$HOME/notes/$1.md" ] && touch "$HOME/notes/$1.md"
             nvim "$HOME/notes/$1.md"
         }
+
+        function gitprune() {
+          git fetch --all -p; git branch -vv | grep ": gone]" | awk '{ print $1 }' | xargs -n 1 git branch -D
+        }
         
         alias lg='lazygit'
         alias gcm='git checkout master && git pull'
@@ -109,6 +113,14 @@ in
         if [ -f '/Users/delabere/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/delabere/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
        
         
+      '';
+
+      envExtra = ''
+        # work configuration
+        [ -f $HOME/src/github.com/monzo/starter-pack/zshenv ] && source $HOME/src/github.com/monzo/starter-pack/zshenv
+
+        JAVA_HOME=$(/usr/libexec/java_home -v 19)
+        
         # work related stuff
         s101 () {
           shipper deploy --s101 $1
@@ -117,13 +129,6 @@ in
         prod () {
           shipper deploy --prod $1
         }
-
-        JAVA_HOME=$(/usr/libexec/java_home -v 19)
-      '';
-
-      envExtra = ''
-        # work configuration
-        [ -f $HOME/src/github.com/monzo/starter-pack/zshenv ] && source $HOME/src/github.com/monzo/starter-pack/zshenv
       '';
     };
 
