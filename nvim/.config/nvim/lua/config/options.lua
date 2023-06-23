@@ -7,3 +7,9 @@ vim.opt.winbar = "%=%m %f"
 
 -- disable swapfiles, they are super annoying
 vim.opt.swapfile = false
+
+-- creates an undo “breakpoint” before doing any formatting, so that undoing will revert only the edits made by the autoformatter
+vim.opt.undolevels = vim.opt.undolevels
+
+-- sets the base_branch for use by the changed_files telescope picker
+vim.g.telescope_changed_files_base_branch = "master"
