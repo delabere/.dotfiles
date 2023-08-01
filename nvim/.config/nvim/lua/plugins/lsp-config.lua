@@ -3,8 +3,17 @@ return {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
-      { "folke/neoconf.nvim", cmd = "Neoconf", config = true },
-      { "folke/neodev.nvim", opts = { experimental = { pathStrict = true } } },
+      {
+        "folke/neoconf.nvim",
+        cmd = "Neoconf",
+        config = true,
+      },
+      {
+        "folke/neodev.nvim",
+        opts = {
+          experimental = { pathStrict = true },
+        },
+      },
       { dir = "~/src/github.com/monzo/wearedev/tools/editors/nvim/nvim-monzo" },
       "mason.nvim",
       "williamboman/mason-lspconfig.nvim",
@@ -111,6 +120,14 @@ return {
         vim.lsp.protocol.make_client_capabilities(),
         require("cmp_nvim_lsp").default_capabilities(),
         opts.capabilities or {}
+        -- adds dynamic realoading when files have changed
+        -- {
+        --   workspace = {
+        --     didChangeWatchedFiles = {
+        --       dynamicRegistration = true,
+        --     },
+        --   },
+        -- }
       )
 
       local function setup(server)
