@@ -87,3 +87,14 @@ e.g. `$ stow nvim`
 `tmux` - open tmux
 `tmux source ~/.tmux.conf` - load config
 `ctrl+a I` - install plugins
+
+## when OSX does an update sometimes you will lose some important cofig from your `zshrc` which will stop nvim/tmux from working
+`sudo vim /etc/zshrc`
+add the following lines if they are missing from the bottom of your file:
+```zshrc
+# Nix
+if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+  . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+fi
+# End Nix
+```
