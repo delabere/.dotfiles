@@ -2,7 +2,6 @@ return {
 
   {
     "hrsh7th/nvim-cmp",
-
     dependencies = {
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-buffer",
@@ -18,7 +17,6 @@ return {
       "quangnguyen30192/cmp-nvim-ultisnips",
       "hrsh7th/cmp-nvim-lsp-signature-help",
     },
-
     opts = function()
       local cmp = require("cmp")
       return {
@@ -56,7 +54,6 @@ return {
           { name = "monzo_component", max_item_count = 20 },
           { name = "monzo_system", max_item_count = 20 },
         }),
-
         formatting = {
           format = function(_, item)
             local icons = require("lazyvim.config").icons.kinds

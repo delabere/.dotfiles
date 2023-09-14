@@ -101,14 +101,14 @@ return {
 
       if type(opts.diagnostics.virtual_text) == "table" and opts.diagnostics.virtual_text.prefix == "icons" then
         opts.diagnostics.virtual_text.prefix = vim.fn.has("nvim-0.10.0") == 0 and "●"
-          or function(diagnostic)
-            local icons = require("lazyvim.config").icons.diagnostics
-            for d, icon in pairs(icons) do
-              if diagnostic.severity == vim.diagnostic.severity[d:upper()] then
-                return icon
+            or function(diagnostic)
+              local icons = require("lazyvim.config").icons.diagnostics
+              for d, icon in pairs(icons) do
+                if diagnostic.severity == vim.diagnostic.severity[d:upper()] then
+                  return icon
+                end
               end
             end
-          end
       end
 
       vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
@@ -120,14 +120,14 @@ return {
         vim.lsp.protocol.make_client_capabilities(),
         require("cmp_nvim_lsp").default_capabilities(),
         opts.capabilities or {}
-        -- adds dynamic realoading when files have changed
-        -- {
-        --   workspace = {
-        --     didChangeWatchedFiles = {
-        --       dynamicRegistration = true,
-        --     },
-        --   },
-        -- }
+      -- adds dynamic realoading when files have changed
+      -- {
+      --   workspace = {
+      --     didChangeWatchedFiles = {
+      --       dynamicRegistration = true,
+      --     },
+      --   },
+      -- }
       )
 
       local function setup(server)
@@ -184,7 +184,6 @@ return {
         local opts = { noremap = true, silent = true }
         vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>ls", "<cmd>lua vim.lsp.buf.document_symbol()<CR>", opts)
         vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>lD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
-        vim.api.nvim_buf_set_keymap(bufnr, "n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
         vim.api.nvim_buf_set_keymap(bufnr, "n", "U", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
         vim.api.nvim_buf_set_keymap(bufnr, "n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
         vim.api.nvim_buf_set_keymap(bufnr, "n", "gt", "<cmd> lua vim.lsp.buf.type_definition()<CR>", opts)
@@ -208,9 +207,7 @@ return {
 
         vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
 
-        vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
-
-        vim.api.nvim_buf_set_keymap(bufnr, "n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
+        -- vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
 
         vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>lf", "<cmd>lua vim.lsp.buf.format()<CR>", opts)
 
