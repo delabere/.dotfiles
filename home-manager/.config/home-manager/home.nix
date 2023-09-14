@@ -38,15 +38,21 @@ in
     # '')
     #(pkgs.nerdfonts.override { fonts = [ "FantasqueSansMono" ]; })
     # pkgs.tmux
+    pkgs.delve
     pkgs.go
     pkgs.gopls
     pkgs.lazygit
+    pkgs.niv
+    pkgs.nodePackages.vscode-html-languageserver-bin
+    pkgs.nodejs
     pkgs.ranger
     pkgs.ripgrep
     pkgs.stow
     pkgs.sumneko-lua-language-server
+    pkgs.thefuck
     pkgs.tldr
     pkgs.tree
+    pkgs.watch
     pkgs.xclip
     pkgs.zsh
     pkgs.watch
@@ -92,6 +98,12 @@ in
             [ ! -d "$HOME/notes" ] && mkdir -p "$HOME/notes"
             [ ! -f "$HOME/notes/$1.md" ] && touch "$HOME/notes/$1.md"
             nvim "$HOME/notes/$1.md"
+        }
+        
+        # for maintaining a simple braglist
+        function brag() {
+            [ ! -f "$HOME/brag.md" ] && touch "$HOME/brag.md"
+            echo "$(date) | $1" >> $HOME/brag.md
         }
 
         function gitprune() {
