@@ -91,3 +91,7 @@ vim.cmd("xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>")
 --     vim.opt.undofile = true
 --     vim.opt.undodir = '~/.config/vim/tmp/undo//'
 -- end
+
+vim.cmd(
+  "nnoremap gh :let pp=getpos('.')<CR>:let res=split(system('handlertool '.shellescape(expand('%:p').':'.line('.').':'.col('.'))), ':')<CR>:e <C-R>=res[0]<CR><CR>:call setpos('.',[pp[0],res[1],res[2],0])<CR>"
+)
