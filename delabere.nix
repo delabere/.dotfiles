@@ -1,12 +1,12 @@
-{ config, pkgs, ... }:
-let
-  user = builtins.getEnv "USER";
-in
+{ config, pkgs, system, ... }:
 {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
-  home.username = "${user}";
-  home.homeDirectory = "/Users/delabere";
+  home.username = "delabere";
+  home.homeDirectory = {
+    aarch64-darwin = "/Users/delabere";
+    x86_64-linux = "/home/delabere";
+  }.${system};
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release

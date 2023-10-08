@@ -33,7 +33,27 @@
     {
       homeConfigurations = {
         delabere-aarch64-darwin = mkHomeManagerConfig ./delabere.nix "aarch64-darwin";
-        delabere-x64_86-linux = mkHomeManagerConfig ./delabere.nix "x64_86-linux";
+        delabere-x86_64-linux = mkHomeManagerConfig ./delabere.nix "x86_64-linux";
       };
+
+      nixosConfigurations = {
+        bitch = nixpkgs.lib.nixosSystem rec {
+          system = "x86_64-linux";
+          modules = [
+            ./bitch.nix
+            home-manager.nixosModules.home-manager
+          ];
+        };
+      };
+
+      devShells.aarch64-darwin.default =
+        let pkgs = nixpkgs.legacyPackages.aarch64-darwin;
+        in
+        pkgs.mkShell {
+          buildInputs = [
+            pkgs.nixos-rebuild
+          ];
+        };
     };
 }
+
