@@ -1,0 +1,39 @@
+{
+  description = "Home Manager configuration of delabere";
+
+  inputs = {
+    # Specify the source of Home Manager and Nixpkgs.
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+
+  outputs = { nixpkgs, home-manager, ... } @ inputs:
+    let
+      mkHomeManagerConfig = module: system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        home-manager.lib.homeManagerConfiguration {
+          pkgs = import nixpkgs {
+            inherit system;
+          };
+
+          modules = [
+            module
+          ];
+
+          extraSpecialArgs = {
+            inherit inputs system;
+          };
+        };
+    in
+    {
+      homeConfigurations = {
+        delabere-aarch64-darwin = mkHomeManagerConfig ./delabere.nix "aarch64-darwin";
+        delabere-x64_86-linux = mkHomeManagerConfig ./delabere.nix "x64_86-linux";
+      };
+    };
+}
