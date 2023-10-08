@@ -1,12 +1,12 @@
 { config, pkgs, ... }:
 let
-user = builtins.getEnv "USER";
+  user = builtins.getEnv "USER";
 in
 {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
-  home.username = "jackrickards";
-  home.homeDirectory = "/Users/jackrickards";
+  home.username = "${user}";
+  home.homeDirectory = "/Users/delabere";
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
@@ -55,12 +55,6 @@ in
     pkgs.watch
     pkgs.xclip
     pkgs.zsh
-    pkgs.watch
-    pkgs.thefuck
-    pkgs.nodejs
-    pkgs.niv
-    pkgs.delve
-    pkgs.nodePackages.vscode-html-languageserver-bin
     (pkgs.nerdfonts.override {
       fonts = [ "FiraCode" "Hack" ];
     })
