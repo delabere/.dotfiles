@@ -35,8 +35,9 @@ You might find cases where you've pushed a change that is not being recognised b
 ```$ home-manager switch --flake github:delabere/.dotfiles#delabere-aarch64-darwin --reload```
 
 ## Nvim setup
-Neovim will have been installed already as part of the home-manager setup. But it won't be able to find the configuration in the default home directory unless you stow the nvim directory.
-Stow sym-links the directory so that if you pull changes to the dotfiles repo, nvim knows about it right away.
+Neovim gets installed as part of the home-manager setup. But it won't find your configuration in the default home directory (`~/.config/nvim/`) unless you stow the nvim directory first.
+
+Stow creates a sym-link to the directory in our repo so that if you pull new changes in, nvim knows about it right away.
 
 Just run:
 `$ stow nvim` 
