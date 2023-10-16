@@ -18,16 +18,20 @@ Point home-manager at our "flakified" repo. You need to use the correct configur
 These are defined [here](https://github.com/delabere/.dotfiles/blob/89ff1dcf20294a49e08580f7b323e96d47173cec/flake.nix#L34-L37)
 
 Build the following command depending on the configuration you need and run:
+
 ```$ nix run home-manager/master switch -- --flake github:delabere/.dotfiles#delabere-aarch64-darwin```
 
 After you've run the above you can use the local home manager for subsequent set-ups:
+
 ```$ home-manager switch --flake github:delabere/.dotfiles#delabere-aarch64-darwin```
 
 If you're testing out some new setups on a local branch or just prefer it, you can also point home-manager at the local
 flake like so:
+
 ```$ home-manager switch --flake ~/.dotfiles#work-aarch64-darwin```
 
 You might find cases where you've pushed a change that is not being recognised by home-manager when using the git flake syntax. If that's happening, use the --reload argument to force a re-download.
+
 ```$ home-manager switch --flake github:delabere/.dotfiles#delabere-aarch64-darwin --reload```
 
 ## Nvim setup
