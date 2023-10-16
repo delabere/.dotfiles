@@ -37,6 +37,7 @@ You might find cases where you've pushed a change that is not being recognised b
 ## Nvim setup
 Neovim gets installed as part of the home-manager setup. But it won't find your configuration in the default home directory (`~/.config/nvim/`) unless you stow the nvim directory first.
 
+
 Stow creates a sym-link to the directory in our repo so that if you pull new changes in, nvim knows about it right away.
 
 Just run:
