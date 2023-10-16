@@ -4,6 +4,11 @@ my dotfiles
 ## install nix
 https://nixos.org/download.html
 
+https://zero-to-nix.com/concepts/nix-installer#using
+
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+
+
 ## enable flakes
 add the following to `/etc/nix/nix.conf`
 `experimental-features = nix-command flakes`

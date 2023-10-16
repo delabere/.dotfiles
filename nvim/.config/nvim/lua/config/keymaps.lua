@@ -54,9 +54,9 @@ vim.keymap.set("n", "<Leader>k", ":cnext<CR>")
 vim.keymap.set("x", "p", "pgvy")
 
 -- -- options
--- vim.opt.tabstop = 4 -- show existing tab with 4 spaces width
--- vim.opt.shiftwidth = 4 -- when indenting with '>', use 4 spaces width
--- vim.opt.expandtab = true -- On pressing tab, insert 4 spaces
+vim.opt.tabstop = 4 -- show existing tab with 4 spaces width
+vim.opt.shiftwidth = 4 -- when indenting with '>', use 4 spaces width
+vim.opt.expandtab = true -- On pressing tab, insert 4 spaces
 -- vim.opt.encoding = 'UTF-8'
 -- vim.opt.hidden = true -- preserve background buffers
 -- vim.opt.hlsearch = true -- highlights search terms

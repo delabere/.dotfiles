@@ -8,7 +8,11 @@
   networking.hostName = "bitch";
 
   security.sudo.wheelNeedsPassword = false;
-  nix.settings.trusted-users = [ "@wheel" ];
+
+  nix.settings = {
+    trusted-users = [ "@wheel" ];
+    experimental-features = [ "nix-command" "flakes" ];
+  };
 
   users.users = {
     delabere = {
