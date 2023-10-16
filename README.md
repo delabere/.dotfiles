@@ -13,10 +13,10 @@ Dotfiles themselves are managed as part of the nix configurations such as in `de
 ## Home-Manager setup
 Point home-manager at the flake in this repo. You need to use the correct configuration depending on what aarch you are using and these are defined [here](https://github.com/delabere/.dotfiles/blob/89ff1dcf20294a49e08580f7b323e96d47173cec/flake.nix#L34-L37)
 Build the following command depending on the configuration you need and run:
-```$ nix run home-manager/master switch -- --flake github:delabere/.dotfiles/oleh-and-jack-hack#delabere-aarch64-darwin```
+```$ nix run home-manager/master switch -- --flake github:delabere/.dotfiles#delabere-aarch64-darwin```
 
 After you've run the above you can use the local home manager for subsequent set-ups:
-```$ home-manager switch --flake github:delabere/.dotfiles/oleh-and-jack-hack#delabere-aarch64-darwin```
+```$ home-manager switch --flake github:delabere/.dotfiles#delabere-aarch64-darwin```
 
 ## Nvim setup
 Neovim will have been installed already as part of the home-manager setup. But it won't be able to find the configuration in the default home directory unless you stow the nvim directory.
