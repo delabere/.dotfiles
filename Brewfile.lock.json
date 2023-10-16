@@ -1,0 +1,54 @@
+{
+  "entries": {
+    "cask": {
+      "iterm2": {
+        "version": "3.4.19",
+        "options": {
+          "full_name": "iterm2"
+        }
+      },
+      "whatsapp": {
+        "version": "2.2312.7",
+        "options": {
+          "full_name": "whatsapp"
+        }
+      },
+      "rectangle": {
+        "version": "0.67",
+        "options": {
+          "full_name": "rectangle"
+        }
+      },
+      "thor": {
+        "version": "1.5.11",
+        "options": {
+          "full_name": "thor"
+        }
+      },
+      "1password": {
+        "version": "8.10.3",
+        "options": {
+          "full_name": "1Password"
+        }
+      },
+      "google-drive": {
+        "version": "72.0.3",
+        "options": {
+          "full_name": "google-drive"
+        }
+      }
+    }
+  },
+  "system": {
+    "macos": {
+      "ventura": {
+        "HOMEBREW_VERSION": "4.0.9",
+        "HOMEBREW_PREFIX": "/opt/homebrew",
+        "Homebrew/homebrew-core": "api",
+        "CLT": "14.2.0.0.1.1668646533",
+        "Xcode": "14.1",
+        "macOS": "13.2.1"
+      }
+    }
+  }
+}

@@ -1,5 +1,4 @@
- " these are all the linked files, for easy access use 'gf' on any of themdao
-" │ │ │  plugin/coc.vim
+" these are all the linked files, for easy access use 'gf' on any of themdao
 " │ │ │  plugin/go.vim
 " │ │ │  lua/autosave-plug.lua
 " │ │ │  lua/mapsandsets-plug.lua
@@ -86,6 +85,7 @@ Plug 'ruanyl/vim-gh-line'
 " debugging
 Plug 'mfussenegger/nvim-dap'
 Plug 'leoluz/nvim-dap-go'
+Plug 'mfussenegger/nvim-dap-python'
 Plug 'rcarriga/nvim-dap-ui'
 Plug 'theHamsta/nvim-dap-virtual-text'
 Plug 'nvim-telescope/telescope-dap.nvim'
@@ -106,6 +106,7 @@ Plug 'f3fora/cmp-spell'
 Plug 'tamago324/cmp-zsh'
 Plug 'quangnguyen30192/cmp-nvim-ultisnips'
 Plug 'hrsh7th/cmp-nvim-lsp-signature-help'
+Plug 'williamboman/mason.nvim'
 
 " open lazygit in a floating window
 Plug 'kdheepak/lazygit.nvim'
@@ -145,10 +146,10 @@ lua require("mason-lspconfig").setup()
 lua require('lsp-config')
 
 lua require('dap-debug')
-lua require('go').setup()
+" lua require('go').setup()
 lua require('navigator').setup({lsp={ disable_lsp = {'gopls'}, disply_diagnostic_qf = false }, treesitter_analysis = false})
 lua require('telescope-plug')
-
+lua require("mason").setup()
 " allows you to select multiple lines in visual mode
 " and perform a macro on all of them at the same time
 function! ExecuteMacroOverVisualRange()
@@ -172,6 +173,16 @@ nnoremap gh :let pp=getpos('.')<CR>:let res=split(system('handlertool '.shellesc
 
 "👇 you can put lua code inside blocks like this 
 lua << EOF
+
+local dap = require('dap')
+dap.adapters.python = {
+  type = 'executable';
+  command = 'python3';
+  args = {'-m', 'debugpy.adapter'};
+}
+
+
+
 require "octo".setup({
     use_local_fs = true, -- use local files on right side of reviews
     default_remote = { "upstream", "origin" }; -- order to try remotes
@@ -315,5 +326,6 @@ require "octo".setup({
         }
     }
 })
-EOF
 
+
+EOF
