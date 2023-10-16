@@ -1,17 +1,22 @@
 # Dotfiles
 This repo actually does a lot more than manage dotfiles
+
 Follow the steps below to completely set up a new or existing machine
+
 
 This setup uses nix home-manager to install software to get you from 0-productive as fast as possible
 
 Dotfiles themselves are managed as part of the nix configurations such as in `delabere.nix`
 
 ## Nix installation
+We're using a rust installer which is fast, and doesn't require you to explicitly allow experimental features (which we need for flakes support)
 ```$ curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install```
 (https://zero-to-nix.com/concepts/nix-installer#using)
 
 ## Home-Manager setup
-Point home-manager at the flake in this repo. You need to use the correct configuration depending on what aarch you are using and these are defined [here](https://github.com/delabere/.dotfiles/blob/89ff1dcf20294a49e08580f7b323e96d47173cec/flake.nix#L34-L37)
+Point home-manager at our "flakified" repo. You need to use the correct configuration in your flake syntax depending on what aarch you are using. 
+These are defined [here](https://github.com/delabere/.dotfiles/blob/89ff1dcf20294a49e08580f7b323e96d47173cec/flake.nix#L34-L37)
+
 Build the following command depending on the configuration you need and run:
 ```$ nix run home-manager/master switch -- --flake github:delabere/.dotfiles#delabere-aarch64-darwin```
 
