@@ -71,6 +71,11 @@
       #enableCompletion = true;
 
       initExtra = ''
+        # so that when mac updates we add nix back into the zshrc file
+        programs.zsh.initExtra = "if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+        . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+        fi";
+
         # brew is installed here on m1 macs
         [[ $OSTYPE == 'darwin'* ]] && export PATH=/opt/homebrew/bin:$PATH
 

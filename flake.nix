@@ -36,5 +36,6 @@
         delabere-x86_64-linux = mkHomeManagerConfig ./delabere.nix "x86_64-linux";
         work-aarch64-darwin = mkHomeManagerConfig ./work.nix "aarch64-darwin";
       };
-    }
+    };
+}
 
