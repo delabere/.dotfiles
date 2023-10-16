@@ -18,6 +18,13 @@ Build the following command depending on the configuration you need and run:
 After you've run the above you can use the local home manager for subsequent set-ups:
 ```$ home-manager switch --flake github:delabere/.dotfiles#delabere-aarch64-darwin```
 
+If you're testing out some new setups on a local branch or just prefer it, you can also point home-manager at the local
+flake like so:
+```$ home-manager switch --flake ~/.dotfiles#work-aarch64-darwin```
+
+You might find cases where you've pushed a change that is not being recognised by home-manager when using the git flake syntax. If that's happening, use the --reload argument to force a re-download.
+```$ home-manager switch --flake github:delabere/.dotfiles#delabere-aarch64-darwin --reload```
+
 ## Nvim setup
 Neovim will have been installed already as part of the home-manager setup. But it won't be able to find the configuration in the default home directory unless you stow the nvim directory.
 Stow sym-links the directory so that if you pull changes to the dotfiles repo, nvim knows about it right away.
