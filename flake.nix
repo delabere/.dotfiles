@@ -36,25 +36,5 @@
         delabere-x86_64-linux = mkHomeManagerConfig ./delabere.nix "x86_64-linux";
         work-aarch64-darwin = mkHomeManagerConfig ./work.nix "aarch64-darwin";
       };
-
-      nixosConfigurations = {
-        bitch = nixpkgs.lib.nixosSystem rec {
-          system = "x86_64-linux";
-          modules = [
-            ./bitch.nix
-            home-manager.nixosModules.home-manager
-          ];
-        };
-      };
-
-      devShells.aarch64-darwin.default =
-        let pkgs = nixpkgs.legacyPackages.aarch64-darwin;
-        in
-        pkgs.mkShell {
-          buildInputs = [
-            pkgs.nixos-rebuild
-          ];
-        };
-    };
-}
+    }
 
