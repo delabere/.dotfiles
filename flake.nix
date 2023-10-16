@@ -34,6 +34,7 @@
       homeConfigurations = {
         delabere-aarch64-darwin = mkHomeManagerConfig ./delabere.nix "aarch64-darwin";
         delabere-x86_64-linux = mkHomeManagerConfig ./delabere.nix "x86_64-linux";
+        work-aarch64-darwin = mkHomeManagerConfig ./work.nix "aarch64-darwin";
       };
 
       nixosConfigurations = {

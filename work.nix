@@ -2,10 +2,10 @@
 {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
-  home.username = "delabere";
+  home.username = "jackrickards";
   home.homeDirectory = {
-    aarch64-darwin = "/Users/delabere";
-    x86_64-linux = "/home/delabere";
+    aarch64-darwin = "/Users/jackrickards/";
+    x86_64-linux = "/home/jackrickards";
   }.${system};
 
   # This value determines the Home Manager release that your configuration is
