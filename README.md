@@ -32,7 +32,7 @@ flake like so:
 
 You might find cases where you've pushed a change that is not being recognised by home-manager when using the git flake syntax. If that's happening, use the --reload argument to force a re-download.
 
-```$ home-manager switch --flake github:delabere/.dotfiles#delabere-aarch64-darwin --reload```
+```$ home-manager switch --flake github:delabere/.dotfiles#delabere-aarch64-darwin --refresh```
 
 ## Nvim setup
 Neovim gets installed as part of the home-manager setup. But it won't find your configuration in the default home directory (`~/.config/nvim/`) unless you stow the nvim directory first.
