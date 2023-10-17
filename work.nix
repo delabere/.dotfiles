@@ -160,6 +160,13 @@
         prod () {
           shipper deploy --prod $1
         }
+
+        function mergeship() {
+        local PRNumber=$(gh pr view $(git branch --show-current) --json url --template "{{.url}}") &&\
+        gh pr merge -sd &&\
+        echo "Shipping $PRNumber to production with automated rollback" &&\
+        shipper deploy --s101 --skip-confirm-rollout $PRNumber && shipper deploy --prod --skip-confirm-rollout $$
+    }
       '';
     };
 
