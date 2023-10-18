@@ -39,8 +39,8 @@
     #(pkgs.nerdfonts.override { fonts = [ "FantasqueSansMono" ]; })
     # pkgs.tmux
     pkgs.delve
-    pkgs.go
-    pkgs.gopls
+    # pkgs.go
+    # pkgs.gopls
     pkgs.lazygit
     pkgs.niv
     pkgs.nodePackages.vscode-html-languageserver-bin
