@@ -42,6 +42,7 @@ return {
     make = ":GoInstallBinaries",
     config = function()
       vim.g.go_gopls_enabled = false -- or false to disable
+      vim.g.go_def_mapping_enabled = false -- stops vim-go taking over <C-t> for tagstack jumps
     end,
   },
 
