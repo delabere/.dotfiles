@@ -113,7 +113,7 @@ return {
                 lspconfig.gopls.setup(monzo_lsp.go_config({
                     on_attach = on_attach,
                     capabilities = capabilities,
-                    cmd = { "/Users/jackrickards/bin/gopls.sh", "-remote=auto" },
+                    cmd = { "/Users/" .. os.getenv("USER") .. "/bin/gopls.sh", "-remote=auto" },
                 }))
             else -- otherwise we are happy with defaults
                 require("lspconfig")["gopls"].setup({
