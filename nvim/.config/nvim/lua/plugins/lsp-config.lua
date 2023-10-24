@@ -39,8 +39,9 @@ return {
             --   },
             -- }
             )
+
             local on_attach = function(client, bufnr)
-                local opts = { noremap = true, silent = true }
+                opts = { noremap = true, silent = true }
                 vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>ls", "<cmd>lua vim.lsp.buf.document_symbol()<CR>", opts)
                 vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>lD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
                 vim.api.nvim_buf_set_keymap(bufnr, "n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
@@ -112,6 +113,7 @@ return {
                 lspconfig.gopls.setup(monzo_lsp.go_config({
                     on_attach = on_attach,
                     capabilities = capabilities,
+                    cmd = { "/Users/jackrickards/bin/gopls.sh", "-remote=auto" },
                 }))
             else -- otherwise we are happy with defaults
                 require("lspconfig")["gopls"].setup({
