@@ -55,6 +55,7 @@
     pkgs.watch
     pkgs.xclip
     pkgs.zsh
+    pkgs.cargo
     (pkgs.nerdfonts.override {
       fonts = [ "FiraCode" "Hack" ];
     })
