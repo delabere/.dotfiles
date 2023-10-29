@@ -143,7 +143,11 @@
 
         # The next line enables shell command completion for gcloud.
         if [ -f '/Users/delabere/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/delabere/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
-       
+        
+        # to enable natural text navigation
+        bindkey -e
+        bindkey "^[f" forward-word
+        bindkey "^[b" backward-word
         
       '';
 
