@@ -14,12 +14,12 @@
     let
       mkHomeManagerConfig = module: system:
         let
-          pkgs = nixpkgs.legacyPackages.${system};
-        in
-        home-manager.lib.homeManagerConfiguration {
           pkgs = import nixpkgs {
             inherit system;
           };
+        in
+        home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
 
           modules = [
             module
