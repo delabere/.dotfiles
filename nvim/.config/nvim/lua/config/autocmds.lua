@@ -7,7 +7,7 @@ vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "InsertLeave" }, {
     command = "silent! wa",
 })
 
-vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave" }, {
+vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "BufWritePre" }, {
     pattern = {
         "*.lua",
         "*.py",
