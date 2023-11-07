@@ -13,27 +13,25 @@ return {
             })
         end,
     },
-    -- {
-    --   "nvimtools/none-ls.nvim",
-    --   event = { "BufReadPre", "BufNewFile" },
-    --   dependencies = { "mason.nvim", "ThePrimeagen/refactoring.nvim" },
-    --   opts = function()
-    --     local nls = require("null-ls")
-    --     return {
-    --       root_dir = require("null-ls.utils").root_pattern(".null-ls-root", ".neoconf.json", "Makefile", ".git", ".py"),
-    --       sources = {
-    --         nls.builtins.formatting.fish_indent,
-    --         nls.builtins.diagnostics.fish,
-    --         nls.builtins.formatting.stylua,
-    --         nls.builtins.formatting.shfmt,
-    --         nls.builtins.formatting.isort,
-    --         nls.builtins.formatting.black,
-    --         -- nls.builtins.code_actions.refactoring,
-    --         -- nls.builtins.diagnostics.flake8,
-    --       },
-    --     }
-    --   end,
-    -- },
+    {
+        "nvimtools/none-ls.nvim",
+        opts = function(_, opts)
+            local nls = require("null-ls")
+            opts.root_dir = opts.root_dir
+                or require("null-ls.utils").root_pattern(".null-ls-root", ".neoconf.json", "Makefile", ".git")
+            opts.sources = vim.list_extend(opts.sources or {}, {
+                -- nls.builtins.formatting.fish_indent,
+                -- nls.builtins.diagnostics.fish,
+                -- nls.builtins.formatting.stylua,
+                -- nls.builtins.formatting.shfmt,
+                nls.builtins.formatting.isort,
+                nls.builtins.formatting.black,
+                -- nls.builtins.diagnostics.flake8,
+                nls.builtins.formatting.alejandra,
+                -- nls.builtins.diagnostics.statix,
+            })
+        end,
+    },
 
     { "delabere/protodef" },
     { "folke/zen-mode.nvim" },
@@ -41,7 +39,7 @@ return {
         "fatih/vim-go",
         make = ":GoInstallBinaries",
         config = function()
-            vim.g.go_gopls_enabled = false -- or false to disable
+            vim.g.go_gopls_enabled = false       -- or false to disable
             vim.g.go_def_mapping_enabled = false -- stops vim-go taking over <C-t> for tagstack jumps
         end,
     },
@@ -103,9 +101,9 @@ return {
         "christoomey/vim-tmux-navigator",
         keys = {
             { "<C-h>", "<C-U>TmuxNavigateRight<cr>", desc = "Tmux Navigate Right" },
-            { "<C-k>", "<C-U>TmuxNavigateUp<cr>", desc = "Tmux Navigate Up" },
-            { "<C-j>", "<C-U>TmuxNavigateDown<cr>", desc = "Tmux Navigate Down" },
-            { "<C-l>", "<C-U>TmuxNavigateLeft<cr>", desc = "Tmux Navigate Left" },
+            { "<C-k>", "<C-U>TmuxNavigateUp<cr>",    desc = "Tmux Navigate Up" },
+            { "<C-j>", "<C-U>TmuxNavigateDown<cr>",  desc = "Tmux Navigate Down" },
+            { "<C-l>", "<C-U>TmuxNavigateLeft<cr>",  desc = "Tmux Navigate Left" },
         },
     },
 
