@@ -4,16 +4,17 @@
 
 -- autosave
 vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "InsertLeave" }, {
-  command = "silent! wa",
+    command = "silent! wa",
 })
 
 vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave" }, {
-  pattern = {
-    "*.lua",
-    "*.py",
-    "*.go",
-  },
-  command = "silent! lua vim.lsp.buf.format()",
+    pattern = {
+        "*.lua",
+        "*.py",
+        "*.go",
+        "*.nix",
+    },
+    command = "silent! lua vim.lsp.buf.format()",
 })
 -- vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave" }, {
 --   callback = function()
