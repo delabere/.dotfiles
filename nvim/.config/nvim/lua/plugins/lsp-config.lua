@@ -50,8 +50,8 @@ return {
                 vim.api.nvim_buf_set_keymap(bufnr, "n", "gt", "<cmd> lua vim.lsp.buf.type_definition()<CR>", opts)
 
                 -- vim.api.nvim_buf_set_keymap(bufnr, 'n', 'U', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-                vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>lwa", "<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>"
-                    , opts)
+                vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>lwa", "<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>",
+                    opts)
                 vim.api.nvim_buf_set_keymap(
                     bufnr,
                     "n",
@@ -122,7 +122,7 @@ return {
                 })
             end
 
-            local servers = { "pyright", "tsserver" }
+            local servers = { "pyright", "tsserver", "rust_analyzer", "nil_ls" }
             for _, lsp in ipairs(servers) do
                 require("lspconfig")[lsp].setup({
                     on_attach = on_attach,
