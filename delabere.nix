@@ -1,12 +1,18 @@
-{ config, pkgs, system, ... }:
 {
+  config,
+  pkgs,
+  system,
+  ...
+}: {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = "delabere";
-  home.homeDirectory = {
-    aarch64-darwin = "/Users/delabere";
-    x86_64-linux = "/home/delabere";
-  }.${system};
+  home.homeDirectory =
+    {
+      aarch64-darwin = "/Users/delabere";
+      x86_64-linux = "/home/delabere";
+    }
+    .${system};
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
@@ -16,7 +22,6 @@
   # want to update the value, then make sure to first check the Home Manager
   # release notes.
   home.stateVersion = "22.11"; # Please read the comment before changing.
-
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
@@ -38,11 +43,13 @@
     # '')
     #(pkgs.nerdfonts.override { fonts = [ "FantasqueSansMono" ]; })
     # pkgs.tmux
+    pkgs.alejandra
     pkgs.delve
     pkgs.go
     pkgs.gopls
     pkgs.lazygit
     pkgs.niv
+    pkgs.nixpkgs-fmt
     pkgs.nodePackages.vscode-html-languageserver-bin
     pkgs.nodejs
     pkgs.ranger
@@ -55,9 +62,8 @@
     pkgs.watch
     pkgs.xclip
     pkgs.zsh
-    pkgs.cargo
     (pkgs.nerdfonts.override {
-      fonts = [ "FiraCode" "Hack" ];
+      fonts = ["FiraCode" "Hack"];
     })
   ];
 
@@ -73,9 +79,9 @@
 
       initExtra = ''
         # so that when mac updates we add nix back into the zshrc file
-        programs.zsh.initExtra = "if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
-        . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
-        fi";
+        if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+          . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+        fi
 
         # brew is installed here on m1 macs
         [[ $OSTYPE == 'darwin'* ]] && export PATH=/opt/homebrew/bin:$PATH
@@ -99,25 +105,25 @@
             [ ! -f "$HOME/notes/$1.md" ] && touch "$HOME/notes/$1.md"
             nvim "$HOME/notes/$1.md"
         }
-        
+
         # for maintaining and reading a simple braglist
         function brag() {
             [ ! -f "$HOME/brag.md" ] && touch "$HOME/brag.md"
             if [[ -z $1 ]]
             then
               cat $HOME/brag.md
-            else 
+            else
               echo "$(date +%d/%m/%Y) | $1" >> $HOME/brag.md
             fi
         }
-        
+
         # for maintaining and reading a simple learnlist
         function learnit() {
             [ ! -f "$HOME/learnit.txt" ] && touch "$HOME/learnit.txt"
             if [[ -z $1 ]]
             then
               cat $HOME/learnit.txt
-            else 
+            else
               echo "$(date +%d/%m/%Y) | $1" >> $HOME/learnit.txt
             fi
         }
@@ -125,7 +131,7 @@
         function gitprune() {
           git fetch --all -p; git branch -vv | grep ": gone]" | awk '{ print $1 }' | xargs -n 1 git branch -D
         }
-        
+
         alias lg='lazygit'
         alias gcm='git checkout master && git pull'
 
@@ -133,30 +139,23 @@
         # pr more easily
         alias reset-commits='git reset --soft $(git merge-base master HEAD)'
 
-        # for pyenv
-        export PYENV_ROOT="$HOME/.pyenv"
-        command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
-        eval "$(pyenv init -)"
-
         # The next line updates PATH for the Google Cloud SDK.
         if [ -f '/Users/delabere/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/delabere/Downloads/google-cloud-sdk/path.zsh.inc'; fi
 
         # The next line enables shell command completion for gcloud.
         if [ -f '/Users/delabere/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/delabere/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
-        
+
         # to enable natural text navigation
         bindkey -e
         bindkey "^[f" forward-word
         bindkey "^[b" backward-word
-        
+
       '';
 
       envExtra = ''
         # work configuration
         [ -f $HOME/src/github.com/monzo/starter-pack/zshenv ] && source $HOME/src/github.com/monzo/starter-pack/zshenv
 
-        JAVA_HOME=$(/usr/libexec/java_home -v 19)
-        
         # work related stuff
         s101 () {
           shipper deploy --s101 $1
