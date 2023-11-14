@@ -10,6 +10,7 @@
   home.homeDirectory =
     {
       aarch64-darwin = "/Users/delabere";
+      aarch64-linux = "/home/ubuntu";
       x86_64-linux = "/home/delabere";
     }
     .${system};
