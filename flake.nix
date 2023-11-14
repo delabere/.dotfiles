@@ -34,7 +34,7 @@
   in {
     homeConfigurations = {
       delabere-aarch64-darwin = mkHomeManagerConfig ./delabere.nix "aarch64-darwin";
-      delabere-aarch64-linux = mkHomeManagerConfig ./delabere.nix "aarch64-linux";
+      lakeview-aarch64-linux = mkHomeManagerConfig ./lakeview.nix "aarch64-linux";
       delabere-x86_64-linux = mkHomeManagerConfig ./delabere.nix "x86_64-linux";
       work-aarch64-darwin = mkHomeManagerConfig ./work.nix "aarch64-darwin";
     };
