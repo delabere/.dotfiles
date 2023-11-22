@@ -122,6 +122,7 @@
         
         alias lg='lazygit'
         alias gcm='git checkout master && git pull'
+        alias cat=bat
 
         # this one let's me pull all my changes back into the index so I can structure my commits on a more complex
         # pr more easily
