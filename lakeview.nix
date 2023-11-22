@@ -6,12 +6,10 @@
 }: {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
-  home.username = "delabere";
+  home.username = "ubuntu";
   home.homeDirectory =
     {
-      aarch64-darwin = "/Users/delabere";
       aarch64-linux = "/home/ubuntu";
-      x86_64-linux = "/home/delabere";
     }
     .${system};
 
@@ -135,7 +133,6 @@
 
         alias lg='lazygit'
         alias gcm='git checkout master && git pull'
-        alias cat=bat
 
         # this one let's me pull all my changes back into the index so I can structure my commits on a more complex
         # pr more easily
