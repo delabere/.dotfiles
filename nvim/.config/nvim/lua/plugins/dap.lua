@@ -1,5 +1,5 @@
 return {
-    "mfussenegger/nvim-dap",
+  "mfussenegger/nvim-dap",
     -- stylua: ignore
     keys = {
         {
@@ -84,7 +84,7 @@ return {
             "Widgets"
         },
     },
-    config = function()
-        require("dap-go").setup()
-    end,
+  config = function()
+    require("dap-go").setup()
+  end,
 }

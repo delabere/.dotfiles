@@ -4,12 +4,12 @@
 
 -- autosave
 vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "InsertLeave" }, {
-    command = "silent! wa",
+  command = "silent! wa",
 })
 
 vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "InsertLeave" }, {
-    pattern = "*",
-    callback = function(args)
-        require("conform").format({ bufnr = args.buf })
-    end,
+  pattern = "*",
+  callback = function(args)
+    require("conform").format({ bufnr = args.buf })
+  end,
 })
