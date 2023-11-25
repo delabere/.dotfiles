@@ -45,6 +45,7 @@
     #(pkgs.nerdfonts.override { fonts = [ "FantasqueSansMono" ]; })
     # pkgs.tmux
     pkgs.alejandra
+    pkgs.btop
     pkgs.delve
     pkgs.go
     pkgs.gopls
