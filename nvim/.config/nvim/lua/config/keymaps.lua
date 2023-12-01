@@ -7,18 +7,18 @@ vim.keymap.set("i", "kj", "<Esc>")
 
 -- resume the last open telescope picker
 vim.keymap.set(
-    "n",
-    "<leader>sx",
-    require("telescope.builtin").resume,
-    { noremap = true, silent = true, desc = "Resume" }
+  "n",
+  "<leader>sx",
+  require("telescope.builtin").resume,
+  { noremap = true, silent = true, desc = "Resume" }
 )
 
 -- mapping for protodef plugin
 vim.keymap.set(
-    "n",
-    "<leader>gp",
-    require("protodef").protodef,
-    { noremap = true, silent = true, desc = "ProtoDefinition" }
+  "n",
+  "<leader>gp",
+  require("protodef").protodef,
+  { noremap = true, silent = true, desc = "ProtoDefinition" }
 )
 
 -- No more Arrow Keys, deal with it
@@ -54,8 +54,8 @@ vim.keymap.set("n", "<Leader>k", ":cnext<CR>")
 vim.keymap.set("x", "p", "pgvy")
 
 -- -- options
-vim.opt.tabstop = 4      -- show existing tab with 4 spaces width
-vim.opt.shiftwidth = 4   -- when indenting with '>', use 4 spaces width
+vim.opt.tabstop = 4 -- show existing tab with 4 spaces width
+vim.opt.shiftwidth = 4 -- when indenting with '>', use 4 spaces width
 vim.opt.expandtab = true -- On pressing tab, insert 4 spaces
 -- vim.opt.encoding = 'UTF-8'
 -- vim.opt.hidden = true -- preserve background buffers
@@ -93,5 +93,5 @@ vim.cmd("xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>")
 -- end
 
 vim.cmd(
-    "nnoremap gh :let pp=getpos('.')<CR>:let res=split(system('handlertool '.shellescape(expand('%:p').':'.line('.').':'.col('.'))), ':')<CR>:e <C-R>=res[0]<CR><CR>:call setpos('.',[pp[0],res[1],res[2],0])<CR>"
+  "nnoremap gh :let pp=getpos('.')<CR>:let res=split(system('handlertool '.shellescape(expand('%:p').':'.line('.').':'.col('.'))), ':')<CR>:e <C-R>=res[0]<CR><CR>:call setpos('.',[pp[0],res[1],res[2],0])<CR>"
 )

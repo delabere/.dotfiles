@@ -121,7 +121,7 @@ return {
         })
       end
 
-      local servers = { "pyright", "tsserver", "rust_analyzer", "nil_ls", "bufls" }
+      local servers = { "pyright", "tsserver", "rust_analyzer" }
       for _, lsp in ipairs(servers) do
         require("lspconfig")[lsp].setup({
           on_attach = on_attach,

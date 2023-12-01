@@ -14,22 +14,45 @@ return {
     end,
   },
   {
-    "nvimtools/none-ls.nvim",
-    opts = function(_, opts)
-      local nls = require("null-ls")
-      opts.root_dir = opts.root_dir
-          or require("null-ls.utils").root_pattern(".null-ls-root", ".neoconf.json", "Makefile", ".git")
-      opts.sources = vim.list_extend(opts.sources or {}, {
-        -- nls.builtins.formatting.fish_indent,
-        -- nls.builtins.diagnostics.fish,
-        -- nls.builtins.formatting.stylua,
-        -- nls.builtins.formatting.shfmt,
-        nls.builtins.formatting.isort,
-        nls.builtins.formatting.black,
-        -- nls.builtins.diagnostics.flake8,
-        nls.builtins.formatting.alejandra,
-        -- nls.builtins.diagnostics.statix,
-      })
+    "stevearc/conform.nvim",
+    opts = function()
+      ---@class ConformOpts
+      local opts = {
+        -- LazyVim will use these options when formatting with the conform.nvim formatter
+        format = {
+          timeout_ms = 3000,
+          async = false, -- not recommended to change
+          quiet = false, -- not recommended to change
+        },
+        ---@type table<string, conform.FormatterUnit[]>
+        formatters_by_ft = {
+          lua = { "stylua" },
+          fish = { "fish_indent" },
+          sh = { "shfmt" },
+          python = { "ruff_format", "isort" },
+          -- python = { "isort", "black" },
+          go = { "gopls" },
+          nix = { "alejandra" },
+        },
+        -- The options you set here will be merged with the builtin formatters.
+        -- You can also define any custom formatters here.
+        ---@type table<string, conform.FormatterConfigOverride|fun(bufnr: integer): nil|conform.FormatterConfigOverride>
+        formatters = {
+          injected = { options = { ignore_errors = true } },
+          -- # Example of using dprint only when a dprint.json file is present
+          -- dprint = {
+          --   condition = function(ctx)
+          --     return vim.fs.find({ "dprint.json" }, { path = ctx.filename, upward = true })[1]
+          --   end,
+          -- },
+          --
+          -- # Example of using shfmt with extra args
+          -- shfmt = {
+          --   prepend_args = { "-i", "2", "-ci" },
+          -- },
+        },
+      }
+      return opts
     end,
   },
 
@@ -39,7 +62,7 @@ return {
     "fatih/vim-go",
     make = ":GoInstallBinaries",
     config = function()
-      vim.g.go_gopls_enabled = false       -- or false to disable
+      vim.g.go_gopls_enabled = false -- or false to disable
       vim.g.go_def_mapping_enabled = false -- stops vim-go taking over <C-t> for tagstack jumps
     end,
   },
@@ -101,9 +124,9 @@ return {
     "christoomey/vim-tmux-navigator",
     keys = {
       { "<C-h>", "<C-U>TmuxNavigateRight<cr>", desc = "Tmux Navigate Right" },
-      { "<C-k>", "<C-U>TmuxNavigateUp<cr>",    desc = "Tmux Navigate Up" },
-      { "<C-j>", "<C-U>TmuxNavigateDown<cr>",  desc = "Tmux Navigate Down" },
-      { "<C-l>", "<C-U>TmuxNavigateLeft<cr>",  desc = "Tmux Navigate Left" },
+      { "<C-k>", "<C-U>TmuxNavigateUp<cr>", desc = "Tmux Navigate Up" },
+      { "<C-j>", "<C-U>TmuxNavigateDown<cr>", desc = "Tmux Navigate Down" },
+      { "<C-l>", "<C-U>TmuxNavigateLeft<cr>", desc = "Tmux Navigate Left" },
     },
   },
 
