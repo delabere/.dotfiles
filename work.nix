@@ -55,6 +55,7 @@
     pkgs.watch
     pkgs.xclip
     pkgs.zsh
+    pkgs.graphviz
     (pkgs.nerdfonts.override {
       fonts = [ "FiraCode" "Hack" ];
     })
@@ -179,6 +180,9 @@
     direnv.enable = true;
     fzf.enable = true;
     starship.enable = true;
+    starship.settings = {
+            command_timeout = 2000;
+        };
     autojump.enable = true;
     lsd.enable = true;
     lsd.enableAliases = true;
