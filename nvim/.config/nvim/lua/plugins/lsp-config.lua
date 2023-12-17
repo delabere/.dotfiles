@@ -3,115 +3,110 @@ return {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
-      {
-        "folke/neoconf.nvim",
-        cmd = "Neoconf",
-        config = true,
-      },
-      {
-        "folke/neodev.nvim",
-        opts = {
-          experimental = { pathStrict = true },
-        },
-      },
+      "hrsh7th/cmp-nvim-lsp",
+      -- only required for work configuration
       { dir = "~/src/github.com/monzo/wearedev/tools/editors/nvim/nvim-monzo" },
-      "mason.nvim",
-      "williamboman/mason-lspconfig.nvim",
-      {
-        "hrsh7th/cmp-nvim-lsp",
-      },
     },
-    config = function(_, opts)
-      vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
 
-      local capabilities = vim.tbl_deep_extend(
-        "force",
-        {},
-        vim.lsp.protocol.make_client_capabilities(),
-        require("cmp_nvim_lsp").default_capabilities(),
-        opts.capabilities or {}
-        -- adds dynamic realoading when files have changed
-        -- {
-        --   workspace = {
-        --     didChangeWatchedFiles = {
-        --       dynamicRegistration = true,
-        --     },
-        --   },
-        -- }
-      )
+    config = function()
+      print("hello lspconfig")
+      -- import lspconfig plugin
+      local lspconfig = require("lspconfig")
 
-      local on_attach = function(client, bufnr)
-        opts = { noremap = true, silent = true }
-        vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>ls", "<cmd>lua vim.lsp.buf.document_symbol()<CR>", opts)
-        vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>lD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
-        vim.api.nvim_buf_set_keymap(bufnr, "n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
-        vim.api.nvim_buf_set_keymap(bufnr, "n", "U", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
-        vim.api.nvim_buf_set_keymap(bufnr, "n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts)
-        vim.api.nvim_buf_set_keymap(bufnr, "n", "gt", "<cmd> lua vim.lsp.buf.type_definition()<CR>", opts)
+      -- import cmp-nvim-lsp plugin
+      local cmp_nvim_lsp = require("cmp_nvim_lsp")
 
-        -- vim.api.nvim_buf_set_keymap(bufnr, 'n', 'U', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-        vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>lwa", "<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>", opts)
-        vim.api.nvim_buf_set_keymap(
-          bufnr,
-          "n",
-          "<leader>lwr",
-          "<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>",
-          opts
-        )
-        vim.api.nvim_buf_set_keymap(
-          bufnr,
-          "n",
-          "<leader>lwl",
-          "<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>",
-          opts
-        )
+      local keymap = vim.keymap -- for conciseness
 
-        vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
+      local opts = { noremap = true, silent = true }
+      local on_attach = function(_, bufnr)
+        opts.buffer = bufnr
 
-        vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
+        opts.desc = "Show LSP definitions"
+        keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts)
 
-        -- vim.api.nvim_buf_set_keymap(bufnr, "n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
-        vim.api.nvim_buf_set_keymap(bufnr, "n", "gr", "<cmd>Telescope lsp_references<CR>", opts)
+        opts.desc = "Show LSP references"
+        keymap.set("n", "gr", "<cmd>Telescope lsp_references<CR>", opts)
 
-        vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>lf", "<cmd>lua vim.lsp.buf.format()<CR>", opts)
+        opts.desc = "Show documentation for what is under cursor"
+        keymap.set("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
 
-        vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>li", "<cmd>LspInfo<CR>", opts)
-        vim.api.nvim_buf_set_keymap(bufnr, "n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
+        opts.desc = "Show LSP implementations"
+        keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts)
 
+        opts.desc = "Show LSP type definitions"
+        keymap.set("n", "gt", "<cmd> lua vim.lsp.buf.type_definition()<CR>", opts)
+
+        opts.desc = "Smart rename"
+        keymap.set("n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
+
+        opts.desc = "See available code actions"
+        keymap.set("n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
+
+        opts.desc = "LSP format"
+        keymap.set("n", "<leader>lf", "<cmd>lua vim.lsp.buf.format()<CR>", opts)
+
+        opts.desc = "LSP info"
+        keymap.set("n", "<leader>li", "<cmd>LspInfo<CR>", opts)
+
+        opts.desc = "Show buffer diagnostics"
+        keymap.set("n", "<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", opts) -- show  diagnostics for file
+
+        opts.desc = "Go to previous diagnostic"
+        keymap.set("n", "[d", vim.diagnostic.goto_prev, opts) -- jump to previous diagnostic in buffer
+
+        opts.desc = "Go to next diagnostic"
+        keymap.set("n", "]d", vim.diagnostic.goto_next, opts) -- jump to next diagnostic in buffer
+
+        -- these aren't LSP specific, but it makes sense to only add them on attach to gopls
+        opts.desc = "See available code actions"
         vim.keymap.set("n", "<Leader>b", "<cmd>GoBuild<cr>")
-        vim.keymap.set("n", "<Leader>t", "<cmd>GoTest<cr>")
-        vim.keymap.set("n", "<Leader>x", "<cmd>GoCodeAction<cr>")
-        vim.keymap.set("v", "<Leader>x", "<cmd>GoCodeAction<cr>")
-        local path = client.workspace_folders[1].name
 
-        -- for better imports sorting in wearedev
-        if string.find(path, "monzo/wearedev") then
-          client.config.settings.gopls["local"] = "github.com/monzo/wearedev"
-        end
-        client.notify("workspace/didChangeConfiguration", { settings = client.config.settings })
+        opts.desc = "See available code actions"
+        vim.keymap.set("n", "<Leader>t", "<cmd>GoTest<cr>")
+
+        opts.desc = "See available code actions"
+        vim.keymap.set("n", "<Leader>x", "<cmd>GoCodeAction<cr>")
+
+        opts.desc = "See available code actions"
+        vim.keymap.set("v", "<Leader>x", "<cmd>GoCodeAction<cr>")
+
+        opts.desc = "Restart LSP"
+        keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts) -- mapping to restart lsp if necessary
 
         -- this line 👇 tells lspconfig to ignore all the above mappings and instead use those
         -- provided by the navigator plugin
-        require("navigator.lspclient.mapping").setup({ bufnr = bufnr, client = client })
+        -- require("navigator.lspclient.mapping").setup({ bufnr = bufnr, client = client })
       end
 
-      -- local capabilities = require("cmp_nvim_lsp").default_capabilities()
-      -- capabilities.textDocument.completion.completionItem.snippetSupport = true
+      -- used to enable autocompletion (assign to every lsp server config)
+      local capabilities = cmp_nvim_lsp.default_capabilities()
+      --
+      -- Change the Diagnostic symbols in the sign column (gutter)
+      -- (not in youtube nvim video)
+      local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
+      for type, icon in pairs(signs) do
+        local hl = "DiagnosticSign" .. type
+        vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
+      end
 
       -- get the work directory as a plenary path
       local path = require("plenary.path")
-      local p = path.new(os.getenv("HOME") .. "/src/github.com/monzo/wearedev")
-
+      local p = path:new(os.getenv("HOME") .. "/src/github.com/monzo/wearedev")
       -- Check if the directory exists
-      local work_profile = path.exists(p)
+      local work_profile = p:exists()
 
+      print(work_profile)
       -- for work, we have a specific setup for our language server
       if work_profile == true then
-        local lspconfig = require("lspconfig")
+        -- we need to import our local monzo config plugin
         local monzo_lsp = require("monzo.lsp")
+        -- use the monzo lsp config for gopls
         lspconfig.gopls.setup(monzo_lsp.go_config({
           on_attach = on_attach,
           capabilities = capabilities,
+          -- this is a bit of a hack, we use a custom shell file to launch
+          -- gopls with gomodules set to off
           cmd = { "/Users/" .. os.getenv("USER") .. "/bin/gopls.sh", "-remote=auto" },
         }))
       else -- otherwise we are happy with defaults
@@ -121,6 +116,7 @@ return {
         })
       end
 
+      -- configure all our other servers
       local servers = { "pyright", "tsserver", "rust_analyzer" }
       for _, lsp in ipairs(servers) do
         require("lspconfig")[lsp].setup({
@@ -129,6 +125,7 @@ return {
         })
       end
 
+      -- lua has some extra special config so it can work with runtime files
       local runtime_path = vim.split(package.path, ";")
       table.insert(runtime_path, "lua/?.lua")
       table.insert(runtime_path, "lua/?/init.lua")
