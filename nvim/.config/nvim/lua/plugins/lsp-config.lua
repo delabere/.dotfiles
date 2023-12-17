@@ -9,6 +9,7 @@ return {
     },
 
     config = function()
+      print("hello lspconfig")
       -- import lspconfig plugin
       local lspconfig = require("lspconfig")
 
@@ -28,7 +29,7 @@ return {
         keymap.set("n", "gr", "<cmd>Telescope lsp_references<CR>", opts)
 
         opts.desc = "Show documentation for what is under cursor"
-        keymap.set("n", "U", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
+        keymap.set("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
 
         opts.desc = "Show LSP implementations"
         keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts)
@@ -45,7 +46,7 @@ return {
         opts.desc = "LSP format"
         keymap.set("n", "<leader>lf", "<cmd>lua vim.lsp.buf.format()<CR>", opts)
 
-        opts.desc = "Restart LSP"
+        opts.desc = "LSP info"
         keymap.set("n", "<leader>li", "<cmd>LspInfo<CR>", opts)
 
         opts.desc = "Show buffer diagnostics"
@@ -70,6 +71,9 @@ return {
         opts.desc = "See available code actions"
         vim.keymap.set("v", "<Leader>x", "<cmd>GoCodeAction<cr>")
 
+        opts.desc = "Restart LSP"
+        keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts) -- mapping to restart lsp if necessary
+
         -- this line 👇 tells lspconfig to ignore all the above mappings and instead use those
         -- provided by the navigator plugin
         -- require("navigator.lspclient.mapping").setup({ bufnr = bufnr, client = client })
@@ -77,6 +81,14 @@ return {
 
       -- used to enable autocompletion (assign to every lsp server config)
       local capabilities = cmp_nvim_lsp.default_capabilities()
+      --
+      -- Change the Diagnostic symbols in the sign column (gutter)
+      -- (not in youtube nvim video)
+      local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
+      for type, icon in pairs(signs) do
+        local hl = "DiagnosticSign" .. type
+        vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
+      end
 
       -- get the work directory as a plenary path
       local path = require("plenary.path")
@@ -84,6 +96,7 @@ return {
       -- Check if the directory exists
       local work_profile = p:exists()
 
+      print(work_profile)
       -- for work, we have a specific setup for our language server
       if work_profile == true then
         -- we need to import our local monzo config plugin
