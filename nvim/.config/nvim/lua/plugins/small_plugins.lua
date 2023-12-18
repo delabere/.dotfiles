@@ -239,11 +239,11 @@ return {
   {
     "axkirillov/telescope-changed-files",
   },
-  {
-    "nvim-neotest/neotest-go",
-  },
-  {
-    "nvim-neotest/neotest",
-    opts = { adapters = { "neotest-go" } },
-  },
+  -- {
+  --   "nvim-neotest/neotest-go",
+  -- },
+  -- {
+  --   "nvim-neotest/neotest",
+  --   opts = { adapters = { "neotest-go" } },
+  -- },
 }
