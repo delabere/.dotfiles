@@ -73,7 +73,10 @@ return {
 
         opts.desc = "Restart LSP"
         keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts) -- mapping to restart lsp if necessary
-
+        --
+        -- Workaround for the lack of a DAP strategy in neotest-go: https://github.com/nvim-neotest/neotest-go/issues/12
+        opts.desc = "Debug nearest test (Go)"
+        keymap.set("", "<leader>td", "<cmd>lua require('dap-go').debug_test()<CR>", opts)
         -- this line 👇 tells lspconfig to ignore all the above mappings and instead use those
         -- provided by the navigator plugin
         -- require("navigator.lspclient.mapping").setup({ bufnr = bufnr, client = client })
