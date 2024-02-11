@@ -1,12 +1,18 @@
-{ config, pkgs, system, ... }:
 {
+  config,
+  pkgs,
+  system,
+  ...
+}: {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = "jackrickards";
-  home.homeDirectory = {
-    aarch64-darwin = "/Users/jackrickards/";
-    x86_64-linux = "/home/jackrickards";
-  }.${system};
+  home.homeDirectory =
+    {
+      aarch64-darwin = "/Users/jackrickards/";
+      x86_64-linux = "/home/jackrickards";
+    }
+    .${system};
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
@@ -16,7 +22,6 @@
   # want to update the value, then make sure to first check the Home Manager
   # release notes.
   home.stateVersion = "22.11"; # Please read the comment before changing.
-
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
@@ -38,6 +43,8 @@
     # '')
     #(pkgs.nerdfonts.override { fonts = [ "FantasqueSansMono" ]; })
     # pkgs.tmux
+    brag.defaultPackage.${system}
+
     pkgs.delve
     # pkgs.go
     # pkgs.gopls
@@ -57,7 +64,7 @@
     pkgs.zsh
     pkgs.graphviz
     (pkgs.nerdfonts.override {
-      fonts = [ "FiraCode" "Hack" ];
+      fonts = ["FiraCode" "Hack"];
     })
   ];
 
@@ -94,25 +101,25 @@
             [ ! -f "$HOME/notes/$1.md" ] && touch "$HOME/notes/$1.md"
             nvim "$HOME/notes/$1.md"
         }
-        
+
         # for maintaining and reading a simple braglist
         function brag() {
             [ ! -f "$HOME/brag.md" ] && touch "$HOME/brag.md"
             if [[ -z $1 ]]
             then
               cat $HOME/brag.md
-            else 
+            else
               echo "$(date +%d/%m/%Y) | $1" >> $HOME/brag.md
             fi
         }
-        
+
         # for maintaining and reading a simple learnlist
         function learnit() {
             [ ! -f "$HOME/learnit.txt" ] && touch "$HOME/learnit.txt"
             if [[ -z $1 ]]
             then
               cat $HOME/learnit.txt
-            else 
+            else
               echo "$(date +%d/%m/%Y) | $1" >> $HOME/learnit.txt
             fi
         }
@@ -120,7 +127,7 @@
         function gitprune() {
           git fetch --all -p; git branch -vv | grep ": gone]" | awk '{ print $1 }' | xargs -n 1 git branch -D
         }
-        
+
         alias lg='lazygit'
         alias gcm='git checkout master && git pull'
         alias cat=bat
@@ -139,12 +146,12 @@
 
         # The next line enables shell command completion for gcloud.
         if [ -f '/Users/delabere/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/delabere/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
-       
+
         # to enable natural text navigation
         bindkey -e
         bindkey "^[f" forward-word
         bindkey "^[b" backward-word
-        
+
       '';
 
       envExtra = ''
@@ -155,7 +162,7 @@
         [ -f $HOME/.dotfiles/env.sh ] && source $HOME/.dotfiles/env.sh
 
         JAVA_HOME=$(/usr/libexec/java_home -v 19)
-        
+
         # work related stuff
         s101 () {
           shipper deploy --s101 $1
@@ -177,7 +184,7 @@
             shipper deploy --s101 --disable-progressive-rollouts --skip-confirm-rollout $PRNumber &&\
             shipper deploy --prod --skip-confirm-rollout $PRNumber
         }
-    
+
         function tpr() {
             # Check if sufficient arguments are provided
             if [ $# -lt 1 ]; then
@@ -224,7 +231,7 @@
                     return 1
                 fi
             fi
-            
+
             # Checkout the base branch and pull the latest changes
             git checkout "$base_branch" && git pull || { echo "Failed to checkout and update $base_branch."; return 1; }
 
@@ -246,8 +253,8 @@
     fzf.enable = true;
     starship.enable = true;
     starship.settings = {
-            command_timeout = 2000;
-        };
+      command_timeout = 2000;
+    };
     autojump.enable = true;
     lsd.enable = true;
     lsd.enableAliases = true;

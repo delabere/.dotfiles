@@ -8,11 +8,13 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    brag.url = "github:delabere/brag";
   };
 
   outputs = {
     nixpkgs,
     home-manager,
+    brag,
     ...
   } @ inputs: let
     mkHomeManagerConfig = module: system: let
@@ -22,13 +24,12 @@
     in
       home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
-
         modules = [
           module
         ];
 
         extraSpecialArgs = {
-          inherit inputs system;
+          inherit inputs system brag;
         };
       };
   in {

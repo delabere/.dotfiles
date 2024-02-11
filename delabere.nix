@@ -2,6 +2,7 @@
   config,
   pkgs,
   system,
+  brag,
   ...
 }: {
   # Home Manager needs a bit of information about you and the paths it should
@@ -44,6 +45,7 @@
     # '')
     #(pkgs.nerdfonts.override { fonts = [ "FantasqueSansMono" ]; })
     # pkgs.tmux
+    brag.defaultPackage.${system}
     pkgs.alejandra
     pkgs.btop
     pkgs.delve
@@ -106,17 +108,6 @@
             [ ! -d "$HOME/notes" ] && mkdir -p "$HOME/notes"
             [ ! -f "$HOME/notes/$1.md" ] && touch "$HOME/notes/$1.md"
             nvim "$HOME/notes/$1.md"
-        }
-
-        # for maintaining and reading a simple braglist
-        function brag() {
-            [ ! -f "$HOME/brag.md" ] && touch "$HOME/brag.md"
-            if [[ -z $1 ]]
-            then
-              cat $HOME/brag.md
-            else
-              echo "$(date +%d/%m/%Y) | $1" >> $HOME/brag.md
-            fi
         }
 
         # for maintaining and reading a simple learnlist
