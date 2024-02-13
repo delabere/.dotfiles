@@ -5,6 +5,10 @@
   brag,
   ...
 }: {
+  imports = [
+    ./base.nix
+  ];
+
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = "delabere";
@@ -51,7 +55,6 @@
     pkgs.delve
     pkgs.go
     pkgs.gopls
-    pkgs.lazygit
     pkgs.niv
     pkgs.nixpkgs-fmt
     pkgs.nodePackages.vscode-html-languageserver-bin
