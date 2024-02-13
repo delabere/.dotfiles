@@ -49,7 +49,7 @@
     # '')
     #(pkgs.nerdfonts.override { fonts = [ "FantasqueSansMono" ]; })
     # pkgs.tmux
-    brag.defaultPackage.${system}
+    brag.packages.${system}.default
     pkgs.alejandra
     pkgs.btop
     pkgs.delve
@@ -149,24 +149,8 @@
 
       '';
 
-      envExtra = ''
-        # work configuration
-        [ -f $HOME/src/github.com/monzo/starter-pack/zshenv ] && source $HOME/src/github.com/monzo/starter-pack/zshenv
-
-        # work related stuff
-        s101 () {
-          shipper deploy --s101 $1
-        }
-
-        shipthis () {
-          branch=$(eval "git rev-parse --symbolic-full-name --abbrev-ref HEAD")
-          shipper deploy --s101 $branch
-        }
-
-        prod () {
-          shipper deploy --prod $1
-        }
-      '';
+      # envExtra = ''
+      # '';
     };
 
     direnv.enable = true;
@@ -199,6 +183,9 @@
       ];
 
       extraConfig = ''
+        # bind the second prefix for more split keyboard
+        set-option -g prefix2 C-b
+
         # let copying use default clipboard
         unbind C-y
         unbind C-p

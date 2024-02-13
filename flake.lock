@@ -2,21 +2,43 @@
   "nodes": {
     "brag": {
       "inputs": {
+        "crane": "crane",
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs",
         "rust-overlay": "rust-overlay"
       },
       "locked": {
-        "lastModified": 1707671936,
-        "narHash": "sha256-uqINNlOtYUWgbuRhtT1VGKGtpyv3HBYCBvSDAyscF38=",
+        "lastModified": 1707784742,
+        "narHash": "sha256-PdmvRvPFMTSk5KeMnTws267W98DS888D44kvKJEK3to=",
         "owner": "delabere",
         "repo": "brag",
-        "rev": "34228d0316cd0731df3d044db5ccdb57501fbcd4",
+        "rev": "63b09355dd63b30e5cc41c193a21b4daf1de4c65",
         "type": "github"
       },
       "original": {
         "owner": "delabere",
         "repo": "brag",
+        "type": "github"
+      }
+    },
+    "crane": {
+      "inputs": {
+        "nixpkgs": [
+          "brag",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1707685877,
+        "narHash": "sha256-XoXRS+5whotelr1rHiZle5t5hDg9kpguS5yk8c8qzOc=",
+        "owner": "ipetkov",
+        "repo": "crane",
+        "rev": "2c653e4478476a52c6aa3ac0495e4dea7449ea0e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ipetkov",
+        "repo": "crane",
         "type": "github"
       }
     },
