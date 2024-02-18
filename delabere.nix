@@ -7,6 +7,7 @@
 }: {
   imports = [
     ./base.nix
+    ./base-apps.nix
   ];
 
   # Home Manager needs a bit of information about you and the paths it should
@@ -63,33 +64,6 @@
         # allows easy resetting of home-manager
         function rebuild-home-manager() {
           home-manager -f $HOME/.dotfiles/configuration.nix switch "$@"
-        }
-
-        function todo() {
-            [ ! -d "$HOME/notes" ] && mkdir "$HOME/notes"
-            [ ! -f "$HOME/notes/todo.md" ] && touch "$HOME/notes/todo.md"
-            nvim "$HOME/notes/todo.md"
-        }
-
-        function note() {
-            [ ! -d "$HOME/notes" ] && mkdir -p "$HOME/notes"
-            [ ! -f "$HOME/notes/$1.md" ] && touch "$HOME/notes/$1.md"
-            nvim "$HOME/notes/$1.md"
-        }
-
-        # for maintaining and reading a simple learnlist
-        function learnit() {
-            [ ! -f "$HOME/learnit.txt" ] && touch "$HOME/learnit.txt"
-            if [[ -z $1 ]]
-            then
-              cat $HOME/learnit.txt
-            else
-              echo "$(date +%d/%m/%Y) | $1" >> $HOME/learnit.txt
-            fi
-        }
-
-        function gitprune() {
-          git fetch --all -p; git branch -vv | grep ": gone]" | awk '{ print $1 }' | xargs -n 1 git branch -D
         }
 
         alias lg='lazygit'
