@@ -58,16 +58,6 @@
           home-manager -f $HOME/.dotfiles/configuration.nix switch "$@"
         }
 
-        # for maintaining and reading a simple braglist
-        function brag() {
-            [ ! -f "$HOME/brag.md" ] && touch "$HOME/brag.md"
-            if [[ -z $1 ]]
-            then
-              cat $HOME/brag.md
-            else
-              echo "$(date +%d/%m/%Y) | $1" >> $HOME/brag.md
-            fi
-        }
 
         alias lg='lazygit'
         alias gcm='git checkout master && git pull'
