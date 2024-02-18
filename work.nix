@@ -16,12 +16,7 @@ in {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = "jackrickards";
-  home.homeDirectory =
-    {
-      aarch64-darwin = "/Users/jackrickards/";
-      x86_64-linux = "/home/jackrickards";
-    }
-    .${system};
+  home.homeDirectory ="/Users/jackrickards/";
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
