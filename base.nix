@@ -23,8 +23,8 @@ in {
       enable = true;
       dotDir = ".config/zsh";
       # haven't quite managed to get these working
-      #enableAutosuggestions = true;
-      #enableCompletion = true;
+      enableAutosuggestions = true;
+      enableCompletion = true;
 
       initExtra = ''
         # so that when mac updates we add nix back into the zshrc file
@@ -57,6 +57,10 @@ in {
         bindkey "^[f" forward-word
         bindkey "^[b" backward-word
 
+        # this is required to get ranger not to crash:
+        # https://github.com/ranger/ranger/issues/2583#issuecomment-1206290600
+        # fix is in ranger 1.9.4, we should be able to remove this when/if it is released
+        export TERM=tmux-256color
       '';
     };
 
