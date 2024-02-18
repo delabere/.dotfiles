@@ -4,11 +4,7 @@
   brag,
   system,
   ...
-}: let
-  randomShellScript = pkgs.writeShellScriptBin "my-hello" ''
-    echo "Hello, ${config.home.username}!"
-  '';
-in {
+}: {
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
   # introduces backwards incompatible changes.
@@ -141,31 +137,24 @@ in {
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
-  home.packages =
-    [
-      randomShellScript
-      brag.packages.${system}.default
-    ]
-    ++ (
-      with pkgs; [
-        btop
-        delve
-        lazygit
-        nodePackages.vscode-html-languageserver-bin
-        nodejs
-        ranger
-        ripgrep
-        stow
-        sumneko-lua-language-server
-        thefuck
-        tldr
-        tree
-        watch
-        xclip
-        zsh
-        (nerdfonts.override {
-          fonts = ["FiraCode" "Hack"];
-        })
-      ]
-    );
+  home.packages = with pkgs; [
+    btop
+    delve
+    lazygit
+    nodePackages.vscode-html-languageserver-bin
+    nodejs
+    ranger
+    ripgrep
+    stow
+    sumneko-lua-language-server
+    thefuck
+    tldr
+    tree
+    watch
+    xclip
+    zsh
+    (nerdfonts.override {
+      fonts = ["FiraCode" "Hack"];
+    })
+  ];
 }
