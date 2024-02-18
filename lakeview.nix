@@ -10,7 +10,7 @@
 in {
   imports = [
     ./base.nix
-    ./base-apps.nix
+    ./shell/base.nix
   ];
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
