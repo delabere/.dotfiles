@@ -31,15 +31,11 @@
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
-  home.packages = [
-    (pkgs.writeShellScriptBin "my-hello" ''
-      echo "Hello, ${config.home.username}!"
-    '')
-    brag.packages.${system}.default
-    pkgs.alejandra
-    pkgs.go
-    pkgs.gopls
-    pkgs.nixpkgs-fmt
+  home.packages = with pkgs; [
+    alejandra
+    go
+    gopls
+    nixpkgs-fmt
   ];
 
   fonts.fontconfig.enable = true;

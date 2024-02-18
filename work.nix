@@ -32,7 +32,6 @@
     # (pkgs.writeShellScriptBin "my-hello" ''
     #   echo "Hello, ${config.home.username}!"
     # '')
-    brag.packages.${system}.default
     pkgs.graphviz
     # pkgs.go
     # pkgs.gopls
