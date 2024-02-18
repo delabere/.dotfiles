@@ -29,12 +29,6 @@ in {
 
   programs = {
     zsh = {
-      enable = true;
-      dotDir = ".config/zsh";
-      # haven't quite managed to get these working
-      #enableAutosuggestions = true;
-      #enableCompletion = true;
-
       envExtra = ''
         # work configuration
         [ -f $HOME/src/github.com/monzo/starter-pack/zshenv ] && source $HOME/src/github.com/monzo/starter-pack/zshenv
