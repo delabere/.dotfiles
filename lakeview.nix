@@ -3,7 +3,11 @@
   pkgs,
   system,
   ...
-}: {
+}: let
+  switch = pkgs.writeShellScriptBin "switch" ''
+    home-manager switch --flake ~/.dotfiles#lakeview-aarch64-linux
+  '';
+in {
   imports = [
     ./base.nix
     ./base-apps.nix
@@ -29,6 +33,7 @@
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = [
+    switch
     pkgs.alejandra
     pkgs.delve
     pkgs.go
