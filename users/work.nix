@@ -9,9 +9,9 @@
   '';
 in {
   imports = [
-    ./base.nix
-    ./shell/base.nix
-    ./shell/work.nix
+    ./config/base.nix
+    ./config/shell/base.nix
+    ./config/shell/work.nix
   ];
   # Home Manager needs a bit of information about you and the paths it should
   # manage.

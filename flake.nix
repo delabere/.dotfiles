@@ -37,10 +37,10 @@
       };
   in {
     homeConfigurations = {
-      delabere-aarch64-darwin = mkHomeManagerusers ./users/delabere.nix "aarch64-darwin";
-      lakeview-aarch64-linux = mkHomeManagerusers ./users/lakeview.nix "aarch64-linux";
-      delabere-x86_64-linux = mkHomeManagerusers ./users/delabere.nix "x86_64-linux";
-      work-aarch64-darwin = mkHomeManagerusers ./users/work.nix "aarch64-darwin";
+      delabere-aarch64-darwin = mkHomeManagerConfig ./users/delabere.nix "aarch64-darwin";
+      lakeview-aarch64-linux = mkHomeManagerConfig ./users/lakeview.nix "aarch64-linux";
+      delabere-x86_64-linux = mkHomeManagerConfig ./users/delabere.nix "x86_64-linux";
+      work-aarch64-darwin = mkHomeManagerConfig ./users/work.nix "aarch64-darwin";
     };
   };
 }
