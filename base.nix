@@ -38,11 +38,6 @@ in {
         # any .zshrc found can be sourced; its probably a work machine
         [ -f "$HOME/.zshrc" ] && source ~/.zshrc
 
-        # allows easy resetting of home-manager
-        function rebuild-home-manager() {
-          home-manager -f $HOME/.dotfiles/configuration.nix switch "$@"
-        }
-
         alias lg='lazygit'
         alias gcm='git checkout master && git pull'
         alias cat=bat
