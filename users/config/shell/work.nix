@@ -99,6 +99,7 @@
 in {
   home.packages = [
     brag.packages.${system}.default
+    brag_old
     s101
     prod
     mergeship
