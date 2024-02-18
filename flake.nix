@@ -8,7 +8,10 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    brag.url = "github:delabere/brag";
+    brag = {
+      url = "github:delabere/brag";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {

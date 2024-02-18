@@ -32,6 +32,9 @@
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = [
+    (pkgs.writeShellScriptBin "my-hello" ''
+      echo "Hello, ${config.home.username}!"
+    '')
     brag.packages.${system}.default
     pkgs.alejandra
     pkgs.go
