@@ -28,7 +28,7 @@
         pkgs = import nixpkgs {
           inherit system;
         };
-        mkHomeManagerConfig = module:
+        mkHomeManagerConfig = module: name:
           home-manager.lib.homeManagerConfiguration {
             inherit pkgs;
             modules = [
@@ -36,13 +36,13 @@
             ];
 
             extraSpecialArgs = {
-              inherit inputs system brag;
+              inherit inputs system brag name;
             };
           };
         homeConfigurations = {
-          delabere = mkHomeManagerConfig ./users/delabere.nix;
-          lakeview = mkHomeManagerConfig ./users/lakeview.nix;
-          work = mkHomeManagerConfig ./users/work.nix;
+          delabere = mkHomeManagerConfig ./users/delabere.nix "delabere";
+          lakeview = mkHomeManagerConfig ./users/lakeview.nix "lakeview";
+          work = mkHomeManagerConfig ./users/work.nix "work";
         };
       in {
         apps.switch =

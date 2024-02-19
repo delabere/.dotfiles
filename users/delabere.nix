@@ -1,10 +1,11 @@
-{ config
-, pkgs
-, system
-, brag
-, ...
-}:
 {
+  config,
+  pkgs,
+  system,
+  brag,
+  name,
+  ...
+}: {
   imports = [
     ./config/base.nix
     ./config/shell/base.nix

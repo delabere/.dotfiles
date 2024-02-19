@@ -1,9 +1,10 @@
-{ config
-, pkgs
-, system
-, ...
-}:
 {
+  config,
+  pkgs,
+  system,
+  name,
+  ...
+}: {
   imports = [
     ./config/base.nix
     ./config/shell/base.nix
@@ -32,4 +33,3 @@
     };
   };
 }
-

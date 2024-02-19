@@ -1,8 +1,9 @@
-{ config
-, pkgs
-, brag
-, system
-, ...
+{
+  config,
+  pkgs,
+  brag,
+  system,
+  ...
 }: {
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
@@ -13,10 +14,12 @@
   # release notes.
   home.stateVersion = "24.05"; # Please read the comment before changing.
 
-  home.homeDirectory = {
-    "x86_64-linux" = "/home/${config.home.username}";
-    "aarch64-darwin" = "/Users/${config.home.username}";
-  }.${system};
+  home.homeDirectory =
+    {
+      "x86_64-linux" = "/home/${config.home.username}";
+      "aarch64-darwin" = "/Users/${config.home.username}";
+    }
+    .${system};
 
   programs = {
     zsh = {
@@ -158,7 +161,7 @@
     xclip
     zsh
     (nerdfonts.override {
-      fonts = [ "FiraCode" "Hack" ];
+      fonts = ["FiraCode" "Hack"];
     })
   ];
 }

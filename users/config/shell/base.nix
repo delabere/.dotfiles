@@ -3,8 +3,17 @@
   pkgs,
   brag,
   system,
+  name,
   ...
 }: let
+  switch = pkgs.writeShellScriptBin "switch" ''
+    nix run ~/.dotfiles#switch.${name}
+  '';
+
+  switch-remote = pkgs.writeShellScriptBin "switch-remote" ''
+    nix run github:delabere/.dotfiles#switch.${name}
+  '';
+
   todo = pkgs.writeShellScriptBin "todo" ''
     [ ! -d "$HOME/notes" ] && mkdir "$HOME/notes"
     [ ! -f "$HOME/notes/todo.md" ] && touch "$HOME/notes/todo.md"
@@ -30,6 +39,8 @@
     '';
 in {
   home.packages = [
+    switch
+    switch-remote
     todo
     note
     learnit

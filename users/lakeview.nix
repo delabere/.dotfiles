@@ -1,9 +1,10 @@
-{ config
-, pkgs
-, system
-, ...
-}:
 {
+  config,
+  pkgs,
+  system,
+  name,
+  ...
+}: {
   imports = [
     ./config/base.nix
     ./config/shell/base.nix
@@ -44,7 +45,7 @@
     pkgs.xclip
     pkgs.zsh
     (pkgs.nerdfonts.override {
-      fonts = [ "FiraCode" "Hack" ];
+      fonts = ["FiraCode" "Hack"];
     })
   ];
 }
