@@ -16,34 +16,23 @@ curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix 
 (https://zero-to-nix.com/concepts/nix-installer#using)
 
 ## Home-Manager setup
-Point home-manager at our "flakified" repo. You need to use the correct configuration in your flake syntax depending on what aarch you are using. 
+Point home-manager at our "flakified" repo. You need to use the correct configuration in your flake syntax depending on what aarch you are using.
 These are defined [here](https://github.com/delabere/.dotfiles/blob/89ff1dcf20294a49e08580f7b323e96d47173cec/flake.nix#L34-L37)
 
 Build the following command depending on the configuration you need and run:
 ```sh
-nix run home-manager/master switch -- --flake github:delabere/.dotfiles#delabere-aarch64-darwin
+nix run github:delabere/.dotfiles#switch.work
 ```
-
-After you've run the above you can use the local home manager for subsequent set-ups:
-```sh
-home-manager switch --flake ~/.dotfiles#work-aarch64-darwin
-```
-
-But an even easier way is just to run:
-```sh
-switch
-```
-which just runs the same as above, but will always use the correct flake for the initialised configuration
 
 ## Nvim setup
 Neovim gets installed as part of the home-manager setup. But it won't find your configuration in the default home directory (`~/.config/nvim/`) unless you stow the nvim directory first.
 
-Stow creates a sym-link to the directory in our repo so that if you pull new changes in, nvim knows about it right away.
+Stow creates a symlink to the directory in our repo so that if you pull new changes in, nvim knows about it right away.
 
 Just run:
 ```sh
 stow nvim
-``` 
+```
 
 ## (optional) Install brew packages for mac
 ```sh
