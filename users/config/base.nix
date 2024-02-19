@@ -63,7 +63,7 @@
         # this is required to get ranger not to crash:
         # https://github.com/ranger/ranger/issues/2583#issuecomment-1206290600
         # fix is in ranger 1.9.4, we should be able to remove this when/if it is released
-        export TERM=tmux-256color
+        # export TERM=xterm-256color
       '';
     };
 
@@ -160,7 +160,7 @@
     watch
     xclip
     (nerdfonts.override {
-      fonts = ["FiraCode" "Hack"];
+      fonts = ["JetBrainsMono" "Iosevka" "FiraCode" "Hack"];
     })
   ];
 }
