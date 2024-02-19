@@ -21,31 +21,4 @@
   # want to update the value, then make sure to first check the Home Manager
   # release notes.
   home.stateVersion = "24.05"; # Please read the comment before changing.
-
-  # The home.packages option allows you to install Nix packages into your
-  # environment.
-  home.packages = [
-    pkgs.alejandra
-    pkgs.delve
-    pkgs.go
-    pkgs.gopls
-    pkgs.lazygit
-    pkgs.niv
-    pkgs.nixpkgs-fmt
-    pkgs.nodePackages.vscode-html-languageserver-bin
-    pkgs.nodejs
-    pkgs.ranger
-    pkgs.ripgrep
-    pkgs.stow
-    pkgs.sumneko-lua-language-server
-    pkgs.thefuck
-    pkgs.tldr
-    pkgs.tree
-    pkgs.watch
-    pkgs.xclip
-    pkgs.zsh
-    (pkgs.nerdfonts.override {
-      fonts = ["FiraCode" "Hack"];
-    })
-  ];
 }
