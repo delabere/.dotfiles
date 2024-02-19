@@ -159,7 +159,6 @@
     tree
     watch
     xclip
-    zsh
     (nerdfonts.override {
       fonts = ["FiraCode" "Hack"];
     })
