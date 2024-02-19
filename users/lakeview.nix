@@ -1,13 +1,9 @@
+{ config
+, pkgs
+, system
+, ...
+}:
 {
-  config,
-  pkgs,
-  system,
-  ...
-}: let
-  switch = pkgs.writeShellScriptBin "switch" ''
-    home-manager switch --flake ~/.dotfiles#lakeview-aarch64-linux
-  '';
-in {
   imports = [
     ./config/base.nix
     ./config/shell/base.nix
@@ -15,7 +11,6 @@ in {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = "ubuntu";
-  home.homeDirectory = "/home/ubuntu";
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
@@ -29,7 +24,6 @@ in {
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = [
-    switch
     pkgs.alejandra
     pkgs.delve
     pkgs.go
@@ -50,7 +44,7 @@ in {
     pkgs.xclip
     pkgs.zsh
     (pkgs.nerdfonts.override {
-      fonts = ["FiraCode" "Hack"];
+      fonts = [ "FiraCode" "Hack" ];
     })
   ];
 }

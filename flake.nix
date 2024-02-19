@@ -2,7 +2,6 @@
   description = "Home Manager configuration of delabere";
 
   inputs = {
-    # Specify the source of Home Manager and Nixpkgs.
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -12,35 +11,52 @@
       url = "github:delabere/brag";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-  };
-
-  outputs = {
-    nixpkgs,
-    home-manager,
-    brag,
-    ...
-  } @ inputs: let
-    mkHomeManagerConfig = module: system: let
-      pkgs = import nixpkgs {
-        inherit system;
-      };
-    in
-      home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
-        modules = [
-          module
-        ];
-
-        extraSpecialArgs = {
-          inherit inputs system brag;
-        };
-      };
-  in {
-    homeConfigurations = {
-      delabere-aarch64-darwin = mkHomeManagerConfig ./users/delabere.nix "aarch64-darwin";
-      lakeview-aarch64-linux = mkHomeManagerConfig ./users/lakeview.nix "aarch64-linux";
-      delabere-x86_64-linux = mkHomeManagerConfig ./users/delabere.nix "x86_64-linux";
-      work-aarch64-darwin = mkHomeManagerConfig ./users/work.nix "aarch64-darwin";
+    flake-utils = {
+      url = "github:numtide/flake-utils";
     };
   };
+
+  outputs =
+    { nixpkgs
+    , flake-utils
+    , home-manager
+    , brag
+    , ...
+    } @ inputs:
+    flake-utils.lib.eachSystem [ "aarch64-darwin" "x86_64-linux" ] (
+      system:
+      let
+        pkgs = import nixpkgs {
+          inherit system;
+        };
+        mkHomeManagerConfig = module:
+          home-manager.lib.homeManagerConfiguration {
+            inherit pkgs;
+            modules = [
+              module
+            ];
+
+            extraSpecialArgs = {
+              inherit inputs system brag;
+            };
+          };
+        homeConfigurations = {
+          delabere = mkHomeManagerConfig ./users/delabere.nix;
+          lakeview = mkHomeManagerConfig ./users/lakeview.nix;
+          work = mkHomeManagerConfig ./users/work.nix;
+        };
+      in
+      {
+        apps.switch = nixpkgs.lib.mapAttrs
+          (
+            name: config:
+              flake-utils.lib.mkApp {
+                drv = config.activationPackage;
+                exePath = "/activate";
+              }
+          )
+          homeConfigurations
+        ;
+      }
+    );
 }
