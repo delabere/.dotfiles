@@ -16,16 +16,15 @@
     };
   };
 
-  outputs =
-    { nixpkgs
-    , flake-utils
-    , home-manager
-    , brag
-    , ...
-    } @ inputs:
-    flake-utils.lib.eachSystem [ "aarch64-darwin" "x86_64-linux" ] (
-      system:
-      let
+  outputs = {
+    nixpkgs,
+    flake-utils,
+    home-manager,
+    brag,
+    ...
+  } @ inputs:
+    flake-utils.lib.eachSystem ["aarch64-darwin" "x86_64-linux"] (
+      system: let
         pkgs = import nixpkgs {
           inherit system;
         };
@@ -45,9 +44,9 @@
           lakeview = mkHomeManagerConfig ./users/lakeview.nix;
           work = mkHomeManagerConfig ./users/work.nix;
         };
-      in
-      {
-        apps.switch = nixpkgs.lib.mapAttrs
+      in {
+        apps.switch =
+          nixpkgs.lib.mapAttrs
           (
             name: config:
               flake-utils.lib.mkApp {
@@ -55,8 +54,7 @@
                 exePath = "/activate";
               }
           )
-          homeConfigurations
-        ;
+          homeConfigurations;
       }
     );
 }
