@@ -11,7 +11,7 @@
   '';
 
   switch-remote = pkgs.writeShellScriptBin "switch-remote" ''
-    nix run github:delabere/.dotfiles#switch.${name}
+    nix run github:delabere/.dotfiles#switch.${name} --refresh
   '';
 
   todo = pkgs.writeShellScriptBin "todo" ''
