@@ -98,7 +98,7 @@
 
       extraConfig = ''
         # bind the second prefix for more split keyboard
-        set-option -g prefix2 C-b
+        set-option -g prefix2 C-s
 
         # let copying use default clipboard
         unbind C-y
