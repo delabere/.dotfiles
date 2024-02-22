@@ -37,6 +37,7 @@
             return 1
         fi
 
+        local ticket_url="$1"  # Capture the full URL for use in PR body
         local ticket_id=$(echo "$1" | awk -F '/' '{print $NF}')
 
         # Setting base branch
@@ -87,7 +88,7 @@
         git commit -m "$commit_msg" --allow-empty && git push || { echo "Failed to commit and push changes."; return 1; }
 
         # Create a pull request
-        gh pr create --title "[$ticket_id] $pr_title" --draft --fill || { echo "Failed to create pull request."; return 1; }
+        gh pr create --title "[$ticket_id] $pr_title" --body "Ticket: [$ticket_id]($ticket_url)" --draft --fill || { echo "Failed to create pull request."; return 1; }
     }
 
     tpr $1
