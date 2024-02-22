@@ -25,7 +25,8 @@ nix run github:delabere/.dotfiles#switch.work
 ```
 
 ## Nvim setup
-Neovim gets installed as part of the home-manager setup. But it won't find your configuration in the default home directory (`~/.config/nvim/`) unless you stow the nvim directory first.
+If you didn't use home-manager to set up nvim, you will need to move the config in this repo into your default home directory (`~/.config/nvim/`).
+Stow is used for this.
 
 Stow creates a symlink to the directory in our repo so that if you pull new changes in, nvim knows about it right away.
 
