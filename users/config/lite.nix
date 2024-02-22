@@ -159,4 +159,6 @@
       fonts = ["JetBrainsMono" "Iosevka" "FiraCode" "Hack"];
     })
   ];
+
+  home.file.".lite".source = "./lite.nix";
 }
