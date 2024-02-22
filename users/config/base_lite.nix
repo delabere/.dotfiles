@@ -17,7 +17,8 @@
   home.homeDirectory =
     {
       "x86_64-linux" = "/home/${config.home.username}";
-      "aarch64-darwin" = "/Users/${config.home.username}";
+      "aarch64-darwin" = "/home/${config.home.username}";
+      "aarch64-linux" = "/home/${config.home.username}";
     }
     .${system};
 

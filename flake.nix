@@ -23,7 +23,7 @@
     brag,
     ...
   } @ inputs:
-    flake-utils.lib.eachSystem ["aarch64-darwin" "x86_64-linux"] (
+    flake-utils.lib.eachSystem ["aarch64-darwin" "x86_64-linux" "aarch64-linux"] (
       system: let
         pkgs = import nixpkgs {
           inherit system;
