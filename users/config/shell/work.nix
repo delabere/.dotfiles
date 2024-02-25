@@ -19,14 +19,14 @@
   '';
 
   mergeship = pkgs.writeShellScriptBin "mergeship" ''
-  function mergeship() {
-    local PRNumber=$(gh pr view $(git branch --show-current) --json url --template "{{.url}}") &&\
-    gh pr merge -sd &&\
-    echo "Shipping $PRNumber to production with automated rollback" &&\
-    shipper deploy --s101 --disable-progressive-rollouts --skip-confirm-rollout $PRNumber &&\
-    shipper deploy --prod --skip-confirm-rollout $PRNumber
-  }
-  mergeship
+    function mergeship() {
+      local PRNumber=$(gh pr view $(git branch --show-current) --json url --template "{{.url}}") &&\
+      gh pr merge -sd &&\
+      echo "Shipping $PRNumber to production with automated rollback" &&\
+      shipper deploy --s101 --disable-progressive-rollouts --skip-confirm-rollout $PRNumber &&\
+      shipper deploy --prod --skip-confirm-rollout $PRNumber
+    }
+    mergeship
   '';
 
   tpr = pkgs.writeShellScriptBin "tpr" ''
@@ -92,17 +92,17 @@
     }
 
     tpr $1
-    '';
+  '';
 
-    # for maintaining and reading a simple braglist
-    brag_old = pkgs.writeShellScriptBin "brag_old" ''
-        [ ! -f "$HOME/brag.md" ] && touch "$HOME/brag.md"
-        if [[ -z $1 ]]
-        then
-        cat $HOME/brag.md
-        else
-        echo "$(date +%d/%m/%Y) | $1" >> $HOME/brag.md
-        fi
+  # for maintaining and reading a simple braglist
+  brag_old = pkgs.writeShellScriptBin "brag_old" ''
+    [ ! -f "$HOME/brag.md" ] && touch "$HOME/brag.md"
+    if [[ -z $1 ]]
+    then
+    cat $HOME/brag.md
+    else
+    echo "$(date +%d/%m/%Y) | $1" >> $HOME/brag.md
+    fi
   '';
 in {
   home.packages = [
