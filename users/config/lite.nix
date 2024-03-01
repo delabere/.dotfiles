@@ -100,6 +100,12 @@
         tmuxPlugins.resurrect
         tmuxPlugins.continuum
         session-x.packages.${system}.default
+        {
+          plugin = tmuxPlugins.jump;
+          extraConfig = ''
+            set-option -g @jump-key 'J'
+          '';
+        }
       ];
 
       extraConfig = ''
