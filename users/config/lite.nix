@@ -90,6 +90,9 @@
       enable = true;
       prefix = "C-a";
       mouse = true;
+      escapeTime = 10;
+      terminal = "screen-256color";
+
       plugins = with pkgs; [
         tmuxPlugins.vim-tmux-navigator
         tmuxPlugins.power-theme
