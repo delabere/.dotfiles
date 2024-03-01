@@ -160,8 +160,5 @@
     })
   ];
 
-  home.file.".config/nvim" = {
-    recursive = true;
-    source = ../../nvim/.config/nvim;
-  };
+  home.file.".lite".source = "./lite.nix";
 }
