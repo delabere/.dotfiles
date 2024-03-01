@@ -172,6 +172,7 @@
     tree
     watch
     xclip
+    marksman
     (nerdfonts.override {
       fonts = ["JetBrainsMono" "Iosevka" "FiraCode" "Hack"];
     })
