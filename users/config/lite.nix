@@ -150,6 +150,7 @@
 
   home.packages = with pkgs; [
     btop
+    gh
     lazygit
     ranger
     ripgrep
