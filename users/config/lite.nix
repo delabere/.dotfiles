@@ -99,7 +99,12 @@
         tmuxPlugins.power-theme
         tmuxPlugins.resurrect
         tmuxPlugins.continuum
-        session-x.packages.${system}.default
+        {
+          plugin = session-x.packages.${system}.default;
+          extraConfig = ''
+            set -g @sessionx-filter-current 'false'
+          '';
+        }
         {
           plugin = tmuxPlugins.jump;
           extraConfig = ''
