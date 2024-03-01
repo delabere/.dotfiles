@@ -2,6 +2,7 @@
   config,
   pkgs,
   brag,
+  session-x,
   system,
   ...
 }: {

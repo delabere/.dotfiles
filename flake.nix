@@ -14,6 +14,10 @@
     flake-utils = {
       url = "github:numtide/flake-utils";
     };
+    session-x = {
+      url = "github:omerxx/tmux-sessionx";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -21,6 +25,7 @@
     flake-utils,
     home-manager,
     brag,
+    session-x,
     ...
   } @ inputs:
     flake-utils.lib.eachSystem ["aarch64-darwin" "x86_64-linux" "aarch64-linux"] (
@@ -36,7 +41,7 @@
             ];
 
             extraSpecialArgs = {
-              inherit inputs system brag name;
+              inherit inputs system brag session-x name;
             };
           };
         homeConfigurations = {

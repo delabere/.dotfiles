@@ -3,6 +3,7 @@
   pkgs,
   system,
   brag,
+  session-x,
   name,
   ...
 }: {

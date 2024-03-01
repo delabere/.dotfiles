@@ -2,6 +2,7 @@
   config,
   pkgs,
   brag,
+  session-x,
   system,
   ...
 }: {
@@ -98,6 +99,7 @@
         tmuxPlugins.power-theme
         tmuxPlugins.resurrect
         tmuxPlugins.continuum
+        session-x.packages.${system}.default
       ];
 
       extraConfig = ''
