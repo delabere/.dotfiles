@@ -173,6 +173,7 @@
     watch
     xclip
     marksman
+    pngpaste # for obsidian nvim plugin
     (nerdfonts.override {
       fonts = ["JetBrainsMono" "Iosevka" "FiraCode" "Hack"];
     })
