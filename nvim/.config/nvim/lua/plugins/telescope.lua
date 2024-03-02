@@ -16,7 +16,20 @@ return {
       },
     },
     config = function()
+      local actions = require("telescope.actions")
       require("telescope").setup({
+        defaults = {
+          -- Default configuration for telescope goes here:
+          -- config_key = value,
+          mappings = {
+            i = {
+              ["<C-h>"] = "which_key",
+              -- smart_send_to_qflist struggles with large search results,
+              -- and when it fails will send all results to the qfixlist
+              ["<C-q>"] = actions.smart_send_to_qflist + actions.open_qflist,
+            },
+          },
+        },
         extensions = {
           file_browser = {
             theme = "ivy",
