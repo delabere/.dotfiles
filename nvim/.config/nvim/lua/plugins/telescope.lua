@@ -11,9 +11,9 @@ return {
     dependencies = {
       {
         dir = "~/src/github.com/monzo/wearedev/tools/editors/nvim/nvim-monzo",
-        "axkirillov/telescope-changed-files",
-        "nvim-telescope/telescope-file-browser.nvim",
       },
+      { "axkirillov/telescope-changed-files" },
+      { "nvim-telescope/telescope-file-browser.nvim" },
     },
     config = function()
       local actions = require("telescope.actions")
