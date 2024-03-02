@@ -1,4 +1,4 @@
-local M = {
+return {
   "mfussenegger/nvim-dap",
   dependencies = {
     { "rcarriga/nvim-dap-ui" },
@@ -102,5 +102,3 @@ local M = {
     end
   end,
 }
-
-return M
