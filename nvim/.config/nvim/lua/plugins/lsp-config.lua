@@ -9,7 +9,6 @@ return {
     },
 
     config = function()
-      print("hello lspconfig")
       -- import lspconfig plugin
       local lspconfig = require("lspconfig")
 
@@ -99,7 +98,6 @@ return {
       -- Check if the directory exists
       local work_profile = p:exists()
 
-      print(work_profile)
       -- for work, we have a specific setup for our language server
       if work_profile == true then
         -- we need to import our local monzo config plugin
