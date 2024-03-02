@@ -42,3 +42,4 @@ vim.api.nvim_command("set nofoldenable") -- no folds please
 -- vim.opt.splitbelow = true --force new splits to go to the right of current window--
 -- vim.opt.splitright = true --force new splits to go to below the of current window
 -- vim.opt.termguicolors = true
+vim.opt.report = 999
