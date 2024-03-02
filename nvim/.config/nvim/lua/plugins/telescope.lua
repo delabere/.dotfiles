@@ -1,6 +1,13 @@
 return {
 
   {
+    "axkirillov/telescope-changed-files",
+  },
+  {
+    "nvim-telescope/telescope-file-browser.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" },
+  },
+  {
     "nvim-telescope/telescope.nvim",
     dependencies = {
       { dir = "~/src/github.com/monzo/wearedev/tools/editors/nvim/nvim-monzo", "axkirillov/telescope-changed-files" },

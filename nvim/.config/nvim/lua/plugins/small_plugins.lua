@@ -246,9 +246,6 @@ return {
   },
 
   {
-    "axkirillov/telescope-changed-files",
-  },
-  {
     "nvim-neotest/neotest-go",
   },
   {
