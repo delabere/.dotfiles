@@ -81,7 +81,7 @@ return {
     },
   },
 
-  { "tpope/vim-surround" },
+  -- { "tpope/vim-surround" },
 
   -- debugger configuration for go
   { "leoluz/nvim-dap-go" },
