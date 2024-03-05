@@ -1,8 +1,5 @@
 {
-  config,
   pkgs,
-  brag,
-  system,
   name,
   ...
 }: let

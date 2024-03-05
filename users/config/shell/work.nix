@@ -1,8 +1,7 @@
 {
-  config,
   pkgs,
-  brag,
   system,
+  brag,
   ...
 }: let
   s101 = pkgs.writeShellScriptBin "s101" ''
