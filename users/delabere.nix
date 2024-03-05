@@ -15,9 +15,7 @@
   home.username = "delabere";
 
   home.packages = with pkgs; [
-    alejandra
     go
     gopls
-    nixpkgs-fmt
   ];
 }
