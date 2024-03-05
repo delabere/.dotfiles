@@ -32,6 +32,7 @@
       system: let
         pkgs = import nixpkgs {
           inherit system;
+          overlays = [(import ./overlay.nix inputs)];
         };
         mkHomeManagerConfig = module: name:
           home-manager.lib.homeManagerConfiguration {

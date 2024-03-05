@@ -2,7 +2,6 @@
   config,
   pkgs,
   brag,
-  session-x,
   system,
   ...
 }: {
@@ -94,19 +93,19 @@
       escapeTime = 10;
       terminal = "screen-256color";
 
-      plugins = with pkgs; [
-        tmuxPlugins.vim-tmux-navigator
-        tmuxPlugins.power-theme
-        tmuxPlugins.resurrect
-        tmuxPlugins.continuum
+      plugins = with pkgs.tmuxPlugins; [
+        vim-tmux-navigator
+        power-theme
+        resurrect
+        continuum
         {
-          plugin = session-x.packages.${system}.default;
+          plugin = session-x;
           extraConfig = ''
             set -g @sessionx-filter-current 'false'
           '';
         }
         {
-          plugin = tmuxPlugins.jump;
+          plugin = jump;
           extraConfig = ''
             set-option -g @jump-key 'J'
           '';
