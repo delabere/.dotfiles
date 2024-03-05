@@ -11,8 +11,10 @@
   ];
 
   home.packages = with pkgs; [
+    alejandra
     brag.packages.${system}.default
     delve
+    nixpkgs-fmt
     nodePackages.vscode-html-languageserver-bin
     nodejs
     sumneko-lua-language-server
