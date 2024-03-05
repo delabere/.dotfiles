@@ -16,7 +16,6 @@
     delve
     nixpkgs-fmt
     nodePackages.vscode-html-languageserver-bin
-    nodejs
     sumneko-lua-language-server
     thefuck
   ];

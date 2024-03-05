@@ -13,8 +13,9 @@
 
   home.username = "jackrickards";
 
-  home.packages = [
-    pkgs.graphviz
+  home.packages = with pkgs; [
+    graphviz
+    nodejs_20
     # pkgs.go
     # pkgs.gopls
   ];
