@@ -1,4 +1,10 @@
-{session-x, ...} @ inputs: final: prev: {
+{
+  session-x,
+  brag,
+  ...
+} @ inputs: final: prev: {
+  brag = brag.packages.${final.system}.default;
+
   tmuxPlugins =
     prev.tmuxPlugins
     // {

@@ -1,7 +1,6 @@
 {
   pkgs,
   system,
-  brag,
   ...
 }: let
   s101 = pkgs.writeShellScriptBin "s101" ''
@@ -104,8 +103,8 @@
     fi
   '';
 in {
-  home.packages = [
-    brag.packages.${system}.default
+  home.packages = a
+    brag
     brag_old
     s101
     prod

@@ -1,6 +1,5 @@
 {
   pkgs,
-  brag,
   system,
   ...
 }: {
@@ -10,7 +9,7 @@
 
   home.packages = with pkgs; [
     alejandra
-    brag.packages.${system}.default
+    brag
     delve
     nixpkgs-fmt
     nodePackages.vscode-html-languageserver-bin

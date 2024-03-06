@@ -42,7 +42,7 @@
             ];
 
             extraSpecialArgs = {
-              inherit inputs system brag session-x name;
+              inherit inputs system session-x name;
             };
           };
         homeConfigurations = {
