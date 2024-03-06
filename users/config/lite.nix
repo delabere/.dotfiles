@@ -101,12 +101,13 @@
           plugin = session-x;
           extraConfig = ''
             set -g @sessionx-filter-current 'false'
+            set -g @sessionx-bind 'o'
           '';
         }
         {
           plugin = jump;
           extraConfig = ''
-            set-option -g @jump-key 'J'
+            set-option -g @jump-key 's'
           '';
         }
       ];
@@ -126,7 +127,7 @@
         bind v split-window -h
 
         unbind '"'
-        bind s split-window -v
+        bind x split-window -v
 
         unbind r
         bind r source-file ~/.tmux.conf
