@@ -1,12 +1,5 @@
 return {
   {
-    "axkirillov/telescope-changed-files",
-  },
-  {
-    "nvim-telescope/telescope-file-browser.nvim",
-    dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" },
-  },
-  {
     "nvim-telescope/telescope.nvim",
     dependencies = {
       {
@@ -23,7 +16,6 @@ return {
           -- config_key = value,
           mappings = {
             i = {
-              ["<C-h>"] = "which_key",
               -- smart_send_to_qflist struggles with large search results,
               -- and when it fails will send all results to the qfixlist
               ["<C-q>"] = actions.smart_send_to_qflist + actions.open_qflist,
