@@ -56,20 +56,7 @@ return {
     end,
   },
 
-  { "delabere/protodef" },
   { "folke/zen-mode.nvim" },
-  {
-    "fatih/vim-go",
-    make = ":GoInstallBinaries",
-    config = function()
-      vim.g.go_gopls_enabled = false -- or false to disable
-      vim.g.go_def_mapping_enabled = false -- stops vim-go taking over <C-t> for tagstack jumps
-      vim.keymap.set("n", "<leader>ge", "<cmd>GoIfErr<CR>", { desc = "Go if error" })
-      vim.keymap.set("n", "<leader>tf", "<cmd>GoAlternate<CR>", { desc = "Go to tests for file" })
-      vim.keymap.set("n", "<leader>tc", "<cmd>GoCoverageToggle<CR>", { desc = "Test coverage toggle" })
-    end,
-  },
-
   -- navigate between other tmux panes
   {
     "christoomey/vim-tmux-navigator",
@@ -84,36 +71,8 @@ return {
   -- { "tpope/vim-surround" },
 
   -- debugger configuration for go
-  { "leoluz/nvim-dap-go" },
   { "ruanyl/vim-gh-line" },
   { "folke/zen-mode.nvim" },
-
-  -- install without yarn or npm
-  {
-    "iamcco/markdown-preview.nvim",
-    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-    ft = { "markdown" },
-
-    init = function()
-      -- set to 1, nvim will open the preview window after entering the Markdown buffer
-      -- default: 0
-      vim.g.mkdp_auto_start = 0
-
-      -- combine preview window
-      -- default: 0
-      -- if enable it will reuse previous opened preview window when you preview markdown file.
-      -- ensure to set let g:mkdp_auto_close = 0 if you have enable this option
-      vim.g.mkdp_combine_preview = 1
-
-      -- auto refetch combine preview contents when change markdown buffer
-      -- only when g:mkdp_combine_preview is 1
-      vim.g.mkdp_combine_preview_auto_refresh = 1
-    end,
-
-    build = function()
-      vim.fn["mkdp#util#install"]()
-    end,
-  },
 
   {
     -- the default blue for todo's is a little garish
@@ -126,16 +85,13 @@ return {
   },
 
   {
-    "nvim-neotest/neotest-go",
-  },
-  {
     "nvim-neotest/neotest",
+    dependencies = { "nvim-neotest/neotest-go" },
     opts = { adapters = { "neotest-go" }, discovery = { enabled = false } },
   },
 
   {
     "stevearc/oil.nvim",
-
     keys = {
       { "<leader>o", "<CMD>Oil<CR>", desc = "Oil" },
     },
@@ -148,20 +104,9 @@ return {
       -- See :help oil-actions for a list of all available actions
       keymaps = {
         ["?"] = "actions.show_help",
-        ["<CR>"] = "actions.select",
         ["<C-v>"] = "actions.select_vsplit",
         ["<C-x>"] = "actions.select_split",
-        ["<C-p>"] = "actions.preview",
-        ["<C-c>"] = "actions.close",
-        ["<C-l>"] = "actions.refresh",
         ["<BS>"] = "actions.parent",
-        ["_"] = "actions.open_cwd",
-        ["`"] = "actions.cd",
-        ["~"] = "actions.tcd",
-        ["gs"] = "actions.change_sort",
-        ["gx"] = "actions.open_external",
-        ["g."] = "actions.toggle_hidden",
-        ["g\\"] = "actions.toggle_trash",
       },
     },
     -- Optional dependencies
