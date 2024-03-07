@@ -132,4 +132,39 @@ return {
     "nvim-neotest/neotest",
     opts = { adapters = { "neotest-go" }, discovery = { enabled = false } },
   },
+
+  {
+    "stevearc/oil.nvim",
+
+    keys = {
+      { "<leader>o", "<CMD>Oil<CR>", desc = "Oil" },
+    },
+    opts = {
+      view_options = {
+        -- Show files and directories that start with "."
+        show_hidden = true,
+      },
+
+      -- See :help oil-actions for a list of all available actions
+      keymaps = {
+        ["?"] = "actions.show_help",
+        ["<CR>"] = "actions.select",
+        ["<C-v>"] = "actions.select_vsplit",
+        ["<C-x>"] = "actions.select_split",
+        ["<C-p>"] = "actions.preview",
+        ["<C-c>"] = "actions.close",
+        ["<C-l>"] = "actions.refresh",
+        ["<BS>"] = "actions.parent",
+        ["_"] = "actions.open_cwd",
+        ["`"] = "actions.cd",
+        ["~"] = "actions.tcd",
+        ["gs"] = "actions.change_sort",
+        ["gx"] = "actions.open_external",
+        ["g."] = "actions.toggle_hidden",
+        ["g\\"] = "actions.toggle_trash",
+      },
+    },
+    -- Optional dependencies
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+  },
 }
