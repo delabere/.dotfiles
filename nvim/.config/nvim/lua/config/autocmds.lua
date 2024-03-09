@@ -3,11 +3,11 @@
 -- Add any additional autocmds here
 
 -- autosave
-vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "InsertLeave" }, {
-  command = "silent! wa",
-})
+-- vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave" }, {
+--   command = "silent! wa",
+-- })
 
-vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "InsertLeave" }, {
+vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave" }, {
   pattern = "*",
   callback = function(args)
     require("conform").format({ bufnr = args.buf })
