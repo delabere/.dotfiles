@@ -24,6 +24,7 @@ return {
         -- python = { "isort", "black" },
         go = { "gopls" },
         nix = { "alejandra" },
+        rust = { "rustfmt" },
       },
     },
   },
