@@ -120,7 +120,7 @@
         unbind C-y
         unbind C-p
         bind C-y run "tmux save-buffer - | xclip -i -sel clipboard"
-        bind C-p run "tmux set-buffer "$(xclip -o -sel clipboard)"; tmux paste-buffer"
+        bind C-p run "tmux set-buffer '$(xclip -o -sel clipboard)'; tmux paste-buffer"
 
         # change window splits key
         unbind %
