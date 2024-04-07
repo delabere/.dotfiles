@@ -174,7 +174,7 @@
     marksman
     pngpaste # for obsidian nvim plugin
     (nerdfonts.override {
-      fonts = ["JetBrainsMono" "Iosevka" "FiraCode" "Hack"];
+      fonts = ["JetBrainsMono" "Iosevka" "FiraCode" "Hack" "RobotoMono"];
     })
   ];
 }
