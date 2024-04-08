@@ -16,6 +16,17 @@
     shipper deploy --prod $1
   '';
 
+  # gets you the id of your production user
+  pid = pkgs.writeShellScriptBin "pid" ''
+    echo "user_00009D6eX3vpzDDK9FdzSj" | pbcopy
+  '';
+
+  # gets you the id of the most recently created staging user
+  sid = pkgs.writeShellScriptBin "sid" ''
+    £ -e s101 'iapi GET /nonprod-user-generator/manual-test-users/list' | \
+    jq '[.users[].info_view_items][0][1].code' | sed 's/"//g' | pbcopy
+  '';
+
   mergeship = pkgs.writeShellScriptBin "mergeship" ''
     function mergeship() {
       local PRNumber=$(gh pr view $(git branch --show-current) --json url --template "{{.url}}") &&\
@@ -111,5 +122,7 @@ in {
     mergeship
     tpr
     shipthis
+    pid
+    sid
   ];
 }
