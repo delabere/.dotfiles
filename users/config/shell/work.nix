@@ -103,8 +103,8 @@
     fi
   '';
 in {
-  home.packages = a
-    brag
+  home.packages = [
+    pkgs.brag
     brag_old
     s101
     prod
