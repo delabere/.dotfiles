@@ -63,5 +63,5 @@ return {
     opts = { adapters = { "neotest-go" }, discovery = { enabled = false } },
   },
 
-  { "github/copilot.vim" },
+  -- { "github/copilot.vim" },
 }
