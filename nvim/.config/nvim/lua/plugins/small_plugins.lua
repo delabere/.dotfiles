@@ -23,7 +23,7 @@ return {
         python = { "ruff_format", "isort" },
         -- python = { "isort", "black" },
         go = { "gopls" },
-        nix = { "alejandra" },
+        nix = { "nixpkgs-fmt" },
         rust = { "rustfmt" },
       },
     },
