@@ -62,4 +62,6 @@ return {
     dependencies = { "nvim-neotest/neotest-go" },
     opts = { adapters = { "neotest-go" }, discovery = { enabled = false } },
   },
+
+  { "github/copilot.vim" },
 }
