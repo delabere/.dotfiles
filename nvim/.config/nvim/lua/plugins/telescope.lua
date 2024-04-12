@@ -20,6 +20,11 @@ return {
               -- and when it fails will send all results to the qfixlist
               ["<C-q>"] = actions.smart_send_to_qflist + actions.open_qflist,
             },
+            n = {
+              -- smart_send_to_qflist struggles with large search results,
+              -- and when it fails will send all results to the qfixlist
+              ["<C-q>"] = actions.smart_send_to_qflist + actions.open_qflist,
+            },
           },
         },
         extensions = {
