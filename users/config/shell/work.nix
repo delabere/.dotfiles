@@ -21,6 +21,27 @@
     echo "user_00009D6eX3vpzDDK9FdzSj" | pbcopy
   '';
 
+  # gets you the id of your production user
+  deepl = pkgs.writeShellScriptBin "deepl" ''
+    function deepl() {
+        local thing=$1
+
+        # Construct the regex pattern incorporating the variable
+        local pattern="@DeepLinkKey\(.*$thing"
+        local directory="$HOME/src/github.com/monzo/android-app"
+
+        # Search with ripgrep, format the output for fzf
+        rg --column --line-number --no-heading --color=always "$pattern" "$directory" | \
+        fzf --ansi --delimiter ':' \
+            --with-nth 3.. \
+            --preview 'echo {1} {2} {3}' \
+            --preview-window up:3:wrap | \
+        awk -F ':' '{print "nvim +" $2 " " $1}' | \
+        sh
+    }
+    deepl $1
+  '';
+
   # gets you the id of the most recently created staging user
   sid = pkgs.writeShellScriptBin "sid" ''
     £ -e s101 'iapi GET /nonprod-user-generator/manual-test-users/list' | \
@@ -124,5 +145,6 @@ in {
     shipthis
     pid
     sid
+    deepl
   ];
 }
