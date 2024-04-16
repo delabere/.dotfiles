@@ -114,7 +114,7 @@ return {
       end
 
       -- configure all our other servers
-      local servers = { "pyright", "tsserver", "marksman" }
+      local servers = { "pyright", "tsserver", "marksman", "kotlin_language_server" }
       for _, lsp in ipairs(servers) do
         require("lspconfig")[lsp].setup({
           on_attach = on_attach,
