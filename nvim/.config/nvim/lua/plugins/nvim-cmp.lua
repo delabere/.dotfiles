@@ -5,15 +5,6 @@ return {
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-path",
-      "hrsh7th/nvim-cmp",
-      "hrsh7th/cmp-cmdline",
-      "hrsh7th/cmp-calc",
-      "saadparwaiz1/cmp_luasnip",
-      "SirVer/ultisnips",
-      "honza/vim-snippets",
-      "f3fora/cmp-spell",
-      "tamago324/cmp-zsh",
-      "quangnguyen30192/cmp-nvim-ultisnips",
       "hrsh7th/cmp-nvim-lsp-signature-help",
     },
 
@@ -35,6 +26,7 @@ return {
           ["<C-f>"] = cmp.mapping.scroll_docs(4),
           ["<C-Space>"] = cmp.mapping.complete(),
           ["<C-e>"] = cmp.mapping.abort(),
+          -- ["<CR>"] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
           ["<TAB>"] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
           ["<S-TAB>"] = cmp.mapping.confirm({
             behavior = cmp.ConfirmBehavior.Replace,
