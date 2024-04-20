@@ -15,6 +15,6 @@
     nodePackages.vscode-html-languageserver-bin
     sumneko-lua-language-server
     thefuck
-    sesh
+    nodejs_20
   ];
 }

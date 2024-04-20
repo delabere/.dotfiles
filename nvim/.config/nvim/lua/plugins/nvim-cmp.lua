@@ -16,6 +16,7 @@ return {
       "quangnguyen30192/cmp-nvim-ultisnips",
       "hrsh7th/cmp-nvim-lsp-signature-help",
     },
+
     opts = function()
       local cmp = require("cmp")
       return {
@@ -40,10 +41,11 @@ return {
             select = true,
           }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
         }),
+
         sources = cmp.config.sources({
           { name = "copilot" },
           { name = "nvim_lsp" },
-          { name = "luasnip" },
+          -- { name = "luasnip" },
           { name = "buffer" },
           { name = "path" },
           -- For ultisnips users
