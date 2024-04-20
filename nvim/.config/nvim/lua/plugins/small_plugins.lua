@@ -1,7 +1,10 @@
 return {
   {
     -- github PR reviews in nvim
-    "pwntester/octo.nvim",
+    -- "pwntester/octo.nvim",
+    -- TODO: go back to pwntester if my pr gets merged in
+    -- https://github.com/pwntester/octo.nvim/pull/538
+    "delabere/octo.nvim",
     dependencies = {
       "nvim-lua/plenary.nvim",
       "nvim-telescope/telescope.nvim",
