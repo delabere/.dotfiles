@@ -26,7 +26,7 @@
       enable = true;
       dotDir = ".config/zsh";
       # haven't quite managed to get these working
-      enableAutosuggestions = true;
+      autosuggestion.enable = true;
       enableCompletion = true;
 
       initExtra = ''
