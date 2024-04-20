@@ -39,6 +39,7 @@ return {
       require("telescope").load_extension("file_browser")
 
       require("telescope").load_extension("changed_files")
+      require("telescope").load_extension("harpoon")
     end,
     keys = {
       { "<leader>fs", ":Monzo jump_to_component_no_cd<CR>", desc = "Monzo jump to component" },

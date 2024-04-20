@@ -63,5 +63,14 @@ return {
     opts = { adapters = { "neotest-go" }, discovery = { enabled = false } },
   },
 
+  {
+    "ThePrimeagen/harpoon",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    keys = {
+      { "<leader>hh", "<cmd>lua require('harpoon.ui').toggle_quick_menu()<cr>", desc = "toggle_quick_menu" },
+      { "<leader>ha", "<cmd>lua require('harpoon.mark').add_file()<cr>", desc = "add_file" },
+      { "<leader>ht", "<cmd>Telescope harpoon marks<cr>", desc = "telescope_marks" },
+    },
+  },
   -- { "github/copilot.vim" },
 }
