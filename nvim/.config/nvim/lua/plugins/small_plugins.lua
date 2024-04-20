@@ -75,5 +75,4 @@ return {
       { "<leader>ht", "<cmd>Telescope harpoon marks<cr>", desc = "telescope_marks" },
     },
   },
-  -- { "github/copilot.vim" },
 }
