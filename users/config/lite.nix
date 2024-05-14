@@ -22,6 +22,11 @@
     .${system};
 
   programs = {
+    zoxide = {
+      enable = true;
+      enableZshIntegration = true;
+    };
+
     zsh = {
       enable = true;
       dotDir = ".config/zsh";
@@ -70,7 +75,7 @@
     direnv.enable = true;
     fzf.enable = true;
     starship.enable = true;
-    autojump.enable = true;
+    # autojump.enable = true;
     lsd.enable = true;
     lsd.enableAliases = true;
     jq.enable = true;
