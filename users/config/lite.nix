@@ -154,7 +154,6 @@
         # enable mouse pane resizing
         unbind -T copy-mode-vi MouseDragEnd1Pane # don't exit copy mode after dragging with mouse
 
-        bind-key x kill-pane # skip "kill-pane 1? (y/n)" prompt
         set -g detach-on-destroy off  # don't exit from tmux when closing a session
 
         bind-key "o" run-shell "sesh connect \"$(
