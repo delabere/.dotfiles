@@ -34,6 +34,14 @@
       autosuggestion.enable = true;
       enableCompletion = true;
 
+      plugins = [
+        {
+          name = "vi-mode";
+          src = pkgs.zsh-vi-mode;
+          file = "share/zsh-vi-mode/zsh-vi-mode.plugin.zsh";
+        }
+      ];
+
       initExtra = ''
         # so that when mac updates we add nix back into the zshrc file
         if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
@@ -69,6 +77,18 @@
         # https://github.com/ranger/ranger/issues/2583#issuecomment-1206290600
         # fix is in ranger 1.9.4, we should be able to remove this when/if it is released
         # export TERM=xterm-256color
+       
+        # edit current commands in editor
+        autoload -U edit-command-line
+        zle -N edit-command-line
+        bindkey '^xe' edit-command-line
+        bindkey '^x^e' edit-command-line
+
+        # Only changing the escape key to `jk` in insert mode, we still
+        # keep using the default keybindings `^[` in other modes
+        ZVM_VI_INSERT_ESCAPE_BINDKEY=kj
+        ZVM_VI_SURROUND_BINDKEY=s-prefix
+        ZVM_VI_HIGHLIGHT_BACKGROUND=#93C4D6
       '';
     };
 
