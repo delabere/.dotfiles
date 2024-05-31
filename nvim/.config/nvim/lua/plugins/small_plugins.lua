@@ -13,6 +13,9 @@ return {
     config = function()
       require("octo").setup({
         use_local_fs = true,
+        suppress_missing_scope = {
+          projects_v2 = true,
+        },
       })
     end,
   },
