@@ -51,7 +51,7 @@
   mergeship = pkgs.writeShellScriptBin "mergeship" ''
     function mergeship() {
       local PRNumber=$(gh pr view $(git branch --show-current) --json url --template "{{.url}}") &&\
-      gh pr merge -sd &&\
+      gh pr merge -s &&\
       echo "Shipping $PRNumber to production with automated rollback" &&\
       shipper deploy --s101 --disable-progressive-rollouts --skip-confirm-rollout $PRNumber &&\
       shipper deploy --prod --skip-confirm-rollout $PRNumber
