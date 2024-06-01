@@ -62,11 +62,57 @@ return {
       },
     },
   },
-
   {
     "nvim-neotest/neotest",
     dependencies = { "nvim-neotest/neotest-go" },
-    opts = { adapters = { "neotest-go" }, discovery = { enabled = false } },
+    config = function()
+      local path_of_current_file = vim.fn.fnamemodify(vim.fn.expand("%"), ":p:h")
+
+      -- get neotest namespace (api call creates or returns namespace)
+      local neotest_ns = vim.api.nvim_create_namespace("neotest")
+      vim.diagnostic.config({
+        virtual_text = {
+          format = function(diagnostic)
+            local message = diagnostic.message:gsub("\n", " "):gsub("\t", " "):gsub("%s+", " "):gsub("^%s+", "")
+            return message
+          end,
+        },
+      }, neotest_ns)
+
+      local go_adapter = require("neotest-go")({
+        experimental = {
+          test_table = true,
+        },
+        args = { "-count=1", "-timeout=60s" },
+      })
+
+      go_adapter.root = function()
+        local this_file_directory = vim.fn.fnamemodify(vim.fn.expand("%"), ":p:h")
+        return this_file_directory
+      end
+
+      require("neotest").setup({
+        discovery = {
+          filter_dir = function(name, rel_path, root)
+            print(name, rel_path, root)
+            return true
+          end,
+        },
+        adapters = {
+          go_adapter,
+        },
+      })
+    end,
+
+    keys = {
+      {
+        "<leader>tT",
+        function()
+          require("neotest").run.run(vim.fn.fnamemodify(vim.fn.expand("%"), ":p:h"))
+        end,
+        desc = "Run All Test Files",
+      },
+    },
   },
 
   {
