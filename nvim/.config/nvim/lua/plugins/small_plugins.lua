@@ -51,6 +51,14 @@ return {
 
   -- debugger configuration for go
   { "ruanyl/vim-gh-line" },
+  {
+    "ruifm/gitlinker.nvim",
+
+    config = function()
+      require("gitlinker").setup()
+    end,
+  },
+
   { "folke/zen-mode.nvim" },
 
   {
