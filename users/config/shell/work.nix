@@ -50,13 +50,21 @@
 
   mergeship = pkgs.writeShellScriptBin "mergeship" ''
     function mergeship() {
-      local PRNumber=$(gh pr view $(git branch --show-current) --json url --template "{{.url}}") &&\
-      gh pr merge -s &&\
-      echo "Shipping $PRNumber to production with automated rollback" &&\
-      shipper deploy --s101 --disable-progressive-rollouts --skip-confirm-rollout $PRNumber &&\
-      shipper deploy --prod --skip-confirm-rollout $PRNumber
+    local PRNumber
+    if [ -n "$1" ]; then
+        PRNumber="$1"
+    else
+        # Fetch the PR number based on the current branch
+        echo "🕵️  Getting the PR number for the current branch..."
+        PRNumber=$(gh pr view $(git branch --show-current) --json url --template "{{.url}}")
+    fi
+
+    gh pr merge -s &&\
+    echo "Shipping $PRNumber to production with automated rollback" &&\
+    shipper deploy --s101 --disable-progressive-rollouts --skip-confirm-rollout $PRNumber &&\
+    shipper deploy --prod --skip-confirm-rollout $PRNumber
     }
-    mergeship
+    mergeship $1
   '';
 
   tpr = pkgs.writeShellScriptBin "tpr" ''
