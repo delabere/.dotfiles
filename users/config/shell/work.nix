@@ -44,9 +44,20 @@
 
   # gets you the id of the most recently created staging user
   sid = pkgs.writeShellScriptBin "sid" ''
-    £ -e s101 'iapi GET /nonprod-user-generator/manual-test-users/list' | \
-    jq '[.users[].info_view_items][0][1].code' | sed 's/"//g' | pbcopy
-  '';
+    result=$(£ -e s101 'iapi GET /nonprod-user-generator/manual-test-users/list')
+    echo $result | jq '[.users[].info_view_items][0][1].code' | sed 's/"//g' | pbcopy
+    echo $result | \
+    jq '[.users[0]]' | \
+        jq 'map({
+      created,
+      email,
+      "Name": (.info_view_items[] | select(.label == "Name").text),
+      "User ID": (.info_view_items[] | select(.label == "User ID").code),
+      "Supportal": (.info_view_items[] | select(.label == "Link" and .text == "Supportal").href),
+      "BizOps": (.info_view_items[] | select(.label == "Link" and .text == "BizOps").href),
+      labels
+    })'
+    '';
 
   mergeship = pkgs.writeShellScriptBin "mergeship" ''
     function mergeship() {
