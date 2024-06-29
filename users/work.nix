@@ -11,7 +11,8 @@
     graphviz
     nodejs_20
     go_1_22
-    # pkgs.gopls
+    gopls
+    gotest
   ];
 
   programs = {

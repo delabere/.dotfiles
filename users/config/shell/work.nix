@@ -70,7 +70,7 @@
         PRNumber=$(gh pr view $(git branch --show-current) --json url --template "{{.url}}")
     fi
 
-    gh pr merge -s &&\
+    gh pr merge -s $PRNumber &&\
     echo "Shipping $PRNumber to production with automated rollback" &&\
     shipper deploy --s101 --disable-progressive-rollouts --skip-confirm-rollout $PRNumber &&\
     shipper deploy --prod --skip-confirm-rollout $PRNumber
