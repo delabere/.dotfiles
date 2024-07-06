@@ -44,6 +44,7 @@ return {
     keys = {
       { "<leader>fs", ":Monzo jump_to_component_no_cd<CR>", desc = "Monzo jump to component" },
       { "<leader>fd", ":Monzo jump_to_downstream<CR>", desc = "Monzo jump to downstream" },
+      { "<leader>fc", "<cmd>Telescope changed_files<CR>", desc = "Find files changed on this branch" },
       { "<leader>E", ":Telescope file_browser<CR>", desc = "File browser at CWD" },
       { "<leader>e", ":Telescope file_browser path=%:p:h<CR>", desc = "File browser at buffer path" },
     },
