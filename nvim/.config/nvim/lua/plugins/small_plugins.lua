@@ -74,8 +74,6 @@ return {
     "nvim-neotest/neotest",
     dependencies = { "nvim-neotest/neotest-go" },
     config = function()
-      local path_of_current_file = vim.fn.fnamemodify(vim.fn.expand("%"), ":p:h")
-
       -- get neotest namespace (api call creates or returns namespace)
       local neotest_ns = vim.api.nvim_create_namespace("neotest")
       vim.diagnostic.config({
@@ -96,6 +94,7 @@ return {
 
       go_adapter.root = function()
         local this_file_directory = vim.fn.fnamemodify(vim.fn.expand("%"), ":p:h")
+        print("setting go adapter root", this_file_directory)
         return this_file_directory
       end
 
