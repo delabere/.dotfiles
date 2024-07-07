@@ -67,6 +67,10 @@ vim.cmd(
   "nnoremap gh :let pp=getpos('.')<CR>:let res=split(system('handlertool '.shellescape(expand('%:p').':'.line('.').':'.col('.'))), ':')<CR>:e <C-R>=res[0]<CR><CR>:call setpos('.',[pp[0],res[1],res[2],0])<CR>"
 )
 
+vim.api.nvim_command(
+  'command! Mockit lua local pos = vim.fn.getpos("."); vim.fn.system("goprotomocker -file " .. vim.fn.expand("%:p") .. " -line " .. vim.fn.line(".") .. " -write"); vim.cmd("edit!"); vim.fn.setpos(".", pos); vim.lsp.buf.format()'
+)
+
 -- diagnostic seeks
 vim.keymap.set("n", ")", "<cmd>lua vim.diagnostic.goto_next()<CR>", { silent = true })
 vim.keymap.set("n", "(", "<cmd>lua vim.diagnostic.goto_prev()<CR>", { silent = true })
