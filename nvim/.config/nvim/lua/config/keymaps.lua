@@ -63,13 +63,30 @@ vim.cmd("xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>")
 --     vim.opt.undodir = '~/.config/vim/tmp/undo//'
 -- end
 
-vim.cmd(
-  "nnoremap gh :let pp=getpos('.')<CR>:let res=split(system('handlertool '.shellescape(expand('%:p').':'.line('.').':'.col('.'))), ':')<CR>:e <C-R>=res[0]<CR><CR>:call setpos('.',[pp[0],res[1],res[2],0])<CR>"
-)
-
 vim.api.nvim_command(
   'command! Mockit lua local pos = vim.fn.getpos("."); vim.fn.system("goprotomocker -file " .. vim.fn.expand("%:p") .. " -line " .. vim.fn.line(".") .. " -write"); vim.cmd("edit!"); vim.fn.setpos(".", pos); vim.lsp.buf.format()'
 )
+vim.api.nvim_set_keymap("n", "gh", "", {
+  noremap = true,
+  silent = true,
+  callback = function()
+    -- Call handlertool.
+    local file_src_path_abs = vim.fn.expand("%:p")
+    local file_src_line = vim.fn.line(".")
+    local file_src_col = vim.fn.col(".")
+    local handlertool_out = vim.fn.system(
+      "handlertool " .. vim.fn.shellescape(file_src_path_abs .. ":" .. file_src_line .. ":" .. file_src_col)
+    )
+
+    -- Parse handlertool output.
+    local file_dst_path_abs, file_dst_line, file_dst_col = string.match(handlertool_out, "([^:]+):(%d+):(%d+)")
+
+    -- Jump to the destination.
+    vim.cmd("e " .. file_dst_path_abs)
+    vim.fn.setpos(".", { vim.api.nvim_get_current_buf(), tonumber(file_dst_line), tonumber(file_dst_col), 0 })
+    vim.cmd("normal! zz")
+  end,
+})
 
 -- diagnostic seeks
 vim.keymap.set("n", ")", "<cmd>lua vim.diagnostic.goto_next()<CR>", { silent = true })
