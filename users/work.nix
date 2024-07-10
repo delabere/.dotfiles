@@ -13,6 +13,7 @@
     go_1_22
     gopls
     gotest
+    goprotomocker
   ];
 
   programs = {

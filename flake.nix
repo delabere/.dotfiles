@@ -11,6 +11,10 @@
       url = "github:delabere/brag";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    goprotomocker = {
+      url = "github:delabere/goprotomocker";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     flake-utils = {
       url = "github:numtide/flake-utils";
     };
@@ -25,6 +29,7 @@
     flake-utils,
     home-manager,
     brag,
+    goprotomocker,
     session-x,
     ...
   } @ inputs:
