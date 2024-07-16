@@ -119,6 +119,7 @@ return {
         require("lspconfig")[lsp].setup({
           on_attach = on_attach,
           capabilities = capabilities,
+          root_dir = lspconfig.util.root_pattern("main.go", "README.md", "go.mod", "LICENSE"),
         })
       end
 
