@@ -58,6 +58,8 @@
         alias gcm='git checkout master && git pull'
         alias cat=bat
 
+        alias gac='git add . && git commit -m'
+
         # this one let's me pull all my changes back into the index so I can structure my commits on a more complex
         # pr more easily
         alias reset-commits='git reset --soft $(git merge-base master HEAD)'
@@ -131,6 +133,9 @@
       ];
 
       extraConfig = ''
+        # I'm always hitting this fucking key by accident and nuking my layout
+        unbind c
+
         # bind the second prefix for more split keyboard
         set-option -g prefix2 C-b
 
