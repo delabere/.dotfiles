@@ -4,24 +4,24 @@
   ...
 }: let
   s = pkgs.writeShellScriptBin "s" ''
-    £ -e s101 --enable-vpnless $1
+    £ -e s101 $1
   '';
 
   p = pkgs.writeShellScriptBin "p" ''
-    £ -e prod --enable-vpnless $1
+    £ -e prod $1
   '';
 
   s101 = pkgs.writeShellScriptBin "s101" ''
-    shipper deploy --s101 --enable-vpnless $1
+    shipper deploy --s101 $1
   '';
 
   shipthis = pkgs.writeShellScriptBin "shipthis" ''
     branch=$(eval "git rev-parse --symbolic-full-name --abbrev-ref HEAD")
-    shipper deploy --s101 --enable-vpnless $branch
+    shipper deploy --s101 $branch
   '';
 
   prod = pkgs.writeShellScriptBin "prod" ''
-    shipper deploy --prod --enable-vpnless $1
+    shipper deploy --prod $1
   '';
 
   # gets you the id of your production user
@@ -80,7 +80,7 @@
 
     gh pr merge -s $PRNumber &&\
     echo "Shipping $PRNumber to production with automated rollback" &&\
-    shipper deploy --s101 --disable-progressive-rollouts --skip-confirm-rollout $PRNumber --enable-vpnless &&\
+    shipper deploy --s101 --disable-progressive-rollouts --skip-confirm-rollout $PRNumber &&\
     shipper deploy --prod --skip-confirm-rollout $PRNumber --enable-vpnless
     }
     mergeship $1
