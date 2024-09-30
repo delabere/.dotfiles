@@ -13,23 +13,34 @@ return {
       local action_state = require("telescope.actions.state")
       local finders = require("telescope.finders")
 
-      -- Custom action to filter out _test.go files
-      local function filter_out_test_files(prompt_bufnr)
+      -- Custom action to toggle filter of _test.go files
+      local function toggle_test_file_filter(prompt_bufnr)
         local picker = action_state.get_current_picker(prompt_bufnr)
-        local manager = picker.manager
 
-        -- Collect the current results (full entries)
-        local original_results = {}
-        for entry in manager:iter() do
-          table.insert(original_results, entry)
+        -- Initialize filter_active and store all_results if not already stored
+        if picker.filter_active == nil then
+          picker.filter_active = false
+          -- Store the initial, unfiltered results
+          picker.all_results = {}
+          for entry in picker.manager:iter() do
+            table.insert(picker.all_results, entry)
+          end
         end
 
-        -- Filter out entries ending with _test.go
+        -- Toggle filter_active
+        picker.filter_active = not picker.filter_active
+
         local filtered_results = {}
-        for _, entry in ipairs(original_results) do
-          if not string.match(entry.value, "_test%.go") then
-            table.insert(filtered_results, entry)
+        if picker.filter_active then
+          -- Filter out entries containing _test.go
+          for _, entry in ipairs(picker.all_results) do
+            if not string.match(entry.value, "_test%.go") then
+              table.insert(filtered_results, entry)
+            end
           end
+        else
+          -- No filtering, use all_results
+          filtered_results = picker.all_results
         end
 
         -- Refresh the picker with the filtered results
@@ -53,14 +64,14 @@ return {
               -- smart_send_to_qflist struggles with large search results,
               -- and when it fails will send all results to the qfixlist
               ["<C-q>"] = actions.smart_send_to_qflist + actions.open_qflist,
-              -- Map <C-f> to filter out _test.go files
-              ["<C-f>"] = filter_out_test_files,
+              -- Map <C-f> to toggle filter of _test.go files
+              ["<C-f>"] = toggle_test_file_filter,
             },
             n = {
               -- smart_send_to_qflist struggles with large search results,
               -- and when it fails will send all results to the qfixlist
               ["<C-q>"] = actions.smart_send_to_qflist + actions.open_qflist,
-              ["<C-f>"] = filter_out_test_files,
+              ["<C-f>"] = toggle_test_file_filter,
             },
           },
         },
