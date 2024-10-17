@@ -53,10 +53,6 @@ vim.keymap.set("n", "<Leader>k", ":cnext<CR>")
 -- stops p in visual mode yanking the replaced text
 vim.keymap.set("x", "p", "pgvy")
 
--- this bit of code allows you to highlight a visual range
--- and run a macro on each line
-vim.cmd("xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>")
-
 --This enables us to undo files even if you exit Vim.
 -- if vim.fn.has('persistent_undo') == 1 then
 --     vim.opt.undofile = true
