@@ -55,6 +55,7 @@
         [ -f "$HOME/.zshrc" ] && source ~/.zshrc
 
         alias lg='lazygit'
+        alias gs='git status'
         alias gcm='git checkout master && git pull'
         alias cat=bat
 
