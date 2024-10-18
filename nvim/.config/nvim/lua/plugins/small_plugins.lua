@@ -131,4 +131,5 @@ return {
       { "<leader>ht", "<cmd>Telescope harpoon marks<cr>", desc = "telescope_marks" },
     },
   },
+  "Hoffs/omnisharp-extended-lsp.nvim",
 }
