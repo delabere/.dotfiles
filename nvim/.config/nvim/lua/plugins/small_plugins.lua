@@ -120,7 +120,7 @@ return {
       require("neotest").setup({
         discovery = {
           filter_dir = function(name, rel_path, root)
-            print(name, rel_path, root)
+            print("name: ", name, "rel_path", rel_path, "root", root)
             return true
           end,
         },
