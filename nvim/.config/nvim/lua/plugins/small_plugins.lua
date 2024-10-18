@@ -121,6 +121,9 @@ return {
         discovery = {
           filter_dir = function(name, rel_path, root)
             print("name: ", name, "rel_path", rel_path, "root", root)
+            if root == "/Users/jackrickards/src/github.com/monzo/wearedev" then
+              return false
+            end
             return true
           end,
         },
