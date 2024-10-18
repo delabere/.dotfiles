@@ -54,7 +54,6 @@ return {
     },
   },
 
-  { "folke/zen-mode.nvim" },
   -- navigate between other tmux panes
   {
     "christoomey/vim-tmux-navigator",
@@ -81,14 +80,15 @@ return {
   { "folke/zen-mode.nvim" },
 
   {
-    -- the default blue for todo's is a little garish
     "folke/todo-comments.nvim",
     opts = {
       keywords = {
+        -- the default blue for todo's is a little garish
         TODO = { icon = " ", color = "hint" },
       },
     },
   },
+
   {
     "nvim-neotest/neotest",
     dependencies = { "nvim-neotest/neotest-go" },
@@ -150,4 +150,5 @@ return {
       { "<leader>ht", "<cmd>Telescope harpoon marks<cr>", desc = "telescope_marks" },
     },
   },
+  "Hoffs/omnisharp-extended-lsp.nvim",
 }
