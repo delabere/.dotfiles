@@ -3,13 +3,12 @@
 -- Add any additional autocmds here
 
 local function is_readonly()
-  local current_buf = vim.api.nvim_get_current_buf()
-  return vim.api.nvim_buf_get_option(current_buf, "readonly")
+  return vim.bo.readonly
 end
 
 vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "InsertLeave" }, {
   desc = "autosave modifiable buffers only",
-  callback = function()
+  callback = function(_)
     if is_readonly() then
       return
     end
@@ -21,7 +20,7 @@ vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "InsertLeave" }, {
 vim.api.nvim_create_autocmd("BufWritePost", {
   pattern = "*.proto",
   group = vim.api.nvim_create_augroup("protobufGeneration", { clear = true }),
-  callback = function()
+  callback = function(_)
     local cwd = vim.fn.getcwd()
     local service = vim.fn.expand("%:p"):match("wearedev/(.+)/proto")
     local cmd = string.format("%s/bin/generate_protobufs %s/%s", cwd, cwd, service)
