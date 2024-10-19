@@ -18,17 +18,6 @@ vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "InsertLeave" }, {
   end,
 })
 
--- vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave" }, {
---   desc = "conform autoformat",
---   callback = function(args)
---     if is_readonly() then
---       return
---     end
---
---     require("conform").format({ bufnr = args.buf })
---   end,
--- })
-
 vim.api.nvim_create_autocmd("BufWritePost", {
   pattern = "*.proto",
   group = vim.api.nvim_create_augroup("protobufGeneration", { clear = true }),
