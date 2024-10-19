@@ -19,43 +19,14 @@ return {
 
     -- Optional, configure key mappings. These are the defaults. If you don't want to set any keymappings this
     -- way then set 'mappings = {}'.
+    -- stylua: ignore
     mappings = {
-      ["gd"] = {
-        action = function()
-          return require("obsidian").util.gf_passthrough()
-        end,
-        opts = { noremap = false, expr = true, buffer = true, desc = "Go to note" },
-      },
-      ["gr"] = {
-        action = function()
-          return "<cmd>ObsidianBacklinks<CR>"
-        end,
-        opts = { noremap = false, expr = true, buffer = true, desc = "Obsidian Backlinks" },
-      },
-      ["<leader>nn"] = {
-        action = function()
-          return "<cmd>ObsidianNew<CR>"
-        end,
-        opts = { noremap = false, expr = true, buffer = true, desc = "New note" },
-      },
-      ["<leader>os"] = {
-        action = function()
-          return "<cmd>ObsidianSearch<CR>"
-        end,
-        opts = { noremap = false, expr = true, buffer = true, desc = "Obsidian search" },
-      },
-      ["<leader>op"] = {
-        action = function()
-          return "<cmd>ObsidianPasteImg<CR>"
-        end,
-        opts = { noremap = false, expr = true, buffer = true, desc = "Paste image" },
-      },
-      ["<leader>ch"] = {
-        action = function()
-          return require("obsidian").util.toggle_checkbox()
-        end,
-        opts = { buffer = true },
-      },
+      ["gd"] = { action = function() return require("obsidian").util.gf_passthrough() end, opts = { noremap = false, expr = true, buffer = true, desc = "Go to note" } },
+      ["gr"] = { action = function() return "<cmd>ObsidianBacklinks<CR>" end, opts = { noremap = false, expr = true, buffer = true, desc = "Obsidian Backlinks" } },
+      ["<leader>nn"] = { action = function() return "<cmd>ObsidianNew<CR>" end, opts = { noremap = false, expr = true, buffer = true, desc = "New note" } },
+      ["<leader>os"] = { action = function() return "<cmd>ObsidianSearch<CR>" end, opts = { noremap = false, expr = true, buffer = true, desc = "Obsidian search" } },
+      ["<leader>op"] = { action = function() return "<cmd>ObsidianPasteImg<CR>" end, opts = { noremap = false, expr = true, buffer = true, desc = "Paste image" } },
+      ["<leader>ch"] = { action = function() return require("obsidian").util.toggle_checkbox() end, opts = { buffer = true } },
     },
 
     -- Optional, customize how note IDs are generated given an optional title.
