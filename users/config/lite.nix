@@ -119,6 +119,7 @@
       mouse = true;
       escapeTime = 10;
       terminal = "screen-256color";
+      shell = "/bin/zsh";
 
       plugins = with pkgs.tmuxPlugins; [
         vim-tmux-navigator
