@@ -50,6 +50,7 @@ return {
         go = { "gopls" },
         nix = { "nixpkgs-fmt" },
         rust = { "rustfmt" },
+        templ = { "templ" },
       },
     },
   },
