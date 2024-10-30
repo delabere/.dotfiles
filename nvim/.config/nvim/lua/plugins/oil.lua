@@ -1,8 +1,9 @@
 return {
   {
     "stevearc/oil.nvim",
+    -- stylua: ignore
     keys = {
-      { "<leader>o", "<CMD>Oil<CR>", desc = "Oil" },
+        {"<leader>o", "<CMD>Oil<CR>", desc = "Oil"},
     },
     opts = {
       view_options = {
@@ -16,6 +17,8 @@ return {
         ["<C-v>"] = "actions.select_vsplit",
         ["<C-x>"] = "actions.select_split",
         ["<BS>"] = "actions.parent",
+        ["<C-h>"] = false,
+        ["<C-l>"] = false,
       },
     },
     -- Optional dependencies
