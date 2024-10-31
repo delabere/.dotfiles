@@ -10,7 +10,7 @@
   home.packages = with pkgs; [
     graphviz
     nodejs_20
-    go_1_22
+    go
     gopls
     gotest
     goprotomocker
