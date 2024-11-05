@@ -57,7 +57,7 @@
         alias lg='lazygit'
         alias gs='git status'
         alias gcm='git checkout master && git pull'
-        alias cat=bat
+        alias cat='bat --decorations=never'
 
         alias gac='git add . && git commit -m'
 
