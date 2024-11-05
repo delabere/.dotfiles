@@ -48,7 +48,7 @@ return {
         python = { "ruff_format", "isort" },
         -- python = { "isort", "black" },
         go = { "gopls" },
-        nix = { "nixpkgs-fmt" },
+        nix = { "nixpkgs_fmt" },
         rust = { "rustfmt" },
         templ = { "templ" },
       },
