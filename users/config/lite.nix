@@ -59,6 +59,7 @@
         alias gcm='git checkout master && git pull'
         alias cat=bat
         alias checks='gh pr checks --watch'
+        alias cat='bat --decorations=never'
 
         alias gac='git add . && git commit -m'
 
