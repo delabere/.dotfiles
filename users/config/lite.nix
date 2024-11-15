@@ -58,8 +58,11 @@
         alias gs='git status'
         alias gcm='git checkout master && git pull'
         alias cat=bat
+        alias checks='gh pr checks --watch'
 
         alias gac='git add . && git commit -m'
+
+        alias showpr='gh pr view --web'
 
         # this one let's me pull all my changes back into the index so I can structure my commits on a more complex
         # pr more easily
@@ -119,7 +122,7 @@
       mouse = true;
       escapeTime = 10;
       terminal = "screen-256color";
-      shell = "/bin/zsh";
+      # shell = "/Users/jackrickards/.nix-profile/bin/zsh";
 
       plugins = with pkgs.tmuxPlugins; [
         vim-tmux-navigator
@@ -140,7 +143,8 @@
 
         # bind the second prefix for more split keyboard
         set-option -g prefix2 C-b
-
+        
+        set-option -g default-shell $SHELL
         # let copying use default clipboard
         unbind C-y
         unbind C-p
