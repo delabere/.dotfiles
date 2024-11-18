@@ -1,8 +1,9 @@
-{
-  pkgs,
-  name,
-  ...
-}: let
+{ pkgs
+, name
+, config
+, ...
+}:
+let
   switch = pkgs.writeShellScriptBin "switch" ''
     nix run ~/.dotfiles#switch.${name}
   '';
@@ -34,8 +35,8 @@
   gitprune =
     pkgs.writeShellScriptBin "gitprune" ''
     '';
-in {
-  home.packages = [
+
+  _pkgs = [
     switch
     switch-remote
     todo
@@ -43,4 +44,23 @@ in {
     learnit
     gitprune
   ];
+
+  mkOption = pkgs.lib.mkOption;
+  types = pkgs.lib.types;
+
+in
+{
+  options = {
+    shell.base.enable = mkOption {
+      type = types.bool;
+      default = false;
+      description = "If enabled, will install cowsay";
+    };
+  };
+
+  config = {
+    home.packages =
+      if config.shell.base.enable then _pkgs else [ ];
+  };
+
 }
