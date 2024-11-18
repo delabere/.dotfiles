@@ -24,20 +24,21 @@
     };
   };
 
-  outputs = {
-    nixpkgs,
-    flake-utils,
-    home-manager,
-    brag,
-    goprotomocker,
-    session-x,
-    ...
-  } @ inputs:
-    flake-utils.lib.eachSystem ["aarch64-darwin" "x86_64-linux" "aarch64-linux"] (
-      system: let
+  outputs =
+    { nixpkgs
+    , flake-utils
+    , home-manager
+    , brag
+    , goprotomocker
+    , session-x
+    , ...
+    } @ inputs:
+    flake-utils.lib.eachSystem [ "aarch64-darwin" "x86_64-linux" "aarch64-linux" ] (
+      system:
+      let
         pkgs = import nixpkgs {
           inherit system;
-          overlays = [(import ./overlay.nix inputs)];
+          overlays = [ (import ./overlay.nix inputs) ];
         };
         mkHomeManagerConfig = module: name:
           home-manager.lib.homeManagerConfiguration {
@@ -55,17 +56,18 @@
           lakeview = mkHomeManagerConfig ./users/lakeview.nix "lakeview";
           work = mkHomeManagerConfig ./users/work.nix "work";
         };
-      in {
+      in
+      {
         apps.switch =
           nixpkgs.lib.mapAttrs
-          (
-            name: config:
-              flake-utils.lib.mkApp {
-                drv = config.activationPackage;
-                exePath = "/activate";
-              }
-          )
-          homeConfigurations;
+            (
+              name: config:
+                flake-utils.lib.mkApp {
+                  drv = config.activationPackage;
+                  exePath = "/activate";
+                }
+            )
+            homeConfigurations;
       }
     );
 }
