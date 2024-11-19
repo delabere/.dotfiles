@@ -1,8 +1,9 @@
-{
-  pkgs,
-  system,
-  ...
-}: let
+{ pkgs
+, system
+, config
+, ...
+}:
+let
   s = pkgs.writeShellScriptBin "s" ''
     £ -e s101 $1
   '';
@@ -65,7 +66,7 @@
       "BizOps": (.info_view_items[] | select(.label == "Link" and .text == "BizOps").href),
       labels
     })'
-    '';
+  '';
 
   mergeship = pkgs.writeShellScriptBin "mergeship" ''
     function mergeship() {
@@ -161,8 +162,8 @@
     echo "$(date +%d/%m/%Y) | $1" >> $HOME/brag.md
     fi
   '';
-in {
-  home.packages = [
+
+  work_pkgs = [
     brag_old
     deepl
     mergeship
@@ -176,4 +177,20 @@ in {
     sid
     tpr
   ];
+
+  mkOption = pkgs.lib.mkOption;
+  types = pkgs.lib.types;
+
+in
+{
+  options = {
+    shell.work.enable = mkOption {
+      type = types.bool;
+      description = "..."; #TODO:
+      default = false;
+
+    };
+  };
+
+  config.home.packages = if config.shell.work.enable then work_pkgs else [ ];
 }

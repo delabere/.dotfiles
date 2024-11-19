@@ -1,19 +1,27 @@
-{pkgs, ...}: {
+{ pkgs, ... }: {
   imports = [
-    ./config/base.nix
-    ./config/shell/base.nix
-    ./config/shell/work.nix
+    ./modules/modules.nix # optional extras, enabled through config options
+    ./modules/core.nix # essentials which should be included in all configurations
   ];
 
   home.username = "jackrickards";
 
+  shell = {
+    base.enable = true;
+    work.enable = true;
+  };
+
+  languages.go = {
+    enable = true;
+    work = true;
+  };
+
+  # use this for packages that haven't permanently made it into this config
+  # if they have a more permanent place in the config then they should live
+  # in a module and be set by an option
   home.packages = with pkgs; [
     graphviz
     nodejs_20
-    go
-    gopls
-    gotest
-    goprotomocker
   ];
 
   programs = {

@@ -1,8 +1,7 @@
-{
-  config,
-  pkgs,
-  system,
-  ...
+{ config
+, pkgs
+, system
+, ...
 }: {
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
@@ -18,8 +17,7 @@
       "x86_64-linux" = "/home/${config.home.username}";
       "aarch64-darwin" = "/Users/${config.home.username}";
       "aarch64-linux" = "/home/${config.home.username}";
-    }
-    .${system};
+    }.${system};
 
   programs = {
     zoxide = {
@@ -215,6 +213,13 @@
   programs.home-manager.enable = true;
 
   home.packages = with pkgs; [
+    alejandra
+    brag
+    delve
+    nixpkgs-fmt
+    sumneko-lua-language-server
+    thefuck
+    nodejs_20
     btop
     gh
     lazygit
@@ -229,7 +234,7 @@
     pngpaste # for obsidian nvim plugin
     sesh
     (nerdfonts.override {
-      fonts = ["JetBrainsMono" "Iosevka" "FiraCode" "Hack" "RobotoMono"];
+      fonts = [ "JetBrainsMono" "Iosevka" "FiraCode" "Hack" "RobotoMono" ];
     })
   ];
 }
