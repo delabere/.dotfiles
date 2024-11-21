@@ -1,4 +1,5 @@
 {
+  "CopilotChat.nvim": { "branch": "canary", "commit": "d24c4b5b4ae1c27041dc931fbcc732a6829c7d9e" },
   "LazyVim": { "branch": "main", "commit": "13a4a84e3485a36e64055365665a45dc82b6bf71" },
   "LuaSnip": { "branch": "master", "commit": "e808bee352d1a6fcf902ca1a71cee76e60e24071" },
   "SchemaStore.nvim": { "branch": "main", "commit": "30eacb81f0202c0d5718fb27e3ec0b03945a03c7" },
