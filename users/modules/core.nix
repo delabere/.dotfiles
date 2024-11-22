@@ -28,6 +28,7 @@
     zsh = {
       enable = true;
       dotDir = ".config/zsh";
+
       # haven't quite managed to get these working
       autosuggestion.enable = true;
       enableCompletion = true;
@@ -45,13 +46,14 @@
         if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
           . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
         fi
-
+        
         # brew is installed here on m1 macs
         [[ $OSTYPE == 'darwin'* ]] && export PATH=/opt/homebrew/bin:$PATH
 
+        
         # any .zshrc found can be sourced; its probably a work machine
         [ -f "$HOME/.zshrc" ] && source ~/.zshrc
-
+        
         alias lg='lazygit'
         alias gs='git status'
         alias gcm='git checkout master && git pull'
@@ -82,7 +84,7 @@
         # https://github.com/ranger/ranger/issues/2583#issuecomment-1206290600
         # fix is in ranger 1.9.4, we should be able to remove this when/if it is released
         # export TERM=xterm-256color
-       
+
         # edit current commands in editor
         autoload -U edit-command-line
         zle -N edit-command-line
@@ -121,8 +123,7 @@
       mouse = true;
       escapeTime = 10;
       terminal = "screen-256color";
-      # shell = "/Users/jackrickards/.nix-profile/bin/zsh";
-
+      shell = "${pkgs.zsh}/bin/zsh";
       plugins = with pkgs.tmuxPlugins; [
         vim-tmux-navigator
         power-theme
@@ -137,12 +138,18 @@
       ];
 
       extraConfig = ''
+        # fix a bug with tmux-sensible plugin that makes tmux use /bin/sh
+        # by default rather than zsh
+        # https://github.com/nix-community/home-manager/issues/5952
+        set -gu default-command
+        set -g default-shell "$SHELL"
+        
         # I'm always hitting this fucking key by accident and nuking my layout
         unbind c
 
         # bind the second prefix for more split keyboard
         set-option -g prefix2 C-b
-        
+
         set-option -g default-shell $SHELL
         # let copying use default clipboard
         unbind C-y
@@ -203,6 +210,7 @@
       '';
     };
   };
+
   fonts.fontconfig.enable = true;
 
   home.sessionVariables = {
