@@ -8,6 +8,9 @@ return {
       { "axkirillov/telescope-changed-files" },
       { "nvim-telescope/telescope-file-browser.nvim" },
     },
+
+    -- this function doesn't work on some telescope picker results
+    -- "string expected, not table"
     config = function()
       local actions = require("telescope.actions")
       local action_state = require("telescope.actions.state")
@@ -34,7 +37,8 @@ return {
         if picker.filter_active then
           -- Filter out entries containing _test.go
           for _, entry in ipairs(picker.all_results) do
-            if not string.match(entry.value, "_test%.go") then
+            local filename = entry.value["filename"] ~= "" and entry.value["filename"] or entry.value
+            if not string.match(filename, "_test%.go") then
               table.insert(filtered_results, entry)
             end
           end
