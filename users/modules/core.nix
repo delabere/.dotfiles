@@ -60,6 +60,7 @@
         alias cat=bat
         alias checks='gh pr checks --watch'
         alias cat='bat --decorations=never'
+        alias test="go test $(git diff --name-only $(git merge-base HEAD origin/master) | xargs dirname | grep service | sort  | uniq | awk '{print "./" $1}' | tr '\n' ' ')"
 
         alias gac='git add . && git commit -m'
 
