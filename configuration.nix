@@ -60,13 +60,22 @@
   # List services that you want to enable:
   services.openssh.enable = true;
   services.openssh.settings.PermitRootLogin = "yes";
-  users.users."delabere".openssh.authorizedKeys.keys = [
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKzFCNGbA9pwrs6fSxV1A4EG6Kfuzw81GSXoPrVSZSwg delabere@Jacks-MacBook-Pro.local"
-  ];
-  users.users.root.openssh.authorizedKeys.keys = [
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKzFCNGbA9pwrs6fSxV1A4EG6Kfuzw81GSXoPrVSZSwg delabere@Jacks-MacBook-Pro.local"
-  ];
+  # users.users."delabere".openssh.authorizedKeys.keys = [
+  #   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKzFCNGbA9pwrs6fSxV1A4EG6Kfuzw81GSXoPrVSZSwg delabere@Jacks-MacBook-Pro.local"
+  # ];
+  # users.users.root.openssh.authorizedKeys.keys = [
+  #   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKzFCNGbA9pwrs6fSxV1A4EG6Kfuzw81GSXoPrVSZSwg delabere@Jacks-MacBook-Pro.local"
+  # ];
 
+  users.users."delabere".openssh.authorizedKeys.keys =
+    let
+      authorizedKeys = pkgs.fetchurl {
+        url = "https://github.com/delabere.keys";
+        sha256 = "sha256-fEyMQqtFi3mlK52AVXPN1UbtQMARk7eBfWD6ExBIydU=";
+      };
+    in
+    pkgs.lib.splitString "\n" (builtins.readFile
+      authorizedKeys);
 
   #Open ports in the firewall. networking.firewall.allowedTCPPorts = [ ... ]; networking.firewall.allowedUDPPorts = [ ... ]; Or disable the firewall altogether. 
   # networking.firewall.enable = false;
