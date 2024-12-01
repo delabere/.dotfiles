@@ -29,45 +29,61 @@
     , flake-utils
     , home-manager
     , brag
-    , goprotomocker
-    , session-x
     , ...
     } @ inputs:
-    flake-utils.lib.eachSystem [ "aarch64-darwin" "x86_64-linux" "aarch64-linux" ] (
-      system:
-      let
-        pkgs = import nixpkgs {
-          inherit system;
-          overlays = [ (import ./overlay.nix inputs) ];
-        };
-        mkHomeManagerConfig = module: name:
-          home-manager.lib.homeManagerConfiguration {
-            inherit pkgs;
-            modules = [
-              module
-            ];
-
-            extraSpecialArgs = {
-              inherit inputs system name;
-            };
+    flake-utils.lib.eachDefaultSystem
+      (
+        system:
+        let
+          pkgs = import nixpkgs {
+            inherit system;
+            overlays = [ (import ./overlay.nix inputs) ];
           };
-        homeConfigurations = {
-          delabere = mkHomeManagerConfig ./users/delabere.nix "delabere";
-          lakeview = mkHomeManagerConfig ./users/lakeview.nix "lakeview";
-          work = mkHomeManagerConfig ./users/work.nix "work";
-        };
-      in
-      {
-        apps.switch =
-          nixpkgs.lib.mapAttrs
-            (
-              name: config:
-                flake-utils.lib.mkApp {
-                  drv = config.activationPackage;
-                  exePath = "/activate";
+          mkHomeManagerConfig = module: name:
+            home-manager.lib.homeManagerConfiguration {
+              inherit pkgs;
+              modules = [
+                module
+              ];
+
+              extraSpecialArgs = {
+                inherit inputs system name;
+              };
+            };
+          homeConfigurations = {
+            delabere = mkHomeManagerConfig ./users/delabere.nix "delabere";
+            lakeview = mkHomeManagerConfig ./users/lakeview.nix "lakeview";
+            work = mkHomeManagerConfig ./users/work.nix "work";
+          };
+        in
+        {
+          apps.switch =
+            nixpkgs.lib.mapAttrs
+              (
+                name: config:
+                  flake-utils.lib.mkApp {
+                    drv = config.activationPackage;
+                    exePath = "/activate";
+                  }
+              )
+              homeConfigurations;
+
+          packages.nixosConfigurations.nixos =
+            nixpkgs.lib.nixosSystem {
+              inherit system;
+              modules = [
+                ./configuration.nix
+                { nixpkgs.config.allowUnfree = true; }
+                home-manager.nixosModules.home-manager
+                {
+                  home-manager.useGlobalPkgs = true;
+                  home-manager.useUserPackages = true;
+                  home-manager.users.delabere = import ./users/delabere.nix;
+                  home-manager.extraSpecialArgs = { inherit inputs system brag; };
                 }
-            )
-            homeConfigurations;
-      }
-    );
+              ];
+            };
+        }
+      );
 }
+

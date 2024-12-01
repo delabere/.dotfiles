@@ -1,6 +1,7 @@
 { config
 , pkgs
 , system
+, brag
 , ...
 }: {
   # This value determines the Home Manager release that your configuration is
@@ -240,7 +241,7 @@
     watch
     xclip
     marksman
-    pngpaste # for obsidian nvim plugin
+    #    pngpaste # for obsidian nvim plugin
     sesh
     (nerdfonts.override {
       fonts = [ "JetBrainsMono" "Iosevka" "FiraCode" "Hack" "RobotoMono" ];
