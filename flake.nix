@@ -72,7 +72,7 @@
             nixpkgs.lib.nixosSystem {
               inherit system;
               modules = [
-                ./configuration.nix
+                ./machines/oracle-free/configuration.nix
                 { nixpkgs.config.allowUnfree = true; }
                 home-manager.nixosModules.home-manager
                 {
