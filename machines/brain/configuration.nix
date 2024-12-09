@@ -8,6 +8,7 @@
     [
       # Include the results of the hardware scan.
       ./hardware-configuration.nix
+      ./../../services/tailscale.nix
     ];
 
   # Use the systemd-boot EFI boot loader.

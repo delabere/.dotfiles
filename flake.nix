@@ -22,6 +22,10 @@
       url = "github:omerxx/tmux-sessionx";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -29,6 +33,7 @@
     , flake-utils
     , home-manager
     , brag
+    , agenix
     , ...
     } @ inputs:
     flake-utils.lib.eachDefaultSystem
@@ -89,6 +94,7 @@
               inherit system;
               modules = [
                 ./machines/brain/configuration.nix
+                agenix.nixosModules.default
                 { nixpkgs.config.allowUnfree = true; }
                 home-manager.nixosModules.home-manager
                 {

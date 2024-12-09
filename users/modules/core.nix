@@ -1,4 +1,5 @@
-{ config
+{ inputs
+, config
 , pkgs
 , system
 , brag
@@ -228,6 +229,7 @@
   programs.home-manager.enable = true;
 
   home.packages = with pkgs; [
+    inputs.agenix.packages."${system}".default
     alejandra
     brag
     delve
