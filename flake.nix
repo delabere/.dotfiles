@@ -83,6 +83,22 @@
                 }
               ];
             };
+
+          packages.nixosConfigurations.brain =
+            nixpkgs.lib.nixosSystem {
+              inherit system;
+              modules = [
+                ./machines/brain/configuration.nix
+                { nixpkgs.config.allowUnfree = true; }
+                home-manager.nixosModules.home-manager
+                {
+                  home-manager.useGlobalPkgs = true;
+                  home-manager.useUserPackages = true;
+                  home-manager.users.delabere = import ./users/delabere.nix;
+                  home-manager.extraSpecialArgs = { inherit inputs system brag; };
+                }
+              ];
+            };
         }
       );
 }

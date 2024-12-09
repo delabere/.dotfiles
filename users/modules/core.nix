@@ -21,6 +21,11 @@
     }.${system};
 
   programs = {
+    git = {
+      enable = true;
+      userName = "delabere";
+      userEmail = "jack.rickards@hotmail.co.uk";
+    };
     zoxide = {
       enable = true;
       enableZshIntegration = true;
