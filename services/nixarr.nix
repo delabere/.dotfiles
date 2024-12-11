@@ -17,7 +17,17 @@
     sonarr.enable = true;
     transmission = {
       enable = true;
+      flood.enable = true;
       vpn.enable = true;
+      openFirewall = true;
     };
+  };
+
+
+  # not provided by nixarr, but it makes sense to live here
+  services.plex = {
+    enable = true;
+    dataDir = "/data/.state/plex";
+    openFirewall = true;
   };
 }

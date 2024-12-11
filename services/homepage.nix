@@ -1,16 +1,22 @@
 { config, ... }: {
   age.secrets = {
-    homepage-env = {
-      file = ../../../../secrets/homepage-env.age;
+    "homepage-env" = {
+      file = ./../secrets/homepage-env.age;
       owner = "root";
       group = "users";
       mode = "400";
     };
   };
 
+  # age.secrets = {
+  #   "tailscale-authkey" = {
+  #     # change to whatever path it is in your NixOS configuration
+  #     file = ./../secrets/tailscale-authkey.age;
+  #   };
+  # };
   services.homepage-dashboard = {
     enable = true;
-    environmentFile = config.age.secrets.homepage-env.path;
+    environmentFile = config.age.secrets."homepage-env".path;
     bookmarks = [{
       dev = [
         {
@@ -53,13 +59,13 @@
           {
             Plex = {
               icon = "plex.png";
-              href = "{{HOMEPAGE_VAR_PLEX_URL}}";
+              href = "http://brain.degu-vega.ts.net:32400";
               description = "media management";
-              widget = {
-                type = "plex";
-                url = "{{HOMEPAGE_VAR_PLEX_URL}}";
-                key = "{{PLEX_API_KEY}}";
-              };
+              # widget = {
+              #   type = "plex";
+              #   url = "http://brain.degu-vega.ts.net:32400";
+              # key = "{{HOMEPAGE_VAR_PLEX_API_KEY}}";
+              # };
             };
           }
           {
@@ -70,7 +76,7 @@
               widget = {
                 type = "radarr";
                 url = "http://brain.degu-vega.ts.net:7878";
-                key = "{{RADARR_API_KEY}}";
+                key = "{{HOMEPAGE_VAR_RADARR_API_KEY}}";
               };
             };
           }
@@ -82,7 +88,7 @@
               widget = {
                 type = "sonarr";
                 url = "http://brain.degu-vega.ts.net:8989";
-                key = "{{SONARR_API_KEY}}";
+                key = "{{HOMEPAGE_VAR_SONARR_API_KEY}}";
               };
             };
           }
@@ -94,7 +100,18 @@
               widget = {
                 type = "prowlarr";
                 url = "http://brain.degu-vega.ts.net:9696";
-                key = "{{PROWLARR_API_KEY}}";
+                key = "{{HOMEPAGE_VAR_PROWLARR_API_KEY}}";
+              };
+            };
+          }
+          {
+            Transmission = {
+              icon = "transmission.png";
+              href = "http://192.168.1.11:9091";
+              description = "torrents";
+              widget = {
+                type = "transmission";
+                url = "http://192.168.1.11:9091";
               };
             };
           }

@@ -76,44 +76,37 @@
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
-    #jack.enable = true;
-
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    #media-session.enable = true;
   };
-
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.delabere = {
-    isNormalUser = true;
-    description = "Jack Rickards";
-    extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [
-      #  thunderbird
-    ];
+  users = {
+    users.delabere = {
+      isNormalUser = true;
+      description = "Jack Rickards";
+      extraGroups = [ "networkmanager" "wheel" ];
+      packages = with pkgs; [
+        #  thunderbird
+      ];
+    };
+    groups = {
+      media = {
+        members = [ "radarr" "sonarr" "plex" ];
+      };
+    };
   };
 
-  # Install firefox.
-  programs.firefox.enable = true;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
-
-  # List packages installed in system profile. To search, run: $ nix search wget environment.systemPackages = with pkgs; [
-  #   vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default. wget
-  # ];
 
   # Some programs need SUID wrappers, can be configured further or are started in user sessions. programs.mtr.enable = true; programs.gnupg.agent = {
   #   enable = true; enableSSHSupport = true;
   # };
 
-  # List services that you want to enable:
-  services.openssh.enable = true;
-  services.openssh.settings.PermitRootLogin = "yes";
+  services.openssh = {
+    enable = true;
+    settings.PermitRootLogin = "yes";
+  };
 
   users.users."delabere".openssh.authorizedKeys.keys =
     let
@@ -132,9 +125,12 @@
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "25.05"; # Did you read the comment?
 
-  programs.vim.enable = true;
+  programs = {
+    firefox.enable = true;
+    vim.enable = true;
+    zsh.enable = true;
+  };
 
-  programs.zsh.enable = true;
   users.users.delabere.shell = pkgs.zsh;
 
   environment.systemPackages = with pkgs; [
@@ -147,36 +143,5 @@
   nix = {
     extraOptions = "experimental-features = nix-command flakes";
   };
-
-
-  # services.homepage-dashboard = {
-  #   # These options were already present in my configuration.
-  #   enable = true;
-  #   # package = unstable.homepage-dashboard;
-  #
-  #   # The following options were what I planned to add.
-  #
-  #   # https://gethomepage.dev/latest/configs/settings/
-  #   settings = { };
-  #
-  #   # https://gethomepage.dev/latest/configs/bookmarks/
-  #   bookmarks = [ ];
-  #
-  #   # https://gethomepage.dev/latest/configs/services/
-  #   services = [ ];
-  #
-  #   # https://gethomepage.dev/latest/configs/service-widgets/
-  #   widgets = [ ];
-  #
-  #   # https://gethomepage.dev/latest/configs/kubernetes/
-  #   kubernetes = { };
-  #
-  #   # https://gethomepage.dev/latest/configs/docker/
-  #   docker = { };
-  #
-  #   # https://gethomepage.dev/latest/configs/custom-css-js/
-  #   customJS = "";
-  #   customCSS = "";
-  # };
 
 }
