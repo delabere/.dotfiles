@@ -26,6 +26,10 @@
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixarr = {
+      url = "github:rasmus-kirk/nixarr";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -34,6 +38,7 @@
     , home-manager
     , brag
     , agenix
+    , nixarr
     , ...
     } @ inputs:
     flake-utils.lib.eachDefaultSystem
@@ -95,6 +100,7 @@
               modules = [
                 ./machines/brain/configuration.nix
                 agenix.nixosModules.default
+                nixarr.nixosModules.default
                 { nixpkgs.config.allowUnfree = true; }
                 home-manager.nixosModules.home-manager
                 {
