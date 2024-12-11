@@ -115,6 +115,26 @@
               };
             };
           }
+          {
+            HomeAssistant = {
+              icon = "home-assistant.png";
+              href = "http://brain.degu-vega.ts.net:8123";
+              description = "Home Assistant";
+              widget = {
+                type = "homeassistant";
+                url = "http://brain.degu-vega.ts.net:8123";
+                key = "{{HOMEPAGE_VAR_HOMEASSISTANT_API_KEY}}";
+                custom = [
+                  { state = "sensor.speedtest_download"; }
+                  { state = "sensor.speedtest_upload"; }
+                  { state = "sensor.downstairs_heating"; label = "downstairs heating"; }
+                  { template = "{{ states.switch|selectattr('state','equalto','on')|list|length }}"; label = "switches on"; }
+                  { state = "weather.forecast_home"; label = "wind speed"; value = "{attributes.wind_speed} {attributes.wind_speed_unit}"; }
+                ];
+              };
+            };
+          }
+
         ];
       }
       # {
@@ -215,7 +235,8 @@
     widgets = [
       { search = { provider = "google"; target = "_blank"; }; }
       { resources = { label = "system"; cpu = true; memory = true; }; }
-      { resources = { label = "storage"; disk = [ "/data" ]; }; }
+      { resources = { label = "internal storage"; disk = [ "/data" ]; }; }
+      { resources = { label = "external storage"; disk = [ "/mnt/external" ]; }; }
       {
         openmeteo = {
           label = "London";
