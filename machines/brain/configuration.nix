@@ -42,6 +42,18 @@
   systemd.targets.hibernate.enable = false;
   systemd.targets.hybrid-sleep.enable = false;
 
+  security.sudo.extraRules = [
+    {
+      users = [ "delabere" ];
+      commands = [
+        {
+          command = "ALL";
+          options = [ "NOPASSWD" ]; # "SETENV" # Adding the following could be a good idea
+        }
+      ];
+    }
+  ];
+
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "gb";
