@@ -5,4 +5,5 @@ in
 {
   "tailscale-authkey.age".publicKeys = [ brain-delabere brain-system ];
   "nordvpn-wireguard.conf.age".publicKeys = [ brain-delabere brain-system ];
+  "homepage-env.age".publicKeys = [ brain-delabere brain-system ];
 }

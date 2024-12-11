@@ -1,16 +1,16 @@
 { config, ... }: {
-  # age.secrets = {
-  #   dashboard-env = {
-  #     file = ../../../../secrets/thor-dashboard-env.age;
-  #     owner = "root";
-  #     group = "users";
-  #     mode = "400";
-  #   };
-  # };
+  age.secrets = {
+    homepage-env = {
+      file = ../../../../secrets/homepage-env.age;
+      owner = "root";
+      group = "users";
+      mode = "400";
+    };
+  };
 
   services.homepage-dashboard = {
     enable = true;
-    # environmentFile = config.age.secrets.dashboard-env.path;
+    environmentFile = config.age.secrets.homepage-env.path;
     bookmarks = [{
       dev = [
         {
@@ -58,7 +58,7 @@
               widget = {
                 type = "plex";
                 url = "{{HOMEPAGE_VAR_PLEX_URL}}";
-                key = "{{HOMEPAGE_VAR_PLEX_API_KEY}}";
+                key = "{{PLEX_API_KEY}}";
               };
             };
           }
@@ -70,7 +70,7 @@
               widget = {
                 type = "radarr";
                 url = "http://brain.degu-vega.ts.net:7878";
-                key = "{{HOMEPAGE_VAR_RADARR_API_KEY}}";
+                key = "{{RADARR_API_KEY}}";
               };
             };
           }
@@ -82,7 +82,7 @@
               widget = {
                 type = "sonarr";
                 url = "http://brain.degu-vega.ts.net:8989";
-                key = "{{HOMEPAGE_VAR_SONARR_API_KEY}}";
+                key = "{{SONARR_API_KEY}}";
               };
             };
           }
@@ -94,7 +94,7 @@
               widget = {
                 type = "prowlarr";
                 url = "http://brain.degu-vega.ts.net:9696";
-                key = "{{HOMEPAGE_VAR_PROWLARR_API_KEY}}";
+                key = "{{PROWLARR_API_KEY}}";
               };
             };
           }
