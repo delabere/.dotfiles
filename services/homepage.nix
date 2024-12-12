@@ -1,6 +1,6 @@
 { config, ... }: {
   age.secrets = {
-    "homepage-env" = {
+    homepage-env = {
       file = ./../secrets/homepage-env.age;
       owner = "root";
       group = "users";
@@ -16,7 +16,7 @@
   # };
   services.homepage-dashboard = {
     enable = true;
-    environmentFile = config.age.secrets."homepage-env".path;
+    environmentFile = config.age.secrets.homepage-env.path;
     bookmarks = [{
       dev = [
         {

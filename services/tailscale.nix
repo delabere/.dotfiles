@@ -2,8 +2,7 @@
 
 
   age.secrets = {
-    "tailscale-authkey" = {
-      # change to whatever path it is in your NixOS configuration
+    tailscale-authkey = {
       file = ./../secrets/tailscale-authkey.age;
     };
   };
@@ -11,7 +10,7 @@
   services.tailscale = {
     enable = true;
     openFirewall = true;
-    authKeyFile = config.age.secrets."tailscale-authkey".path;
+    authKeyFile = config.age.secrets.tailscale-authkey.path;
     extraUpFlags = [
       "--advertise-routes=10.0.0.0/8"
     ];
