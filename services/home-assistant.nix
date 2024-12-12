@@ -9,6 +9,9 @@
       # https://www.home-assistant.io/integrations/default_config/
       default_config = { };
       lovelace.mode = "storage";
+      automation = "!include automations.yaml";
+      script = "!include scripts.yaml";
+      scene = "!include scenes.yaml";
     };
     extraComponents = [
       "shelly"
