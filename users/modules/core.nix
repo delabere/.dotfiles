@@ -250,8 +250,10 @@
     marksman
     #    pngpaste # for obsidian nvim plugin
     sesh
-    (nerdfonts.override {
-      fonts = [ "JetBrainsMono" "Iosevka" "FiraCode" "Hack" "RobotoMono" ];
-    })
+    nerd-fonts.jetbrains-mono
+    nerd-fonts.iosevka
+    nerd-fonts.fira-code
+    nerd-fonts.hack
+    nerd-fonts.roboto-mono
   ];
 }
