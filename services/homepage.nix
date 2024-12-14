@@ -8,12 +8,6 @@
     };
   };
 
-  # age.secrets = {
-  #   "tailscale-authkey" = {
-  #     # change to whatever path it is in your NixOS configuration
-  #     file = ./../secrets/tailscale-authkey.age;
-  #   };
-  # };
   services.homepage-dashboard = {
     enable = true;
     environmentFile = config.age.secrets.homepage-env.path;
@@ -35,24 +29,6 @@
         }
       ];
     }];
-    # machines = [ ];
-    #   machines = [
-    #     {
-    #       tower = [{
-    #         abbr = "TR";
-    #         href = "https://dash.crgrd.uk";
-    #         icon = "homarr.png";
-    #       }];
-    #     }
-    #     {
-    #       gbox = [{
-    #         abbr = "GB";
-    #         href = "https://dash.gbox.crgrd.uk";
-    #         icon = "homepage.png";
-    #       }];
-    #     }
-    #   ];
-    # }];
     services = [
       {
         media = [
@@ -134,93 +110,15 @@
               };
             };
           }
-
+          {
+            Btop = {
+              icon = "terminal.png";
+              href = "http://brain.degu-vega.ts.net:7681";
+              description = "btop";
+            };
+          }
         ];
       }
-      # {
-      #   infra = [
-      #     {
-      #       Files = {
-      #         description = "file manager";
-      #         icon = "files.png";
-      #         href = "https://files.jnsgr.uk";
-      #       };
-      #     }
-      #     {
-      #       "Syncthing (thor)" = {
-      #         description = "syncthing ui for thor";
-      #         icon = "syncthing.png";
-      #         href = "https://thor.sync.jnsgr.uk";
-      #       };
-      #     }
-      #     {
-      #       "Syncthing (kara)" = {
-      #         description = "syncthing ui for kara";
-      #         icon = "syncthing.png";
-      #         href = "https://kara.sync.jnsgr.uk";
-      #       };
-      #     }
-      #     {
-      #       "Syncthing (freyja)" = {
-      #         description = "syncthing ui for freyja";
-      #         icon = "syncthing.png";
-      #         href = "https://freyja.sync.jnsgr.uk";
-      #       };
-      #     }
-      #   ];
-      # }
-      # {
-      #   machines = [
-      #     {
-      #       thor = {
-      #         description = "thor";
-      #         icon = "tailscale.png";
-      #         href = "https://dash.jnsgr.uk";
-      #         widget = {
-      #           type = "tailscale";
-      #           deviceid = "{{HOMEPAGE_VAR_TAILSCALE_THOR_DEVICE_ID}}";
-      #           key = "{{HOMEPAGE_VAR_TAILSCALE_AUTH_KEY}}";
-      #         };
-      #       };
-      #     }
-      #     {
-      #       tower = {
-      #         description = "tower";
-      #         icon = "tailscale.png";
-      #         href = "https://dash.crgrd.uk";
-      #         widget = {
-      #           type = "tailscale";
-      #           deviceid = "{{HOMEPAGE_VAR_TAILSCALE_TOWER_DEVICE_ID}}";
-      #           key = "{{HOMEPAGE_VAR_TAILSCALE_AUTH_KEY}}";
-      #         };
-      #       };
-      #     }
-      #     {
-      #       gbox = {
-      #         description = "gbox";
-      #         icon = "tailscale.png";
-      #         href = "https://dash.gbox.crgrd.uk";
-      #         widget = {
-      #           type = "tailscale";
-      #           deviceid = "{{HOMEPAGE_VAR_TAILSCALE_GBOX_DEVICE_ID}}";
-      #           key = "{{HOMEPAGE_VAR_TAILSCALE_AUTH_KEY}}";
-      #         };
-      #       };
-      #     }
-      #     {
-      #       hugin = {
-      #         description = "hugin";
-      #         icon = "tailscale.png";
-      #         href = "https://dash.jnsgr.uk";
-      #         widget = {
-      #           type = "tailscale";
-      #           deviceid = "{{HOMEPAGE_VAR_TAILSCALE_HUGIN_DEVICE_ID}}";
-      #           key = "{{HOMEPAGE_VAR_TAILSCALE_AUTH_KEY}}";
-      #         };
-      #       };
-      #     }
-      #   ];
-      # }
     ];
     settings = {
       title = "ranger's dashboard";
@@ -228,8 +126,6 @@
       headerStyle = "clean";
       layout = {
         media = { style = "row"; columns = 3; };
-        # infra = { style = "row"; columns = 4; };
-        # machines = { style = "row"; columns = 4; };
       };
     };
     widgets = [

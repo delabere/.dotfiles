@@ -150,4 +150,10 @@
     "aspnetcore-runtime-6.0.36"
   ];
 
+  services.ttyd = {
+    enable = true;
+    writeable = true;
+    entrypoint = [ (lib.getExe pkgs.btop) ];
+  };
+
 }
