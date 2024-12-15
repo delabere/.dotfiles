@@ -20,6 +20,12 @@
       flood.enable = true;
       vpn.enable = true;
       openFirewall = true;
+      extraSettings = {
+        download-dir = "/data/tmp/complete/";
+        incomplete-dir = "/data/tmp/incomplete/";
+        ratio-limit-enabled = true;
+        ratio-limit = 1;
+      };
     };
   };
 
