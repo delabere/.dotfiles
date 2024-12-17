@@ -12,6 +12,7 @@
       ./../../services/nixarr.nix
       ./../../services/homepage.nix
       ./../../services/home-assistant.nix
+      ./../../services/monitoring.nix
     ];
 
 
