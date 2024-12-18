@@ -14,7 +14,7 @@ local function get_opts(keymap_setup, capabilities)
       capabilities = capabilities,
       -- this is a bit of a hack, we use a custom shell file to launch
       -- gopls with gomodules set to off
-      cmd = { "/Users/" .. os.getenv("USER") .. "/bin/gopls.sh", "-remote=auto" },
+      cmd = { "env", "GO111MODULE=off", "gopls", "-remote=auto" },
     })
   else
     return {
