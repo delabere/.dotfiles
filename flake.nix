@@ -57,7 +57,7 @@
               ];
 
               extraSpecialArgs = {
-                inherit inputs system name;
+                inherit inputs system name brag;
               };
             };
           homeConfigurations = {
