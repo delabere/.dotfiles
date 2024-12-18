@@ -82,7 +82,7 @@ let
     gh pr merge -s $PRNumber &&\
     echo "Shipping $PRNumber to production with automated rollback" &&\
     shipper deploy --s101 --disable-progressive-rollouts --skip-confirm-rollout $PRNumber &&\
-    shipper deploy --prod --skip-confirm-rollout $PRNumber --enable-vpnless
+    shipper deploy --prod --skip-confirm-rollout $PRNumber
     }
     mergeship $1
   '';
