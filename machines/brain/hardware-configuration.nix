@@ -29,9 +29,16 @@
 
   fileSystems."/mnt/external" =
     {
-      device = "/dev/sda1";
+      device = "/dev/disk/by-uuid/6eae1040-d4a4-462e-a030-86deff8d7944";
       fsType = "ext4";
     };
+
+  fileSystems."/mnt/bigboi" =
+    {
+      device = "/dev/disk/by-uuid/5566dbcc-7da5-45c0-b31f-96035e2f2e62";
+      fsType = "ext4";
+    };
+
 
   swapDevices = [ ];
 
@@ -42,6 +49,9 @@
   networking.useDHCP = lib.mkDefault true;
   # networking.interfaces.eno1.useDHCP = lib.mkDefault true;
   # networking.interfaces.enp3s0.useDHCP = lib.mkDefault true;
+  # networking.interfaces.tailscale0.useDHCP = lib.mkDefault true;
+  # networking.interfaces.veth-wg-br.useDHCP = lib.mkDefault true;
+  # networking.interfaces.wg-br.useDHCP = lib.mkDefault true;
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
