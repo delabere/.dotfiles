@@ -29,7 +29,13 @@
 
   fileSystems."/mnt/external" =
     {
-      device = "/dev/sda1";
+      device = "/dev/disk/by-uuid/6eae1040-d4a4-462e-a030-86deff8d7944";
+      fsType = "ext4";
+    };
+
+  fileSystems."/mnt/bigboi" =
+    {
+      device = "/dev/disk/by-uuid/7076bb20-8649-4e53-af6f-5a11cdf68512";
       fsType = "ext4";
     };
 
