@@ -14,6 +14,7 @@
     };
     # jellyfin.enable = true;
     radarr.enable = true;
+    bazarr.enable = true;
     prowlarr.enable = true;
     sonarr.enable = true;
     transmission = {
