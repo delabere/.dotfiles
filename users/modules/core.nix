@@ -2,7 +2,6 @@
 , config
 , pkgs
 , system
-, brag
 , ...
 }: {
   # This value determines the Home Manager release that your configuration is
@@ -231,7 +230,7 @@
   home.packages = with pkgs; [
     inputs.agenix.packages."${system}".default
     alejandra
-    brag
+    inputs.brag
     delve
     nixpkgs-fmt
     sumneko-lua-language-server
