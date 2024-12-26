@@ -12,6 +12,7 @@
       enable = true;
       wgConf = config.age.secrets."wg.conf".path;
     };
+    # jellyfin.enable = true;
     radarr.enable = true;
     prowlarr.enable = true;
     sonarr.enable = true;
@@ -21,8 +22,6 @@
       vpn.enable = true;
       openFirewall = true;
       extraSettings = {
-        download-dir = "/data/tmp/complete/";
-        incomplete-dir = "/data/tmp/incomplete/";
         ratio-limit-enabled = true;
         ratio-limit = 1;
       };
@@ -36,4 +35,5 @@
     dataDir = "/data/.state/plex";
     openFirewall = true;
   };
+
 }
