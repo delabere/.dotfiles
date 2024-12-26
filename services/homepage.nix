@@ -132,7 +132,7 @@
       { search = { provider = "google"; target = "_blank"; }; }
       { resources = { label = "system"; cpu = true; memory = true; }; }
       { resources = { label = "internal storage"; disk = [ "/data" ]; }; }
-      { resources = { label = "external storage"; disk = [ "/mnt/external" ]; }; }
+      { resources = { label = "external storage"; disk = [ "/mnt/bigboi/" ]; }; }
       {
         openmeteo = {
           label = "London";
