@@ -21,9 +21,7 @@ return {
             async = true,
           },
         },
-        completion = {
-          enabled_providers = { "lsp", "path", "snippets", "buffer", "copilot" },
-        },
+        default = { "lsp", "path", "snippets", "buffer", "copilot" },
 
         cmdline = {},
       },
@@ -31,7 +29,7 @@ return {
       keymap = {
         preset = "super-tab",
         ["<Tab>"] = { "select_and_accept" },
-        ["Enter"] = { "" },
+        ["Enter"] = { "accept" },
       },
       completion = {
         list = {
