@@ -1,5 +1,5 @@
 local lspconfig = require("lspconfig")
-local cmp_nvim_lsp = require("cmp_nvim_lsp")
+-- local cmp_nvim_lsp = require("cmp_nvim_lsp")
 local keymaps = require("plugins.lsp.default_keymaps")
 
 return {
@@ -7,12 +7,14 @@ return {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
-      "hrsh7th/cmp-nvim-lsp",
+      "saghen/blink.cmp",
+      -- "hrsh7th/cmp-nvim-lsp",
       -- only required for work configuration
       { dir = "~/src/github.com/monzo/wearedev/tools/editors/nvim/nvim-monzo" },
     },
     config = function()
-      local capabilities = cmp_nvim_lsp.default_capabilities()
+      local capabilities = require("blink.cmp").get_lsp_capabilities()
+      -- local capabilities = cmp_nvim_lsp.default_capabilities()
       -- Change the Diagnostic symbols in the sign column (gutter)
       local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
       for type, icon in pairs(signs) do

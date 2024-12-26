@@ -6,7 +6,7 @@ table.insert(runtime_path, "lua/?/init.lua")
 
 return {
   on_attach = keymaps.setup_keymaps,
-  capabilities = require("cmp_nvim_lsp").default_capabilities(),
+  capabilities = require("blink.cmp").get_lsp_capabilities(),
   settings = {
     Lua = {
       runtime = {
