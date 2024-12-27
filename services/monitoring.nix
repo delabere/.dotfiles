@@ -2,9 +2,19 @@
 
   services.grafana = {
     enable = true;
+    settings = {
+      server = {
+        port = 3000;
+        domain = "localhost";
+        protocol = "http";
+        dataDir = "/var/lib/grafana";
+        http_addr = "";
+      };
+    };
   };
 
   services.prometheus = {
+    enable = true;
     exporters = {
       node = {
         enable = true;
