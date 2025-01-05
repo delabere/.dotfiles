@@ -111,13 +111,21 @@
 
   users.users."delabere".openssh.authorizedKeys.keys =
     let
-      authorizedKeys = pkgs.fetchurl {
-        url = "https://github.com/delabere.keys";
-        sha256 = "sha256-i9rarqkXLTlBvUCeN3H9uzogq8loo5WQUA6kbmDBISM=";
-      };
+      githubKeys = user: sha256:
+        let
+          file =
+            pkgs.fetchurl {
+              url = "https://github.com/${user}.keys";
+              sha256 = sha256;
+            };
+          contents = builtins.readFile file;
+        in
+        lib.splitString "\n" contents;
+
+      delabereKeys = githubKeys "delabere" "sha256-YwSUvDwjEfFjDFMYktKynM/YR6gfNvULzyayF3i311w=";
+      olehKeys = githubKeys "stolyaroleh" "sha256-nU4h0fTLZ8AThYk1V8X+sEyqUO3ly2kwRJEgmVho6TU=";
     in
-    pkgs.lib.splitString "\n" (builtins.readFile
-      authorizedKeys);
+    delabereKeys ++ olehKeys;
 
   #Open ports in the firewall. networking.firewall.allowedTCPPorts = [ ... ]; networking.firewall.allowedUDPPorts = [ ... ]; Or disable the firewall altogether. 
   networking.firewall.enable = false;
