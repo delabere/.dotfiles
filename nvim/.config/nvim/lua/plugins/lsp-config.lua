@@ -10,7 +10,7 @@ return {
       "saghen/blink.cmp",
       -- "hrsh7th/cmp-nvim-lsp",
       -- only required for work configuration
-      -- { dir = "~/src/github.com/monzo/wearedev/tools/editors/nvim/nvim-monzo" },
+      { dir = "~/src/github.com/monzo/wearedev/tools/editors/nvim/nvim-monzo" },
     },
     config = function()
       local capabilities = require("blink.cmp").get_lsp_capabilities()
