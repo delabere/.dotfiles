@@ -13,7 +13,10 @@
     authKeyFile = config.age.secrets.tailscale-authkey.path;
     extraUpFlags = [
       "--advertise-routes=10.0.0.0/8"
+      "--advertise-exit-node"
+      "--accept-routes"
     ];
+    useRoutingFeatures = "both";
   };
 
   # # create a oneshot job to authenticate to Tailscale
