@@ -13,6 +13,7 @@
       ./../../services/homepage.nix
       ./../../services/home-assistant.nix
       ./../../services/monitoring.nix
+      # ./../../services/librechat_beta.nix
     ];
 
 
@@ -123,9 +124,9 @@
         lib.splitString "\n" contents;
 
       delabereKeys = githubKeys "delabere" "sha256-YwSUvDwjEfFjDFMYktKynM/YR6gfNvULzyayF3i311w=";
-      olehKeys = githubKeys "stolyaroleh" "sha256-nU4h0fTLZ8AThYk1V8X+sEyqUO3ly2kwRJEgmVho6TU=";
+      # olehKeys = githubKeys "stolyaroleh" "sha256-nU4h0fTLZ8AThYk1V8X+sEyqUO3ly2kwRJEgmVho6TU=";
     in
-    delabereKeys ++ olehKeys;
+    delabereKeys;
 
   #Open ports in the firewall. networking.firewall.allowedTCPPorts = [ ... ]; networking.firewall.allowedUDPPorts = [ ... ]; Or disable the firewall altogether. 
   networking.firewall.enable = false;
@@ -165,4 +166,6 @@
     entrypoint = [ (lib.getExe pkgs.btop) ];
   };
 
+  # allows users to use port 80 (required for hosting applications as a user)
+  boot.kernel.sysctl."net.ipv4.ip_unprivileged_port_start" = 0;
 }
