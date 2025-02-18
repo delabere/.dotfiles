@@ -13,6 +13,7 @@
       ./../../services/homepage.nix
       ./../../services/home-assistant.nix
       ./../../services/monitoring.nix
+      ./../../services/samba.nix
       # ./../../services/librechat_beta.nix
     ];
 
