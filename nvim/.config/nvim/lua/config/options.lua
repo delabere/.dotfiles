@@ -45,6 +45,4 @@ vim.api.nvim_command("set nofoldenable") -- no folds please
 vim.opt.report = 999
 
 vim.g.lazygit_config = false
-
 vim.g.lazyvim_picker = "telescope"
-
