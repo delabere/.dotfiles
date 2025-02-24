@@ -232,6 +232,7 @@
     alejandra
     inputs.brag
     delve
+    difftastic
     nixpkgs-fmt
     sumneko-lua-language-server
     thefuck
