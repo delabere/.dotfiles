@@ -71,12 +71,10 @@ end
 
 ---@param p snacks.Picker
 local function filter_test_files(p)
-  if p.input.filter.pattern ~= "" then
-    p.input.filter.pattern = ""
-  else
-    p.input.filter.pattern = "!_test.go"
-  end
-  p:find()
+  p._test_filter = not p._test_filter
+  local pattern = p._test_filter and "!_test.go" or ""
+  p.matcher:init(pattern)
+  p.matcher:run(p)
 end
 
 local home = os.getenv("HOME")
@@ -101,7 +99,7 @@ return {
   "folke/snacks.nvim",
   opts = {
     picker = {
-      -- matcher = { frecency = true },
+      matcher = { frecency = true },
       actions = {
         toggle_test_filter = filter_test_files,
       },
