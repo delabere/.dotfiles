@@ -1,72 +1,78 @@
----@class toolbox.Command
----@field name string
----@field execute fun()
----
----@class toolbox.finder.Item : snacks.picker.finder.Item
----@field idx number
----@field name string
----@field divider boolean
----@field execute fun()
+local Snacks = require("snacks") -- Assuming this is how you access snacks.nvim
 
----@return toolbox.finder.Item[]
-local function get_items()
-  ---@type toolbox.finder.Item[]
-  local items = {
-    { text = "Chips" },
-    { text = "Candy" },
-    { text = "Popcorn" },
-  }
-  -- local commands = require("ms.snacks.toolbox.commands").all_commands()
-  -- for i, v in ipairs(commands) do
-  --   ---@type toolbox.finder.Item
-  --   local item = {
-  --     idx = i,
-  --     text = v.name,
-  --     name = v.name,
-  --     execute = v.execute,
-  --     divider = v.name == "-",
-  --   }
-  --   table.insert(items, item)
-  -- end
-  return items
+local function get_items(find_cmd_table)
+  if not find_cmd_table or type(find_cmd_table) ~= "table" then
+    print("Error: find_cmd_table is nil or not a table")
+    return {}
+  end
+  print("Executing command: " .. table.concat(find_cmd_table, " "))
+  local result = vim.system(find_cmd_table, { text = true }):wait()
+  local output = result.stdout
+  local code = result.code
+  if code ~= 0 or not output or output == "" then
+    print("Command failed or no output: " .. (result.stderr or "No error message"))
+    return {}
+  end
+  local items = {}
+  for dir in output:gmatch("[^\n]+") do
+    table.insert(items, dir)
+  end
+  local items_with_text = {}
+  for _, full_path in ipairs(items) do
+    local directory_name = full_path:match("([^/]+)$") or full_path
+    table.insert(items_with_text, {
+      text = directory_name,
+      full_path = full_path,
+    })
+  end
+  return items_with_text
 end
 
-local function show_toolbox()
-  local last_idx = 0
-  local items = get_items()
-
+local function jump_to_component(prompt_title, find_cmd, change_directory)
+  local items = get_items(find_cmd)
   Snacks.picker({
-    title = "@ms Toolbox",
-    source = "ms_toolbox",
+    title = prompt_title,
+    source = "jump_to_component",
     items = items,
     format = function(item, picker)
-      local width = picker.layout.opts.layout.width * vim.o.columns
-      width = math.floor(width)
-      width = (width / 10) * 10 - 4
-
-      local text = items[item.idx].divider and string.rep(item.text, width) or item.text
-
-      ---@type snacks.picker.Highlight[]
-      return {
-        { text, item.text_hl },
-      }
+      return { { item.text, "Normal" } }
     end,
-    on_change = function(picker, item)
-      if items[item.idx].divider then
-        if last_idx < item.idx then
-          picker:action("list_down")
-        else
-          picker:action("list_up")
-        end
-      end
-      last_idx = item.idx
-    end,
-    -- layout = MsConfig.snacks.layouts.vscode_bordered,
     confirm = function(picker, item)
       picker:close()
-      items[item.idx].execute()
+      local full_path = items[item.idx].full_path
+      vim.command("tabedit " .. full_path)
     end,
   })
+end
+
+local M = {}
+local path_join = function(...)
+  local args = { ... }
+  return table.concat(args, "/")
+end
+
+local home = os.getenv("HOME")
+M.path_join = path_join
+M.wearedev_base = path_join(home, "src", "github.com", "monzo", "wearedev")
+M.tools_base = path_join(home, "src", "github.com", "monzo", "wearedev", "tools")
+M.libraries_base = path_join(home, "src", "github.com", "monzo", "wearedev", "libraries")
+M.catalog_base = path_join(home, "src", "github.com", "monzo", "wearedev", "catalog")
+M.catalog_components_base = path_join(M.catalog_base, "components")
+M.catalog_owners_base = path_join(M.catalog_base, "owners")
+M.catalog_systems_base = path_join(M.catalog_base, "systems")
+
+M.jump_to_component_no_cd = function()
+  jump_to_component("Jump to Component", {
+    "find",
+    "-E",
+    M.wearedev_base,
+    "-type",
+    "d",
+    "-regex",
+    ".*(service|cron|web)\\.[^/]*",
+    "-maxdepth",
+    "1",
+  }, false)
 end
 
 return {
@@ -74,10 +80,8 @@ return {
   keys = {
     {
       "<leader>fs",
-      function()
-        show_toolbox()
-      end,
-      desc = "@ms Toolbox",
+      M.jump_to_component_no_cd,
+      desc = "Jump to Component",
     },
   },
 }
