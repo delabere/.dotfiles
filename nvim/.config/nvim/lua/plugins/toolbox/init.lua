@@ -1,5 +1,4 @@
 local Snacks = require("snacks")
-
 local oil = require("oil")
 
 local M = {}
@@ -70,6 +69,16 @@ local function jump_to_component(prompt_title, find_cmd, change_directory)
   })
 end
 
+---@param p snacks.Picker
+local function filter_test_files(p)
+  if p.input.filter.pattern ~= "" then
+    p.input.filter.pattern = ""
+  else
+    p.input.filter.pattern = "!_test.go"
+  end
+  p:find()
+end
+
 local home = os.getenv("HOME")
 M.path_join = path_join
 M.wearedev_base = path_join(home, "src", "github.com", "monzo", "wearedev")
@@ -91,7 +100,22 @@ end
 return {
   "folke/snacks.nvim",
   opts = {
-    matcher = { frecency = true },
+    picker = {
+      -- matcher = { frecency = true },
+      actions = {
+        toggle_test_filter = filter_test_files,
+      },
+      win = {
+        input = {
+          keys = {
+            ["<c-f>"] = {
+              "toggle_test_filter",
+              mode = { "n", "i" },
+            },
+          },
+        },
+      },
+    },
   },
   keys = {
     {
