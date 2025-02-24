@@ -56,10 +56,11 @@ local function jump_to_component(prompt_title, find_cmd, change_directory)
     confirm = function(picker, item)
       picker:close()
       local full_path = items[item.idx].full_path
-      print("Opening directory: " .. full_path)
-      vim.cmd("tabnew")
-      vim.cmd("tcd " .. vim.fn.fnameescape(full_path))
-      vim.cmd("Explore")
+      print("Opening (default): " .. full_path)
+      vim.cmd("e " .. vim.fn.fnameescape(full_path))
+      if change_directory then
+        vim.cmd("lcd " .. vim.fn.fnameescape(full_path))
+      end
     end,
   })
 end
