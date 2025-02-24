@@ -12,7 +12,6 @@ local function get_items(find_cmd_table)
     print("Error: find_cmd_table is nil or not a table")
     return {}
   end
-  print("Executing command: " .. table.concat(find_cmd_table, " "))
   local result = vim.system(find_cmd_table, { text = true }):wait()
   local output = result.stdout
   local code = result.code
@@ -58,7 +57,6 @@ local function jump_to_component(prompt_title, find_cmd, change_directory)
     confirm = function(picker, item)
       picker:close()
       local full_path = items[item.idx].full_path
-      print("Opening file picker in: " .. full_path)
       -- Open the file picker in the selected directory
       -- Snacks.picker.files({ cwd = full_path })
       -- Snacks.explorer({ cwd = full_path })
@@ -92,6 +90,9 @@ end
 
 return {
   "folke/snacks.nvim",
+  opts = {
+    matcher = { frecency = true },
+  },
   keys = {
     {
       "<leader>fs",
