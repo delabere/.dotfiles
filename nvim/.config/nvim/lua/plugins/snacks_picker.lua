@@ -70,11 +70,13 @@ local function jump_to_component(prompt_title, find_cmd, change_directory)
 end
 
 ---@param p snacks.Picker
-local function filter_test_files(p)
+local function filter_test_files_new(p)
   p._test_filter = not p._test_filter
   local pattern = p._test_filter and "!_test.go" or ""
   p.matcher:init(pattern)
+  p.input.filter.pattern = pattern
   p.matcher:run(p)
+  p:update_titles()
 end
 
 local home = os.getenv("HOME")
@@ -99,9 +101,9 @@ return {
   "folke/snacks.nvim",
   opts = {
     picker = {
-      matcher = { frecency = true },
+      -- matcher = { frecency = true },
       actions = {
-        toggle_test_filter = filter_test_files,
+        toggle_test_filter = filter_test_files_new,
       },
       win = {
         input = {
