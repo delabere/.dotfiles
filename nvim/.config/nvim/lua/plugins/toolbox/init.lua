@@ -1,5 +1,7 @@
 local Snacks = require("snacks")
 
+local oil = require("oil")
+
 local M = {}
 local path_join = function(...)
   local args = { ... }
@@ -58,7 +60,10 @@ local function jump_to_component(prompt_title, find_cmd, change_directory)
       local full_path = items[item.idx].full_path
       print("Opening file picker in: " .. full_path)
       -- Open the file picker in the selected directory
-      Snacks.picker.files({ cwd = full_path })
+      -- Snacks.picker.files({ cwd = full_path })
+      -- Snacks.explorer({ cwd = full_path })
+      oil.open(full_path)
+
       -- If change_directory is true, set the local directory after opening
       if change_directory then
         vim.cmd("lcd " .. vim.fn.fnameescape(full_path))
