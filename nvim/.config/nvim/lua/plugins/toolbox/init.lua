@@ -1,5 +1,10 @@
-local Snacks = require("snacks") -- Assuming this is how you access snacks.nvim
+local Snacks = require("snacks")
 
+local M = {}
+local path_join = function(...)
+  local args = { ... }
+  return table.concat(args, "/")
+end
 local function get_items(find_cmd_table)
   if not find_cmd_table or type(find_cmd_table) ~= "table" then
     print("Error: find_cmd_table is nil or not a table")
@@ -23,9 +28,19 @@ local function get_items(find_cmd_table)
     table.insert(items_with_text, {
       text = directory_name,
       full_path = full_path,
+      file = M.path_join(full_path, "README.md"),
     })
   end
   return items_with_text
+end
+
+local function previewer(item)
+  local readme_path = M.path_join(item.full_path, "README.md")
+  if vim.fn.filereadable(readme_path) == 1 then
+    local contents = vim.fn.readfile(readme_path)
+    return table.concat(contents, "\n")
+  end
+  return "No README.md found in " .. item.full_path
 end
 
 local function jump_to_component(prompt_title, find_cmd, change_directory)
@@ -37,29 +52,21 @@ local function jump_to_component(prompt_title, find_cmd, change_directory)
     format = function(item, picker)
       return { { item.text, "Normal" } }
     end,
+    previewer = previewer,
     confirm = function(picker, item)
       picker:close()
       local full_path = items[item.idx].full_path
-      vim.command("tabedit " .. full_path)
+      print("Opening directory: " .. full_path)
+      vim.cmd("tabnew")
+      vim.cmd("tcd " .. vim.fn.fnameescape(full_path))
+      vim.cmd("Explore")
     end,
   })
-end
-
-local M = {}
-local path_join = function(...)
-  local args = { ... }
-  return table.concat(args, "/")
 end
 
 local home = os.getenv("HOME")
 M.path_join = path_join
 M.wearedev_base = path_join(home, "src", "github.com", "monzo", "wearedev")
-M.tools_base = path_join(home, "src", "github.com", "monzo", "wearedev", "tools")
-M.libraries_base = path_join(home, "src", "github.com", "monzo", "wearedev", "libraries")
-M.catalog_base = path_join(home, "src", "github.com", "monzo", "wearedev", "catalog")
-M.catalog_components_base = path_join(M.catalog_base, "components")
-M.catalog_owners_base = path_join(M.catalog_base, "owners")
-M.catalog_systems_base = path_join(M.catalog_base, "systems")
 
 M.jump_to_component_no_cd = function()
   jump_to_component("Jump to Component", {
