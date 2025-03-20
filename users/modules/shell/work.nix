@@ -25,6 +25,10 @@ let
     shipper deploy --prod $1
   '';
 
+  minbuilds = pkgs.writeShellScriptBin "minbuilds" ''
+    £ -e prod "config get BASE/app.forceUpgrade"
+  '';
+
   # gets you the id of your production user
   pid = pkgs.writeShellScriptBin "pid" ''
     echo "user_00009D6eX3vpzDDK9FdzSj" | pbcopy
@@ -167,6 +171,7 @@ let
     brag_old
     deepl
     mergeship
+    minbuilds
     p
     pid
     pkgs.brag
