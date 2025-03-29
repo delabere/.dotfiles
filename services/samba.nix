@@ -1,5 +1,8 @@
 { config, pkgs, ... }: {
 
+  # to get folders set up for sharing
+  # sudo chown -R nobody:nogroup share
+  # sudo chmod -R 0775 share
   services.samba = {
     enable = true;
     openFirewall = true;
@@ -12,6 +15,7 @@
       };
       "public" = {
         "path" = "/mnt/bigboi/share";
+        "public" = "yes";
         "browseable" = "yes";
         "writable" = "yes";
         "read only" = "no";
@@ -25,6 +29,7 @@
   # so samba works on windows
   services.samba-wsdd = {
     enable = true;
+    discovery = true;
     openFirewall = true;
   };
 
