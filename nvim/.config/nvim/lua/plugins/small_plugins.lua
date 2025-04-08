@@ -51,6 +51,7 @@ return {
         nix = { "nixpkgs_fmt" },
         rust = { "rustfmt" },
         templ = { "templ" },
+        -- svelte = { "prettierd", "prettier", "svelte", lsp_format = "fallback" },
       },
     },
   },
