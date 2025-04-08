@@ -37,12 +37,13 @@ return {
       -- configure all our other servers
       local servers = {
         "pyright",
-        "tsserver",
+        -- "tsserver",
         "marksman",
         "kotlin_language_server",
         "templ",
-        "htmx",
+        -- "htmx",
         "html",
+        "svelte",
       }
       for _, lsp in ipairs(servers) do
         require("lspconfig")[lsp].setup({
