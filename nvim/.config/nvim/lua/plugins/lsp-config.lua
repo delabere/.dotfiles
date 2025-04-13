@@ -20,7 +20,6 @@ return {
   {
     dir = "~/src/github.com/monzo/wearedev/tools/editors/nvim/nvim-monzo",
     enabled = path:new(os.getenv("HOME") .. "/src/github.com/monzo/wearedev"):exists(),
-    dependencies = { "neovim/nvim-lspconfig", "nvim-lua/plenary.nvim" },
     config = function()
       vim.lsp.config("gopls", {
         root_dir = lspconfig.util.root_pattern("main.go", "README.md", "LICENSE")(),
