@@ -1,4 +1,5 @@
 local lspconfig = require("lspconfig")
+local path = require("plenary.path")
 -- local cmp_nvim_lsp = require("cmp_nvim_lsp")
 -- local keymaps = require("plugins.lsp.default_keymaps")
 
@@ -25,6 +26,7 @@ local servers = {
   "templ",
   "html",
   "svelte",
+  "gopls",
   -- "htmx",
   -- "tsserver",
 }
@@ -35,15 +37,13 @@ end
 return {
   {
     dir = "~/src/github.com/monzo/wearedev/tools/editors/nvim/nvim-monzo",
+    enabled = path:new(os.getenv("HOME") .. "/src/github.com/monzo/wearedev"):exists(),
     dependencies = { "neovim/nvim-lspconfig" },
     config = function()
-      local path = require("plenary.path")
-      if path:new(os.getenv("HOME") .. "/src/github.com/monzo/wearedev"):exists() then
-        vim.lsp.config("gopls", {
-          root_dir = lspconfig.util.root_pattern("main.go", "README.md", "LICENSE")(),
-        })
-        vim.lsp.enable("gopls")
-      end
+      vim.lsp.config("gopls", {
+        root_dir = lspconfig.util.root_pattern("main.go", "README.md", "LICENSE")(),
+      })
+      vim.lsp.enable("gopls")
     end,
   },
 }
