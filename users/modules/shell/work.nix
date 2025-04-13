@@ -25,11 +25,6 @@ let
     shipper deploy local-changes --s101 $1
   '';
 
-  shipl = pkgs.writeShellScriptBin "shipthis" ''
-    branch=$(eval "git rev-parse --symbolic-full-name --abbrev-ref HEAD")
-    shipper deploy --s101 $branch
-  '';
-
   prod = pkgs.writeShellScriptBin "prod" ''
     shipper deploy --prod $1
   '';

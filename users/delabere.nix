@@ -23,5 +23,8 @@
   home.packages = with pkgs; [
     pyright
     rust-analyzer
+    svelte-language-server
+    prettierd
+    nodePackages_latest.prettier
   ];
 }
