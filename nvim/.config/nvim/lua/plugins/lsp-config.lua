@@ -31,7 +31,6 @@ return {
 
       -- servers with special config
       require("lspconfig")["gopls"].setup(require("plugins.lsp.go").get_opts(keymaps.setup_keymaps, capabilities))
-      require("lspconfig").omnisharp.setup(require("plugins.lsp.csharp"))
       require("lspconfig").lua_ls.setup(require("plugins.lsp.lua"))
 
       -- configure all our other servers
