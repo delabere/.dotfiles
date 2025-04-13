@@ -1,22 +1,22 @@
--- local lspconfig = require("lspconfig")
+local lspconfig = require("lspconfig")
 -- local cmp_nvim_lsp = require("cmp_nvim_lsp")
-local keymaps = require("plugins.lsp.default_keymaps")
+-- local keymaps = require("plugins.lsp.default_keymaps")
 
 -- get the work directory as a plenary path
-local path = require("plenary.path")
-local p = path:new(os.getenv("HOME") .. "/src/github.com/monzo/wearedev")
--- Check if the directory exists
-local work_profile = p:exists()
--- for work, we have a specific setup for our language server
+-- local path = require("plenary.path")
+-- local p = path:new(os.getenv("HOME") .. "/src/github.com/monzo/wearedev")
+-- -- Check if the directory exists
+-- local work_profile = p:exists()
+-- -- for work, we have a specific setup for our language server
+--
+-- local dependencies = { "saghen/blink.cmp" }
+-- if work_profile == true then
+--   table.insert(dependencies, { dir = "~/src/github.com/monzo/wearedev/tools/editors/nvim/nvim-monzo" })
+-- end
 
-local dependencies = { "saghen/blink.cmp" }
-if work_profile == true then
-  table.insert(dependencies, { dir = "~/src/github.com/monzo/wearedev/tools/editors/nvim/nvim-monzo" })
-end
+-- require("plugins.lsp.gopls")
 
--- go config in its own file
-require("plugins.lsp.gopls")
-
+-- vim.lsp.enable("gopls")
 -- configure all our other servers
 local servers = {
   "pyright",
@@ -32,7 +32,21 @@ for _, lsp in ipairs(servers) do
   vim.lsp.enable(lsp)
 end
 
-return {}
+return {
+  {
+    dir = "~/src/github.com/monzo/wearedev/tools/editors/nvim/nvim-monzo",
+    dependencies = { "neovim/nvim-lspconfig" },
+    config = function()
+      local path = require("plenary.path")
+      if path:new(os.getenv("HOME") .. "/src/github.com/monzo/wearedev"):exists() then
+        vim.lsp.config("gopls", {
+          root_dir = lspconfig.util.root_pattern("main.go", "README.md", "LICENSE")(),
+        })
+        vim.lsp.enable("gopls")
+      end
+    end,
+  },
+}
 --   {
 --     "neovim/nvim-lspconfig",
 --     event = { "BufReadPre", "BufNewFile" },
