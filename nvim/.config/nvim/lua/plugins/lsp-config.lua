@@ -18,7 +18,7 @@ end
 
 return {
   {
-    dir = "~/src/github.com/monzo/wearedev/tools/editors/nvim/nvim-monzo",
+    dir = "~",
     enabled = path:new(os.getenv("HOME") .. "/src/github.com/monzo/wearedev"):exists(),
     config = function()
       vim.lsp.config("gopls", {
