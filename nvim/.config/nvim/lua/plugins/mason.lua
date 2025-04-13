@@ -6,7 +6,7 @@ return {
         "black",
         "debugpy",
         "go-debug-adapter",
-        "gopls",
+        -- "gopls",
         "pyright",
         "rnix-lsp",
         "shfmt",
