@@ -22,6 +22,7 @@
   home.packages = with pkgs; [
     graphviz
     nodejs_20
+    cargo # needed to compile pbls, protobuf lsp
   ];
 
   programs = {
