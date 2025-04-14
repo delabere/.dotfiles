@@ -9,6 +9,8 @@ local servers = {
   "html",
   "svelte",
   "gopls",
+  -- "pbls", -- protobuf
+  -- "buf_ls",
   -- "htmx",
   -- "tsserver",
 }
@@ -16,6 +18,7 @@ for _, lsp in ipairs(servers) do
   vim.lsp.enable(lsp)
 end
 
+require("lspconfig").protols.setup({})
 return {
   {
     dir = "~",
