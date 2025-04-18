@@ -9,46 +9,37 @@ local servers = {
   "html",
   "svelte",
   "gopls",
+  "protols",
   -- "pbls", -- protobuf
   -- "buf_ls",
   -- "htmx",
   -- "tsserver",
 }
 
--- vim.lsp.config("gopls", {
---   root_dir = lspconfig.util.root_pattern("main.go", "README.md", "LICENSE")(),
--- })
---
-
 for _, lsp in ipairs(servers) do
   vim.lsp.enable(lsp)
 end
 
-require("lspconfig").protols.setup({})
+local function service_root_dir(bufnr, cb)
+  local buffer_filepath = vim.api.nvim_buf_get_name(bufnr)
+  local root_markers = { "main.go", "README.md", "go.mod", "LICENSE" } -- Add more as needed
+  local root_directory = lspconfig.util.root_pattern(root_markers)(buffer_filepath, bufnr)
+  cb(root_directory)
+end
+
 return {
   {
     dir = "~",
     enabled = path:new(os.getenv("HOME") .. "/src/github.com/monzo/wearedev"):exists(),
     config = function()
       vim.lsp.config("gopls", {
-        -- stops the lsp from trying to ingest the world
         cmd = { "env", "GO111MODULE=off", "gopls", "-remote=auto" },
+        root_dir = service_root_dir,
+        filetypes = { "go", "yml" },
+      })
 
-        -- sets the root directory at the service level, which achieves two things:
-        -- 1. Stops lsp from ingesting the world
-        -- 2. Allows you to use <leader>sg for picker scoped to the service, and <leader>sG, for all of the monorepo
-        root_dir = function(bufnr, cb)
-          local buffer_filepath = vim.api.nvim_buf_get_name(bufnr)
-
-          local root_markers = { "main.go", "README.md", "go.mod", "LICENSE" } -- Add more as needed
-          local root_directory = lspconfig.util.root_pattern(root_markers)(buffer_filepath, bufnr)
-          cb(root_directory)
-        end,
-
-        -- make sure that even when you are in other common files within
-        -- a service, that you can still use pickers scoped to the service
-        -- such as <leader>space (files), <leader>sg (grep), etc.
-        filetypes = { "go", "proto", "yml" },
+      vim.lsp.config("protols", {
+        root_dir = service_root_dir,
       })
     end,
   },
