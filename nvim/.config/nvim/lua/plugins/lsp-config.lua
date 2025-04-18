@@ -44,8 +44,11 @@ return {
           local root_directory = lspconfig.util.root_pattern(root_markers)(buffer_filepath, bufnr)
           cb(root_directory)
         end,
-        --
-        filetypes = { "go", "yml", "proto" },
+
+        -- make sure that even when you are in other common files within
+        -- a service, that you can still use pickers scoped to the service
+        -- such as <leader>space (files), <leader>sg (grep), etc.
+        filetypes = { "go", "proto", "yml" },
       })
     end,
   },
