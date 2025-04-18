@@ -111,6 +111,20 @@
             };
           }
           {
+            Grafana = {
+              icon = "grafana.png";
+              # node exporter dash
+              href = "http://brain.degu-vega.ts.net:3000";
+              description = "system dashboard";
+              widget = {
+                type = "grafana";
+                url = "http://brain.degu-vega.ts.net:3000";
+                username = "admin";
+                password = "admin";
+              };
+            };
+          }
+          {
             Btop = {
               icon = "terminal.png";
               href = "http://brain.degu-vega.ts.net:7681";
