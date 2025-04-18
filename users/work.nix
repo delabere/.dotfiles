@@ -23,6 +23,7 @@
     graphviz
     nodejs_20
     cargo # needed to compile pbls, protobuf lsp
+    protols
   ];
 
   programs = {
