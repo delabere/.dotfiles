@@ -23,6 +23,8 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = "brain";
+  networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
+
   # networking.hostName = "nixos"; # Define your hostname. Pick only one of the below networking options. networking.wireless.enable = true; # Enables wireless support via 
   # wpa_supplicant. networking.networkmanager.enable = true; # Easiest to use and most distros use this by default.
 
@@ -72,7 +74,7 @@
   services.printing.enable = true;
 
   # Enable sound with pipewire.
-  hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -93,7 +95,7 @@
     };
     groups = {
       media = {
-        members = [ "radarr" "sonarr" "plex" ];
+        members = [ "radarr" "sonarr" "plex" "transmission" "torrenter" ];
       };
     };
   };
