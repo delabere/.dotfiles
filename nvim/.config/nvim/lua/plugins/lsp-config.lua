@@ -23,7 +23,7 @@ end
 local function service_root_dir(bufnr, cb)
   local buffer_filepath = vim.api.nvim_buf_get_name(bufnr)
   local root_markers = { "main.go", "README.md", "go.mod", "LICENSE" } -- Add more as needed
-  local root_directory = lspconfig.util.root_pattern(root_markers)(buffer_filepath, bufnr)
+  local root_directory = lspconfig.util.root_pattern(root_markers)(buffer_filepath)
   cb(root_directory)
 end
 
