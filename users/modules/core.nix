@@ -61,6 +61,8 @@
         [ -f "$HOME/.zshrc" ] && source ~/.zshrc
         
         alias lg='lazygit'
+        alias vim='nvim'
+        alias vi='nvim'
         alias gs='git status'
         alias gcm='git checkout master && git pull'
         alias cat=bat
@@ -122,6 +124,7 @@
     neovim = {
       enable = true;
       vimAlias = true;
+      viAlias = true;
     };
 
     tmux = {
@@ -232,6 +235,7 @@
     alejandra
     inputs.brag
     delve
+    difftastic
     nixpkgs-fmt
     sumneko-lua-language-server
     thefuck

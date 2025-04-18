@@ -10,6 +10,11 @@ return {
     { "nvim-treesitter/nvim-treesitter" },
   },
   opts = {
+    templates = {
+      folder = "templates",
+      date_format = "%Y-%m-%d-%a",
+      time_format = "%H:%M",
+    },
     workspaces = {
       {
         name = "notes",

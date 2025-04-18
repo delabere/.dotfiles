@@ -21,8 +21,16 @@ let
     shipper deploy --s101 $branch
   '';
 
+  shipl = pkgs.writeShellScriptBin "shipl" ''
+    shipper deploy local-changes --s101 $1
+  '';
+
   prod = pkgs.writeShellScriptBin "prod" ''
     shipper deploy --prod $1
+  '';
+
+  minbuilds = pkgs.writeShellScriptBin "minbuilds" ''
+    £ -e prod "config get BASE/app.forceUpgrade"
   '';
 
   # gets you the id of your production user
@@ -167,6 +175,7 @@ let
     brag_old
     deepl
     mergeship
+    minbuilds
     p
     pid
     pkgs.brag
@@ -174,6 +183,7 @@ let
     s
     s101
     shipthis
+    shipl
     sid
     tpr
   ];
