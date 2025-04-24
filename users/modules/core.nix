@@ -50,16 +50,16 @@
       initExtra = ''
         # so that when mac updates we add nix back into the zshrc file
         if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
-          . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+            . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
         fi
-        
+
         # brew is installed here on m1 macs
         [[ $OSTYPE == 'darwin'* ]] && export PATH=/opt/homebrew/bin:$PATH
 
-        
+
         # any .zshrc found can be sourced; its probably a work machine
         [ -f "$HOME/.zshrc" ] && source ~/.zshrc
-        
+
         alias lg='lazygit'
         alias vim='nvim'
         alias vi='nvim'
@@ -105,6 +105,30 @@
         ZVM_VI_INSERT_ESCAPE_BINDKEY=kj
         ZVM_VI_SURROUND_BINDKEY=s-prefix
         ZVM_VI_HIGHLIGHT_BACKGROUND=#93C4D6
+
+        function find_service() {
+            base_dir="$HOME/src/github.com/monzo/wearedev"
+            selected=$(find -E "$base_dir" -type d -regex ".*(service|cron|web)\.[^/]*" -maxdepth 1 | sed "s|$base_dir/||" | fzf)
+
+            if [[ -n "$selected" ]]; then
+                # Extract the part after the dot
+                svc=''${selected#*.}
+                echo "$svc"
+            fi
+        }
+
+        function k() {
+            local svc=$(find_service)
+            echo "Running kib $1 $svc"
+            kib $1 "$svc"
+        }
+
+        function g() {
+            local svc=$(find_service)
+            echo "Running graf $1 $svc"
+            graf $1 "$svc"
+        }
+
       '';
     };
 
