@@ -59,6 +59,15 @@ let
     deepl $1
   '';
 
+  copypr = pkgs.writeShellScriptBin "copypr" ''
+    echo "⏳    Reading pull request $1..."
+    content=$(gh pr view --json title,url)
+    title=$(echo $content | jq -r .title)
+    url=$(echo $content | jq -r .url)
+    echo -e ":octocat: $title\n:pr-arrow: $url" | pbcopy
+    echo "✅    Pull request copied to clipboard in Slack format."
+  '';
+
   # gets you the id of the most recently created staging user
   sid = pkgs.writeShellScriptBin "sid" ''
     result=$(£ -e s101 'iapi GET /nonprod-user-generator/manual-test-users/list')
@@ -173,6 +182,7 @@ let
 
   work_pkgs = [
     brag_old
+    copypr
     deepl
     mergeship
     minbuilds
@@ -182,8 +192,8 @@ let
     prod
     s
     s101
-    shipthis
     shipl
+    shipthis
     sid
     tpr
   ];
