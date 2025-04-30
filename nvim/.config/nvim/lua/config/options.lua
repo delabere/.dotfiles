@@ -12,7 +12,7 @@ vim.opt.swapfile = false
 vim.opt.undolevels = vim.opt.undolevels
 
 -- sets the base_branch for use by the changed_files telescope picker
-vim.g.telescope_changed_files_base_branch = "master"
+vim.g.telescope_changed_files_base_branch = "origin/master"
 
 -- -- options
 vim.opt.tabstop = 4 -- show existing tab with 4 spaces width
