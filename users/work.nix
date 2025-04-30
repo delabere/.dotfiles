@@ -21,7 +21,11 @@
   # in a module and be set by an option
   home.packages = with pkgs; [
     graphviz
-    nodejs_20
+
+    # web
+    nodejs_23
+    typescript
+
     cargo # needed to compile pbls, protobuf lsp
     protols
   ];
