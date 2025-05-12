@@ -126,7 +126,7 @@
         in
         lib.splitString "\n" contents;
 
-      delabereKeys = githubKeys "delabere" "sha256-YwSUvDwjEfFjDFMYktKynM/YR6gfNvULzyayF3i311w=";
+      delabereKeys = githubKeys "delabere" "sha256-auNnTulhj3ypQa7hTAfb5f7YJpV+IQK7ppC29x8lVfU=";
       # olehKeys = githubKeys "stolyaroleh" "sha256-nU4h0fTLZ8AThYk1V8X+sEyqUO3ly2kwRJEgmVho6TU=";
     in
     delabereKeys;
