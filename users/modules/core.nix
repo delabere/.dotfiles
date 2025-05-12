@@ -47,7 +47,7 @@
         }
       ];
 
-      initExtra = ''
+      initContent = ''
         # so that when mac updates we add nix back into the zshrc file
         if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
             . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
@@ -137,7 +137,6 @@
     starship.enable = true;
     # autojump.enable = true;
     lsd.enable = true;
-    lsd.enableAliases = true;
     jq.enable = true;
 
     bat = {
