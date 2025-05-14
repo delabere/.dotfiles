@@ -92,7 +92,16 @@ return {
   },
   {
     "nvim-neotest/neotest",
-    dependencies = { "nvim-neotest/neotest-go" },
+    dependencies = { "fredrikaverpil/neotest-golang", "leoluz/nvim-dap-go" },
+    -- opts = {
+    --   adapters = {
+    --     ["neotest-golang"] = {
+    --       -- Here we can set options for neotest-golang, e.g.
+    --       -- go_test_args = { "-v", "-race", "-count=1", "-timeout=60s" },
+    --       dap_go_enabled = true, -- requires leoluz/nvim-dap-go
+    --     },
+    --   },
+    -- },
     config = function()
       -- get neotest namespace (api call creates or returns namespace)
       local neotest_ns = vim.api.nvim_create_namespace("neotest")
@@ -105,11 +114,12 @@ return {
         },
       }, neotest_ns)
 
-      local go_adapter = require("neotest-go")({
+      local go_adapter = require("neotest-golang")({
         experimental = {
           test_table = true,
         },
         args = { "-count=1", "-timeout=60s" },
+        dap_go_enabled = true, -- requires leoluz/nvim-dap-go
       })
 
       go_adapter.root = function()
