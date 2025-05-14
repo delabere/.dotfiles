@@ -23,11 +23,12 @@
     graphviz
 
     # web
-    nodejs_23
+    # nodejs_23
     typescript
 
     cargo # needed to compile pbls, protobuf lsp
     protols
+    gotestsum
   ];
 
   programs = {
