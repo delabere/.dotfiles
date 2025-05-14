@@ -68,8 +68,7 @@
         alias cat=bat
         alias checks='gh pr checks --watch'
         alias cat='bat --decorations=never'
-        alias test="go test $(git diff --name-only $(git merge-base HEAD origin/master) | xargs dirname | grep service | sort  | uniq | awk '{print "./" $1}' | tr '\n' ' ')"
-
+        alias test="gotestsum $(git diff --name-only $(git merge-base HEAD origin/master) | xargs dirname | grep service | sort  | uniq | awk '{print "./" $1}' | tr '\n' ' ')"
         alias gac='git add . && git commit -m'
 
         alias showpr='gh pr view --web'
@@ -129,6 +128,11 @@
             graf $1 "$svc"
         }
 
+        function g() {
+            local svc=$(find_service)
+            echo "Running graf $1 $svc"
+            graf $1 "$svc"
+        }
       '';
     };
 
