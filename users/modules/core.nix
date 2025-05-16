@@ -107,7 +107,7 @@
 
         function find_service() {
             base_dir="$HOME/src/github.com/monzo/wearedev"
-            selected=$(find -E "$base_dir" -type d -regex ".*(service|cron|web)\.[^/]*" -maxdepth 1 | sed "s|$base_dir/||" | fzf)
+            selected=$(find -E "$base_dir" -type d -regex ".*(service)\.[^/]*" -maxdepth 1 | sed "s|$base_dir/||" | fzf)
 
             if [[ -n "$selected" ]]; then
                 # Extract the part after the dot
@@ -132,6 +132,12 @@
             local svc=$(find_service)
             echo "Running graf $1 $svc"
             graf $1 "$svc"
+        }
+
+        function shipf() {
+            local svc=$(find_service)
+            echo "Running shipl $1 $svc"
+            shipl $1 service."$svc"
         }
       '';
     };
