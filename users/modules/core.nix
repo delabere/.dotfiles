@@ -136,8 +136,8 @@
 
         function shipf() {
             local svc=$(find_service)
-            echo "Running shipl $1 $svc"
-            shipl $1 service."$svc"
+            echo "Running shipper deploy local-changes $1 service.$svc" --no-docker
+            shipl $1 service."$svc" --no-docker
         }
       '';
     };
