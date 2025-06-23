@@ -22,7 +22,7 @@ let
   '';
 
   shipl = pkgs.writeShellScriptBin "shipl" ''
-    shipper deploy local-changes --s101 $1
+    shipper deploy local-changes --s101 --no-docker $1
   '';
 
   prod = pkgs.writeShellScriptBin "prod" ''
