@@ -106,29 +106,6 @@
         ZVM_VI_SURROUND_BINDKEY=s-prefix
         ZVM_VI_HIGHLIGHT_BACKGROUND=#93C4D6
 
-        function find_service() {
-            base_dir="$HOME/src/github.com/monzo/wearedev"
-            selected=$(find -E "$base_dir" -type d -regex ".*(service|cron|web)\.[^/]*" -maxdepth 1 | sed "s|$base_dir/||" | fzf)
-
-            if [[ -n "$selected" ]]; then
-                # Extract the part after the dot
-                svc=''${selected#*.}
-                echo "$svc"
-            fi
-        }
-
-        function k() {
-            local svc=$(find_service)
-            echo "Running kib $1 $svc"
-            kib $1 "$svc"
-        }
-
-        function g() {
-            local svc=$(find_service)
-            echo "Running graf $1 $svc"
-            graf $1 "$svc"
-        }
-
       '';
     };
 
@@ -261,7 +238,6 @@
     difftastic
     nixpkgs-fmt
     sumneko-lua-language-server
-    thefuck
     nodejs_20
     btop
     gh
