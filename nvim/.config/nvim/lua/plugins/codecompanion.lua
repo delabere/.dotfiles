@@ -1,57 +1,45 @@
 return {
   {
-    -- CodeCompanion plugin for AI-assisted development
     "olimorris/codecompanion.nvim",
-    -- Required dependencies
     dependencies = {
-      "nvim-lua/plenary.nvim",      -- Lua utility functions
-      "nvim-treesitter/nvim-treesitter", -- For syntax understanding
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
     },
     opts = {
-      -- Configure AI adapters that will be used
+
       adapters = {
-        -- Copilot adapter configuration
         copilot = function()
           return require("codecompanion.adapters").extend("copilot", {
             schema = {
               model = {
-                -- See https://codecompanion.olimorris.dev/usage/chat-buffer/agents.html#compatibility for supported models
-                default = "claude-3.7-sonnet", -- Default AI model to use (note: may not support @editor command)
+                -- see https://codecompanion.olimorris.dev/usage/chat-buffer/agents.html#compatibility for enabled models
+                default = "claude-3.7-sonnet", -- this model seems to not be able to use the @editor, probably because it's reasoning aloud
               },
             },
           })
         end,
       },
-      -- Define strategies for different interaction modes
       strategies = {
         chat = {
-          adapter = "copilot", -- Use Copilot for chat interactions
-        },
-        inline = {
-          adapter = "copilot", -- Use Copilot for inline completions
-        },
-        agent = {
-          adapter = "copilot", -- Use Copilot for agent-based operations
+          adapter = "copilot",
         },
       },
-      -- Custom prompt templates library
       prompt_library = {
         ["Monzo"] = {
-          strategy = "chat",           -- Use chat strategy for this prompt
-          description = "Help me to write code", -- Description shown in UI
+          strategy = "chat",
+          description = "Help me to write code",
           opts = {
-            index = 11,              -- Position in the prompt list
-            is_slash_cmd = false,    -- Not accessible via slash command
-            auto_submit = false,     -- Don't auto-submit prompt
-            short_name = "monzo",    -- Short name for quick access
+            index = 11,
+            is_slash_cmd = false,
+            auto_submit = false,
+            short_name = "monzo",
           },
-          -- Include reference files for context
           references = {
             {
               type = "file",
               path = {
-                -- Reference paths to organization coding guidelines
-                -- Note: These are relative paths that only work within wearedev environment
+                -- These will only work when using within wearedev (which is fine)
+                -- using an absolute path fails here for some reason
                 "./.cursor/rules/general.mdc",
                 "./.cursor/rules/monzo-go.mdc",
                 "./.cursor/rules/protobufs.mdc",
@@ -61,7 +49,6 @@ return {
               },
             },
           },
-          -- Initial prompt messages to set context
           prompts = {
             {
               role = "user",
