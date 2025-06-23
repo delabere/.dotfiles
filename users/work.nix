@@ -23,11 +23,14 @@
     graphviz
 
     # web
-    nodejs_23
+    # nodejs_23
     typescript
 
     cargo # needed to compile pbls, protobuf lsp
     protols
+
+
+    scrcpy # for droid
   ];
 
   programs = {
@@ -40,6 +43,30 @@
         [ -f $HOME/.dotfiles/env.sh ] && source $HOME/.dotfiles/env.sh
 
         JAVA_HOME=$(/usr/libexec/java_home -v 19)
+
+        function find_service() {
+            base_dir="$HOME/src/github.com/monzo/wearedev"
+            selected=$(find -E "$base_dir" -type d -regex ".*(service|cron|web)\.[^/]*" -maxdepth 1 | sed "s|$base_dir/||" | fzf)
+
+            if [[ -n "$selected" ]]; then
+                # Extract the part after the dot
+                svc=''${selected#*.}
+                echo "$svc"
+            fi
+        }
+
+        function k() {
+            local svc=$(find_service)
+            echo "Running kib $1 $svc"
+            kib $1 "$svc"
+        }
+
+        function g() {
+            local svc=$(find_service)
+            echo "Running graf $1 $svc"
+            graf $1 "$svc"
+        }
+
       '';
     };
   };
