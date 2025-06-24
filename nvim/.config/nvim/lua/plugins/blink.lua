@@ -8,6 +8,13 @@ return {
           LazyVim.cmp.map({ "snippet_forward", "ai_accept" }),
           "fallback",
         },
+
+        -- ["<C-space>"] = {
+        --   function(cmp)
+        --     require("blink.cmp")["show"]()
+        --     -- cmp.show()
+        --   end,
+        -- },
         -- https://github.com/LazyVim/LazyVim/issues/6185
         -- preset = "super-tab",
       },
