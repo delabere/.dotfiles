@@ -38,18 +38,7 @@ return {
         -- cmd = { "env", "GO111MODULE=off", "gopls", "-remote=auto", "-rpc.trace", "serve", "--debug=localhost:6060" },
         root_dir = service_root_dir,
         filetypes = { "go", "yml" },
-        -- verboseOutput = true, -- should provide better logging
       })
-
-      -- vim.lsp.enable("gopls2")
-      -- vim.lsp.config("gopls2", {
-      --   -- cmd = { "env", "GO111MODULE=off", "gopls", "-remote=auto" },
-      --   cmd = { "gopls", "-remote=auto" },
-      --   -- cmd = { "env", "GO111MODULE=off", "gopls", "-remote=auto", "-rpc.trace", "serve", "--debug=localhost:6060" },
-      --   -- root_dir = service_root_dir,
-      --   filetypes = { "go", "yml" },
-      --   -- verboseOutput = true, -- should provide better logging
-      -- })
 
       vim.lsp.config("protols", {
         root_dir = service_root_dir,
