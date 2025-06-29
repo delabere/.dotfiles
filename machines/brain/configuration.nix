@@ -15,6 +15,7 @@
       ./../../services/monitoring.nix
       ./../../services/samba.nix
       ./../../services/n8n.nix
+      ./../../services/caddy.nix
       # ./../../services/librechat_beta.nix
     ];
 
@@ -151,6 +152,7 @@
     vim
     stow
     gcc
+    lm_sensors
   ];
 
   nixpkgs.config.allowUnsupportedSystem = true;
