@@ -48,6 +48,7 @@
           pkgs = import nixpkgs {
             inherit system;
             overlays = [ (import ./overlay.nix inputs) ];
+            config.allowUnfree = true;
           };
           mkHomeManagerConfig = module: name:
             home-manager.lib.homeManagerConfiguration {
