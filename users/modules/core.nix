@@ -21,6 +21,7 @@
     }.${system};
 
   programs = {
+    fd.enable = true;
     git = {
       enable = true;
       userName = "delabere";
