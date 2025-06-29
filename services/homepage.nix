@@ -36,11 +36,11 @@
           {
             Plex = {
               icon = "plex.png";
-              href = "http://brain.degu-vega.ts.net:32400";
+              href = "http://brain:32400";
               description = "media management";
               # widget = {
               #   type = "plex";
-              #   url = "http://brain.degu-vega.ts.net:32400";
+              #   url = "http://brain:32400";
               # key = "{{HOMEPAGE_VAR_PLEX_API_KEY}}";
               # };
             };
@@ -48,11 +48,11 @@
           {
             Radarr = {
               icon = "radarr.png";
-              href = "http://brain.degu-vega.ts.net:7878";
+              href = "http://brain:7878";
               description = "film management";
               widget = {
                 type = "radarr";
-                url = "http://brain.degu-vega.ts.net:7878";
+                url = "http://brain.:7878";
                 key = "{{HOMEPAGE_VAR_RADARR_API_KEY}}";
               };
             };
@@ -60,11 +60,11 @@
           {
             Sonarr = {
               icon = "sonarr.png";
-              href = "http://brain.degu-vega.ts.net:8989";
+              href = "http://brain:8989";
               description = "tv management";
               widget = {
                 type = "sonarr";
-                url = "http://brain.degu-vega.ts.net:8989";
+                url = "http://brain:8989";
                 key = "{{HOMEPAGE_VAR_SONARR_API_KEY}}";
               };
             };
@@ -72,11 +72,11 @@
           {
             Prowlarr = {
               icon = "prowlarr.png";
-              href = "http://brain.degu-vega.ts.net:9696";
+              href = "http://brain:9696";
               description = "index management";
               widget = {
                 type = "prowlarr";
-                url = "http://brain.degu-vega.ts.net:9696";
+                url = "http://brain:9696";
                 key = "{{HOMEPAGE_VAR_PROWLARR_API_KEY}}";
               };
             };
@@ -95,11 +95,11 @@
           {
             HomeAssistant = {
               icon = "home-assistant.png";
-              href = "http://brain.degu-vega.ts.net:8123";
+              href = "http://brain:8123";
               description = "Home Assistant";
               widget = {
                 type = "homeassistant";
-                url = "http://brain.degu-vega.ts.net:8123";
+                url = "http://brain:8123";
                 key = "{{HOMEPAGE_VAR_HOMEASSISTANT_API_KEY}}";
                 custom = [
                   { state = "sensor.speedtest_download"; }
@@ -115,11 +115,11 @@
             Grafana = {
               icon = "grafana.png";
               # node exporter dash
-              href = "http://brain.degu-vega.ts.net:3000";
+              href = "http://brain:3000";
               description = "system dashboard";
               widget = {
                 type = "grafana";
-                url = "http://brain.degu-vega.ts.net:3000";
+                url = "http://brain:3000";
                 username = "admin";
                 password = "admin";
               };
@@ -128,7 +128,7 @@
           {
             Btop = {
               icon = "terminal.png";
-              href = "http://brain.degu-vega.ts.net:7681";
+              href = "http://brain:7681";
               description = "btop";
             };
           }
