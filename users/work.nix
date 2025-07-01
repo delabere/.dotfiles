@@ -23,7 +23,7 @@
     graphviz
 
     # web
-    # nodejs_23
+    nodejs_24
     typescript
 
     cargo # needed to compile pbls, protobuf lsp

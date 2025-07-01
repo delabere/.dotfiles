@@ -239,7 +239,7 @@
     difftastic
     nixpkgs-fmt
     sumneko-lua-language-server
-    nodejs_20
+    # nodejs_20
     btop
     gh
     lazygit
