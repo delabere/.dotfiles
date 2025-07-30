@@ -61,7 +61,7 @@ let
 
   copypr = pkgs.writeShellScriptBin "copypr" ''
     echo "⏳    Reading pull request $1..."
-    content=$(gh pr view --json title,url)
+    content=$(gh pr view $1 --json title,url)
     title=$(echo $content | jq -r .title)
     url=$(echo $content | jq -r .url)
     echo -e ":octocat: $title\n:pr-arrow: $url" | pbcopy
