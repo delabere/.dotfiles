@@ -79,6 +79,102 @@ let
     claude
   '';
 
+  wt = pkgs.writeShellScriptBin "wt" ''
+    # Configuration
+    WORKTREES_BASE="$HOME/projects/worktrees"
+    USERNAME="jackrickards"
+    
+    # Ensure worktrees directory exists
+    mkdir -p "$WORKTREES_BASE"
+    
+    # Function to get current repo name
+    get_repo_name() {
+        basename "$(git rev-parse --show-toplevel 2>/dev/null || echo "unknown")"
+    }
+    
+    # Function to list existing worktrees for a repo
+    list_worktrees() {
+        local repo="$1"
+        if [ -d "$WORKTREES_BASE/$repo" ]; then
+            find "$WORKTREES_BASE/$repo" -maxdepth 1 -type d -name "*" -exec basename {} \; | grep -v "^$repo$" | sort
+        fi
+    }
+    
+    # Function to create or access a worktree
+    handle_worktree() {
+        local repo="$1"
+        local branch="$2"
+        local worktree_name="$USERNAME-$branch"
+        local worktree_path="$WORKTREES_BASE/$repo/$worktree_name"
+        
+        # Create worktree if it doesn't exist
+        if [ ! -d "$worktree_path" ]; then
+            echo "Creating worktree: $worktree_name"
+            
+            # Create the base directory for this repo's worktrees
+            mkdir -p "$WORKTREES_BASE/$repo"
+            
+            # Create the worktree
+            git worktree add "$worktree_path" -b "$branch" 2>/dev/null || git worktree add "$worktree_path" "$branch"
+            
+            # Copy .claude directory if it exists
+            if [ -d ".claude" ]; then
+                cp -r .claude "$worktree_path/"
+            fi
+        fi
+        
+        echo "$worktree_path"
+    }
+    
+    # Main logic
+    if [ $# -eq 0 ]; then
+        echo "Usage: wt <branch> [command...]"
+        echo "       wt <branch>              # cd to worktree"
+        echo "       wt <branch> claude       # run Claude in worktree"
+        echo "       wt <branch> git status   # run git status in worktree"
+        echo ""
+        echo "Current repo: $(get_repo_name)"
+        
+        current_repo=$(get_repo_name)
+        if [ "$current_repo" != "unknown" ]; then
+            worktrees=$(list_worktrees "$current_repo")
+            if [ -n "$worktrees" ]; then
+                echo "Existing worktrees:"
+                echo "$worktrees" | sed 's/^/  /'
+            fi
+        fi
+        exit 0
+    fi
+    
+    # Auto-discover current repo
+    REPO=$(get_repo_name)
+    if [ "$REPO" = "unknown" ]; then
+        echo "Error: Not in a git repository"
+        exit 1
+    fi
+    
+    BRANCH="$1"
+    shift 1
+    COMMAND="$@"
+    
+    if [ -z "$BRANCH" ]; then
+        echo "Error: Branch name required"
+        exit 1
+    fi
+    
+    # Handle the worktree (create if needed)
+    WORKTREE_PATH=$(handle_worktree "$REPO" "$BRANCH")
+    
+    if [ -n "$COMMAND" ]; then
+        echo "Running: $COMMAND"
+        echo "In: $WORKTREE_PATH"
+        cd "$WORKTREE_PATH" && eval "$COMMAND"
+    else
+        echo "Worktree ready: $WORKTREE_PATH"
+        echo "Run: cd \"$WORKTREE_PATH\""
+    fi
+  '';
+
   tdiff = pkgs.writeShellScriptBin "tdiff" ''
     # Parse command line arguments
     TEST_WHOLE_SERVICE=false
@@ -291,19 +387,32 @@ let
 
   linear-get = pkgs.writeShellScriptBin "linear-get" ''
     if [ $# -ne 1 ]; then
-        echo "Usage: linear-get <ticket_url>"
+        echo "Usage: linear-get <ticket_url_or_branch>"
         exit 1
     fi
 
-    TICKET_URL="$1"
+    INPUT="$1"
 
-    # Extract issue ID from URL - Linear URLs are like https://linear.app/monzo/issue/WS-123/title
-    ISSUE_ID=$(echo "$TICKET_URL" | sed -n 's|.*/issue/\([^/]*\)/.*|\1|p')
-    
-    if [ -z "$ISSUE_ID" ]; then
-        echo "Error: Could not extract issue ID from URL: $TICKET_URL"
-        echo "Expected format: https://linear.app/workspace/issue/ISSUE-ID/..."
-        exit 1
+    # Check if input is a URL or branch name
+    if [[ "$INPUT" =~ ^https?:// ]]; then
+        # Extract issue ID from URL - Linear URLs are like https://linear.app/monzo/issue/WS-123/title
+        ISSUE_ID=$(echo "$INPUT" | sed -n 's|.*/issue/\([^/]*\)/.*|\1|p')
+        
+        if [ -z "$ISSUE_ID" ]; then
+            echo "Error: Could not extract issue ID from URL: $INPUT"
+            echo "Expected format: https://linear.app/workspace/issue/ISSUE-ID/..."
+            exit 1
+        fi
+    else
+        # Assume it's a branch name - extract issue ID from branch like sav-123-feature-name or jackrickards-sav-123-feature-name
+        # Use grep to find the pattern anywhere in the string
+        ISSUE_ID=$(echo "$INPUT" | grep -o '[a-zA-Z]\+-[0-9]\+' | head -1 | tr '[:lower:]' '[:upper:]')
+        
+        if [ -z "$ISSUE_ID" ]; then
+            echo "Error: Could not extract issue ID from branch: $INPUT"
+            echo "Expected format: [username-]prefix-number-description (e.g., sav-123-feature-name or jackrickards-sav-123-feature-name)"
+            exit 1
+        fi
     fi
 
     # Read API key from local file
@@ -472,6 +581,7 @@ let
     sid
     tdiff
     tpr
+    wt
   ];
 
   mkOption = pkgs.lib.mkOption;
