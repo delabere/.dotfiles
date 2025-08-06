@@ -289,6 +289,56 @@ let
     echo "$RESPONSE" | jq -r '.data.team.projects.nodes[] | "ID: " + .id + " | Name: " + .name'
   '';
 
+  linear-get = pkgs.writeShellScriptBin "linear-get" ''
+    if [ $# -ne 1 ]; then
+        echo "Usage: linear-get <ticket_url>"
+        exit 1
+    fi
+
+    TICKET_URL="$1"
+
+    # Extract issue ID from URL - Linear URLs are like https://linear.app/monzo/issue/WS-123/title
+    ISSUE_ID=$(echo "$TICKET_URL" | sed -n 's|.*/issue/\([^/]*\)/.*|\1|p')
+    
+    if [ -z "$ISSUE_ID" ]; then
+        echo "Error: Could not extract issue ID from URL: $TICKET_URL"
+        echo "Expected format: https://linear.app/workspace/issue/ISSUE-ID/..."
+        exit 1
+    fi
+
+    # Read API key from local file
+    API_KEY_FILE="$HOME/.linear_api_key"
+    if [ ! -f "$API_KEY_FILE" ]; then
+        echo "Error: Linear API key file not found at $API_KEY_FILE"
+        exit 1
+    fi
+
+    API_KEY=$(cat "$API_KEY_FILE")
+
+    # Query for issue details - properly escape the issue ID as a string
+    QUERY=$(jq -n --arg issueId "$ISSUE_ID" '{query: ("query { issue(id: \"" + $issueId + "\") { id title description branchName } }")}')
+
+    RESPONSE=$(curl -s -X POST \
+      -H "Authorization: $API_KEY" \
+      -H "Content-Type: application/json" \
+      -d "$QUERY" \
+      https://api.linear.app/graphql)
+
+    # Check if issue was found
+    if echo "$RESPONSE" | jq -e '.data.issue' > /dev/null 2>&1; then
+        # Extract and format the data as JSON
+        echo "$RESPONSE" | jq '{
+          title: .data.issue.title,
+          body: .data.issue.description,
+          "branch-name": .data.issue.branchName
+        }'
+    else
+        echo "Error: Issue not found or API error"
+        echo "Response: $RESPONSE"
+        exit 1
+    fi
+  '';
+
   # gets you the id of the most recently created staging user
   sid = pkgs.writeShellScriptBin "sid" ''
     result=$(£ -e s101 'iapi GET /nonprod-user-generator/manual-test-users/list')
@@ -407,6 +457,7 @@ let
     copypr
     deepl
     linear
+    linear-get
     linear-projects
     mergeship
     minbuilds
