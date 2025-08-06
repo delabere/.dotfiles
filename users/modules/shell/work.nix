@@ -89,16 +89,16 @@ let
     # Get the base branch (usually master)
     BASE_BRANCH="master"
 
-    # Get list of changed files compared to base branch
-    CHANGED_FILES=$(git diff --name-only $BASE_BRANCH...HEAD)
+    # Get list of changed Go files compared to base branch, excluding generated proto files
+    CHANGED_FILES=$(git diff --name-only $BASE_BRANCH...HEAD | grep '\.go$' | grep -v '/proto/')
 
     if [ -z "$CHANGED_FILES" ]; then
-        echo "No changes detected"
+        echo "No Go file changes detected"
         exit 0
     fi
 
     if [ "$TEST_WHOLE_SERVICE" = true ]; then
-        # Extract unique service names from changed files
+        # Extract unique service names from changed Go files
         SERVICES=$(echo "$CHANGED_FILES" | grep -E '^service\.[^/]+/' | cut -d'/' -f1 | sort -u)
 
         if [ -z "$SERVICES" ]; then
@@ -116,11 +116,11 @@ let
             fi
         done
     else
-        # Extract unique service/package combinations from changed files
+        # Extract unique service/package combinations from changed Go files
         PACKAGES=$(echo "$CHANGED_FILES" | grep -E '^service\.[^/]+/[^/]+/' | sed 's|/[^/]*$||' | sort -u)
 
         if [ -z "$PACKAGES" ]; then
-            echo "No package changes detected"
+            echo "No Go package changes detected"
             exit 0
         fi
 
@@ -136,6 +136,157 @@ let
     fi
 
     echo "All tests passed!"
+  '';
+
+  linear = pkgs.writeShellScriptBin "linear" ''
+    if [ $# -lt 3 ]; then
+        echo "Usage: linear <project> <name> <description> [labels...]"
+        echo "Available labels: Backend, Android, iOS"
+        exit 1
+    fi
+
+    PROJECT_NAME="$1"
+    NAME="$2"  
+    DESCRIPTION="$3"
+    shift 3
+    LABELS="$@"
+
+    # Clean up newlines and carriage returns but don't escape quotes yet (jq will handle that)
+    NAME=$(echo "$NAME" | tr '\n\r' '  ')
+    DESCRIPTION=$(echo "$DESCRIPTION" | tr '\n\r' '  ')
+
+    # Read API key from local file
+    API_KEY_FILE="$HOME/.linear_api_key"
+    if [ ! -f "$API_KEY_FILE" ]; then
+        echo "Error: Linear API key file not found at $API_KEY_FILE"
+        echo "Please create this file with your Linear API key"
+        exit 1
+    fi
+
+    API_KEY=$(cat "$API_KEY_FILE")
+    if [ -z "$API_KEY" ]; then
+        echo "Error: API key is empty"
+        exit 1
+    fi
+
+    # Fixed team ID for Wealth: Savings
+    TEAM_ID="7d772272-0780-4db4-9452-2ca325752e2f"
+
+    # Query for projects to find the matching project ID
+    PROJECTS_QUERY='{"query": "query { team(id: \"'$TEAM_ID'\") { projects { nodes { id name } } } }"}'
+    
+    PROJECTS_RESPONSE=$(curl -s -X POST \
+      -H "Authorization: $API_KEY" \
+      -H "Content-Type: application/json" \
+      -d "$PROJECTS_QUERY" \
+      https://api.linear.app/graphql)
+
+    # Find project ID by name (case insensitive)
+    PROJECT_ID=$(echo "$PROJECTS_RESPONSE" | jq -r --arg name "$PROJECT_NAME" '.data.team.projects.nodes[] | select(.name | test($name; "i")) | .id')
+
+    if [ -z "$PROJECT_ID" ] || [ "$PROJECT_ID" = "null" ]; then
+        echo "❌ Project not found: $PROJECT_NAME"
+        echo "Available projects:"
+        echo "$PROJECTS_RESPONSE" | jq -r '.data.team.projects.nodes[] | "  - " + .name'
+        exit 1
+    fi
+
+    # Handle labels if provided
+    LABEL_IDS=""
+    if [ -n "$LABELS" ]; then
+        # Query for team labels to get IDs
+        LABELS_QUERY='{"query": "query { team(id: \"'$TEAM_ID'\") { labels { nodes { id name } } } }"}'
+        
+        LABELS_RESPONSE=$(curl -s -X POST \
+          -H "Authorization: $API_KEY" \
+          -H "Content-Type: application/json" \
+          -d "$LABELS_QUERY" \
+          https://api.linear.app/graphql)
+
+        # Build label IDs array
+        LABEL_ID_ARRAY="["
+        FIRST_LABEL=true
+        for LABEL in $LABELS; do
+            LABEL_ID=$(echo "$LABELS_RESPONSE" | jq -r --arg name "$LABEL" '.data.team.labels.nodes[] | select(.name | test($name; "i")) | .id')
+            if [ -n "$LABEL_ID" ] && [ "$LABEL_ID" != "null" ]; then
+                if [ "$FIRST_LABEL" = true ]; then
+                    LABEL_ID_ARRAY="$LABEL_ID_ARRAY\"$LABEL_ID\""
+                    FIRST_LABEL=false
+                else
+                    LABEL_ID_ARRAY="$LABEL_ID_ARRAY, \"$LABEL_ID\""
+                fi
+            else
+                echo "⚠️  Label not found: $LABEL"
+            fi
+        done
+        LABEL_ID_ARRAY="$LABEL_ID_ARRAY]"
+        
+        if [ "$LABEL_ID_ARRAY" != "[]" ]; then
+            LABEL_IDS=", labelIds: $LABEL_ID_ARRAY"
+        fi
+    fi
+
+    echo "📝 Creating issue in project: $PROJECT_NAME (ID: $PROJECT_ID)"
+
+    # Properly escape strings for GraphQL
+    ESCAPED_TITLE=$(echo "$NAME" | jq -Rs .)
+    ESCAPED_DESCRIPTION=$(echo "$DESCRIPTION" | jq -Rs .)
+
+    # Build GraphQL mutation string
+    if [ -n "$LABEL_IDS" ]; then
+        GRAPHQL_QUERY="mutation { issueCreate(input: { title: $ESCAPED_TITLE, description: $ESCAPED_DESCRIPTION, teamId: \"$TEAM_ID\", projectId: \"$PROJECT_ID\", labelIds: $LABEL_ID_ARRAY }) { success issue { id title url } } }"
+    else
+        GRAPHQL_QUERY="mutation { issueCreate(input: { title: $ESCAPED_TITLE, description: $ESCAPED_DESCRIPTION, teamId: \"$TEAM_ID\", projectId: \"$PROJECT_ID\" }) { success issue { id title url } } }"
+    fi
+
+    # Create the JSON request
+    MUTATION=$(jq -n --arg query "$GRAPHQL_QUERY" '{query: $query}')
+
+    # Make the API request
+    RESPONSE=$(curl -s -X POST \
+        -H "Authorization: $API_KEY" \
+        -H "Content-Type: application/json" \
+        -d "$MUTATION" \
+        https://api.linear.app/graphql)
+
+    # Parse response
+    SUCCESS=$(echo "$RESPONSE" | jq -r '.data.issueCreate.success')
+    
+    if [ "$SUCCESS" = "true" ]; then
+        ISSUE_ID=$(echo "$RESPONSE" | jq -r '.data.issueCreate.issue.id')
+        ISSUE_URL=$(echo "$RESPONSE" | jq -r '.data.issueCreate.issue.url')
+        echo "✅ Issue created successfully!"
+        echo "ID: $ISSUE_ID"
+        echo "URL: $ISSUE_URL"
+    else
+        echo "❌ Failed to create issue"
+        echo "Response: $RESPONSE"
+        exit 1
+    fi
+  '';
+
+  linear-projects = pkgs.writeShellScriptBin "linear-projects" ''
+    # Read API key from local file
+    API_KEY_FILE="$HOME/.linear_api_key"
+    if [ ! -f "$API_KEY_FILE" ]; then
+        echo "Error: Linear API key file not found at $API_KEY_FILE"
+        exit 1
+    fi
+
+    API_KEY=$(cat "$API_KEY_FILE")
+    
+    echo "Fetching Linear projects for Wealth: Savings team..."
+    
+    QUERY='{"query": "query { team(id: \"7d772272-0780-4db4-9452-2ca325752e2f\") { projects { nodes { id name } } } }"}'
+    
+    RESPONSE=$(curl -s -X POST \
+      -H "Authorization: $API_KEY" \
+      -H "Content-Type: application/json" \
+      -d "$QUERY" \
+      https://api.linear.app/graphql)
+    
+    echo "Projects:"
+    echo "$RESPONSE" | jq -r '.data.team.projects.nodes[] | "ID: " + .id + " | Name: " + .name'
   '';
 
   # gets you the id of the most recently created staging user
@@ -255,6 +406,8 @@ let
     claudetree
     copypr
     deepl
+    linear
+    linear-projects
     mergeship
     minbuilds
     p
