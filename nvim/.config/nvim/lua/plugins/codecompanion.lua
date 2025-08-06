@@ -13,7 +13,7 @@ return {
             schema = {
               model = {
                 -- see https://codecompanion.olimorris.dev/usage/chat-buffer/agents.html#compatibility for enabled models
-                default = "claude-3.7-sonnet", -- this model seems to not be able to use the @editor, probably because it's reasoning aloud
+                default = "claude-sonnet-4",
               },
             },
           })
