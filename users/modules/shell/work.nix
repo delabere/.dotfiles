@@ -68,6 +68,76 @@ let
     echo "✅    Pull request copied to clipboard in Slack format."
   '';
 
+  claudetree = pkgs.writeShellScriptBin "claudetree" ''
+    if [ -z "$1" ]; then
+      echo "provide a worktree name"
+      exit 1
+    fi
+    git worktree add $1
+    cp -r .claude $1
+    cd $1
+    claude
+  '';
+
+  tdiff = pkgs.writeShellScriptBin "tdiff" ''
+    # Parse command line arguments
+    TEST_WHOLE_SERVICE=false
+    if [ "$1" = "--full" ] || [ "$1" = "-f" ]; then
+        TEST_WHOLE_SERVICE=true
+    fi
+
+    # Get the base branch (usually master)
+    BASE_BRANCH="master"
+
+    # Get list of changed files compared to base branch
+    CHANGED_FILES=$(git diff --name-only $BASE_BRANCH...HEAD)
+
+    if [ -z "$CHANGED_FILES" ]; then
+        echo "No changes detected"
+        exit 0
+    fi
+
+    if [ "$TEST_WHOLE_SERVICE" = true ]; then
+        # Extract unique service names from changed files
+        SERVICES=$(echo "$CHANGED_FILES" | grep -E '^service\.[^/]+/' | cut -d'/' -f1 | sort -u)
+
+        if [ -z "$SERVICES" ]; then
+            echo "No service changes detected"
+            exit 0
+        fi
+
+        # Run tests for each affected service
+        for SERVICE in $SERVICES; do
+            echo "Running tests for $SERVICE..."
+            gotestsum ./$SERVICE/...
+            if [ $? -ne 0 ]; then
+                echo "Tests failed for $SERVICE"
+                exit 1
+            fi
+        done
+    else
+        # Extract unique service/package combinations from changed files
+        PACKAGES=$(echo "$CHANGED_FILES" | grep -E '^service\.[^/]+/[^/]+/' | sed 's|/[^/]*$||' | sort -u)
+
+        if [ -z "$PACKAGES" ]; then
+            echo "No package changes detected"
+            exit 0
+        fi
+
+        # Run tests for each affected package
+        for PACKAGE in $PACKAGES; do
+            echo "Running tests for $PACKAGE..."
+            gotestsum ./$PACKAGE/...
+            if [ $? -ne 0 ]; then
+                echo "Tests failed for $PACKAGE"
+                exit 1
+            fi
+        done
+    fi
+
+    echo "All tests passed!"
+  '';
+
   # gets you the id of the most recently created staging user
   sid = pkgs.writeShellScriptBin "sid" ''
     result=$(£ -e s101 'iapi GET /nonprod-user-generator/manual-test-users/list')
@@ -182,6 +252,7 @@ let
 
   work_pkgs = [
     brag_old
+    claudetree
     copypr
     deepl
     mergeship
@@ -195,6 +266,7 @@ let
     shipl
     shipthis
     sid
+    tdiff
     tpr
   ];
 
