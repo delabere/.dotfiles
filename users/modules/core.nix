@@ -34,7 +34,7 @@
 
     zsh = {
       enable = true;
-      dotDir = ".config/zsh";
+      dotDir = "${config.xdg.configHome}/zsh";
 
       # haven't quite managed to get these working
       autosuggestion.enable = true;
