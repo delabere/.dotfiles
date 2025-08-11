@@ -104,18 +104,25 @@ let
     handle_worktree() {
         local repo="$1"
         local branch="$2"
-        local worktree_name="$USERNAME-$branch"
+        
+        # Check if branch already starts with username
+        if [[ "$branch" == "$USERNAME-"* ]]; then
+            local worktree_name="$branch"
+        else
+            local worktree_name="$USERNAME-$branch"
+        fi
+        
         local worktree_path="$WORKTREES_BASE/$repo/$worktree_name"
         
         # Create worktree if it doesn't exist
         if [ ! -d "$worktree_path" ]; then
-            echo "Creating worktree: $worktree_name"
+            echo "Creating worktree: $worktree_name" >&2
             
             # Create the base directory for this repo's worktrees
             mkdir -p "$WORKTREES_BASE/$repo"
             
             # Create the worktree
-            git worktree add "$worktree_path" -b "$branch" 2>/dev/null || git worktree add "$worktree_path" "$branch"
+            git worktree add "$worktree_path" -b "$branch" >&2 2>/dev/null || git worktree add "$worktree_path" "$branch" >&2
             
             # Copy .claude directory if it exists
             if [ -d ".claude" ]; then
