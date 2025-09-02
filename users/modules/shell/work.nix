@@ -5,11 +5,11 @@
 }:
 let
   s = pkgs.writeShellScriptBin "s" ''
-    £ -e s101 $1
+    £ -e s101 "$*"
   '';
 
   p = pkgs.writeShellScriptBin "p" ''
-    £ -e prod $1
+    £ -e prod "$*"
   '';
 
   s101 = pkgs.writeShellScriptBin "s101" ''
@@ -79,7 +79,7 @@ let
     claude
   '';
 
-  wt-helper = pkgs.writeShellScriptBin "wt-helper" ''
+  wt = pkgs.writeShellScriptBin "wt" ''
     # Configuration
     WORKTREES_BASE="$HOME/projects/worktrees"
     USERNAME="jackrickards"
@@ -135,19 +135,19 @@ let
     
     # Main logic
     if [ $# -eq 0 ]; then
-        echo "Usage: wt <branch> [command...]" >&2
-        echo "       wt <branch>              # cd to worktree" >&2
-        echo "       wt <branch> claude       # run Claude in worktree" >&2
-        echo "       wt <branch> git status   # run git status in worktree" >&2
-        echo "" >&2
-        echo "Current repo: $(get_repo_name)" >&2
+        echo "Usage: wt <branch> [command...]"
+        echo "       wt <branch>              # cd to worktree"
+        echo "       wt <branch> claude       # run Claude in worktree"
+        echo "       wt <branch> git status   # run git status in worktree"
+        echo ""
+        echo "Current repo: $(get_repo_name)"
         
         current_repo=$(get_repo_name)
         if [ "$current_repo" != "unknown" ]; then
             worktrees=$(list_worktrees "$current_repo")
             if [ -n "$worktrees" ]; then
-                echo "Existing worktrees:" >&2
-                echo "$worktrees" | sed 's/^/  /' >&2
+                echo "Existing worktrees:"
+                echo "$worktrees" | sed 's/^/  /'
             fi
         fi
         exit 0
@@ -156,7 +156,7 @@ let
     # Auto-discover current repo
     REPO=$(get_repo_name)
     if [ "$REPO" = "unknown" ]; then
-        echo "Error: Not in a git repository" >&2
+        echo "Error: Not in a git repository"
         exit 1
     fi
     
@@ -165,57 +165,22 @@ let
     COMMAND="$@"
     
     if [ -z "$BRANCH" ]; then
-        echo "Error: Branch name required" >&2
+        echo "Error: Branch name required"
         exit 1
     fi
     
     # Handle the worktree (create if needed)
     WORKTREE_PATH=$(handle_worktree "$REPO" "$BRANCH")
     
-    # Always output the path (for the wrapper function to use)
-    echo "$WORKTREE_PATH"
-    
-    # If there's a command, run it in the worktree
     if [ -n "$COMMAND" ]; then
-        echo "Running: $COMMAND" >&2
-        echo "In: $WORKTREE_PATH" >&2
+        echo "Running: $COMMAND"
+        echo "In: $WORKTREE_PATH"
         cd "$WORKTREE_PATH" && eval "$COMMAND"
+    else
+        echo "Worktree ready: $WORKTREE_PATH"
+        echo "Run: cd \"$WORKTREE_PATH\""
     fi
   '';
-  
-  # Create a wrapper script that sources a function
-  wt = pkgs.writeTextFile {
-    name = "wt";
-    destination = "/bin/wt-function.sh";
-    text = ''
-      # This file should be sourced, not executed
-      # Add to your shell config: source ${placeholder "out"}/bin/wt-function.sh
-      
-      wt() {
-          local WORKTREE_PATH
-          
-          # Special case: no arguments shows help
-          if [ $# -eq 0 ]; then
-              wt-helper
-              return
-          fi
-          
-          # Get the worktree path from the helper
-          WORKTREE_PATH=$(wt-helper "$@")
-          local exit_code=$?
-          
-          # If helper failed, return its exit code
-          if [ $exit_code -ne 0 ]; then
-              return $exit_code
-          fi
-          
-          # If we got a path and it exists, cd into it
-          if [ -n "$WORKTREE_PATH" ] && [ -d "$WORKTREE_PATH" ]; then
-              cd "$WORKTREE_PATH"
-              echo "Changed to worktree: $WORKTREE_PATH"
-          fi
-      }
-    '';
 
   tdiff = pkgs.writeShellScriptBin "tdiff" ''
     # Parse command line arguments
@@ -788,7 +753,6 @@ let
     tdiff
     tpr
     wt
-    wt-helper
   ];
 
   mkOption = pkgs.lib.mkOption;
@@ -805,16 +769,5 @@ in
     };
   };
 
-  config = pkgs.lib.mkIf config.shell.work.enable {
-    home.packages = work_pkgs;
-    
-    # Source the wt function in bash and zsh
-    programs.bash.initExtra = ''
-      source ${wt}/bin/wt-function.sh
-    '';
-    
-    programs.zsh.initExtra = ''
-      source ${wt}/bin/wt-function.sh
-    '';
-  };
+  config.home.packages = if config.shell.work.enable then work_pkgs else [ ];
 }
