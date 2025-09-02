@@ -29,7 +29,7 @@
     typescript
 
     cargo # needed to compile pbls, protobuf lsp
-    protols
+    # protols
 
 
     scrcpy # for droid
