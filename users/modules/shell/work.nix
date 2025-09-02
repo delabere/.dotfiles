@@ -79,7 +79,7 @@ let
     claude
   '';
 
-  wt = pkgs.writeShellScriptBin "wt" ''
+  wt-helper = pkgs.writeShellScriptBin "wt-helper" ''
     # Configuration
     WORKTREES_BASE="$HOME/projects/worktrees"
     USERNAME="jackrickards"
@@ -135,19 +135,19 @@ let
     
     # Main logic
     if [ $# -eq 0 ]; then
-        echo "Usage: wt <branch> [command...]"
-        echo "       wt <branch>              # cd to worktree"
-        echo "       wt <branch> claude       # run Claude in worktree"
-        echo "       wt <branch> git status   # run git status in worktree"
-        echo ""
-        echo "Current repo: $(get_repo_name)"
+        echo "Usage: wt <branch> [command...]" >&2
+        echo "       wt <branch>              # cd to worktree" >&2
+        echo "       wt <branch> claude       # run Claude in worktree" >&2
+        echo "       wt <branch> git status   # run git status in worktree" >&2
+        echo "" >&2
+        echo "Current repo: $(get_repo_name)" >&2
         
         current_repo=$(get_repo_name)
         if [ "$current_repo" != "unknown" ]; then
             worktrees=$(list_worktrees "$current_repo")
             if [ -n "$worktrees" ]; then
-                echo "Existing worktrees:"
-                echo "$worktrees" | sed 's/^/  /'
+                echo "Existing worktrees:" >&2
+                echo "$worktrees" | sed 's/^/  /' >&2
             fi
         fi
         exit 0
@@ -156,7 +156,7 @@ let
     # Auto-discover current repo
     REPO=$(get_repo_name)
     if [ "$REPO" = "unknown" ]; then
-        echo "Error: Not in a git repository"
+        echo "Error: Not in a git repository" >&2
         exit 1
     fi
     
@@ -165,22 +165,57 @@ let
     COMMAND="$@"
     
     if [ -z "$BRANCH" ]; then
-        echo "Error: Branch name required"
+        echo "Error: Branch name required" >&2
         exit 1
     fi
     
     # Handle the worktree (create if needed)
     WORKTREE_PATH=$(handle_worktree "$REPO" "$BRANCH")
     
+    # Always output the path (for the wrapper function to use)
+    echo "$WORKTREE_PATH"
+    
+    # If there's a command, run it in the worktree
     if [ -n "$COMMAND" ]; then
-        echo "Running: $COMMAND"
-        echo "In: $WORKTREE_PATH"
+        echo "Running: $COMMAND" >&2
+        echo "In: $WORKTREE_PATH" >&2
         cd "$WORKTREE_PATH" && eval "$COMMAND"
-    else
-        echo "Worktree ready: $WORKTREE_PATH"
-        echo "Run: cd \"$WORKTREE_PATH\""
     fi
   '';
+  
+  # Create a wrapper script that sources a function
+  wt = pkgs.writeTextFile {
+    name = "wt";
+    destination = "/bin/wt-function.sh";
+    text = ''
+      # This file should be sourced, not executed
+      # Add to your shell config: source ${placeholder "out"}/bin/wt-function.sh
+      
+      wt() {
+          local WORKTREE_PATH
+          
+          # Special case: no arguments shows help
+          if [ $# -eq 0 ]; then
+              wt-helper
+              return
+          fi
+          
+          # Get the worktree path from the helper
+          WORKTREE_PATH=$(wt-helper "$@")
+          local exit_code=$?
+          
+          # If helper failed, return its exit code
+          if [ $exit_code -ne 0 ]; then
+              return $exit_code
+          fi
+          
+          # If we got a path and it exists, cd into it
+          if [ -n "$WORKTREE_PATH" ] && [ -d "$WORKTREE_PATH" ]; then
+              cd "$WORKTREE_PATH"
+              echo "Changed to worktree: $WORKTREE_PATH"
+          fi
+      }
+    '';
 
   tdiff = pkgs.writeShellScriptBin "tdiff" ''
     # Parse command line arguments
@@ -392,6 +427,169 @@ let
     echo "$RESPONSE" | jq -r '.data.team.projects.nodes[] | "ID: " + .id + " | Name: " + .name'
   '';
 
+  protogen = pkgs.writeShellScriptBin "protogen" ''
+    set -e
+
+    # protogen - A workaround script to run protobuf generation in the main repo
+    # when working from a Git worktree, since our protobuf tooling doesn't work with worktrees
+
+    MAIN_REPO_PATH="$HOME/src/github.com/monzo/wearedev"
+
+    # Logging functions
+    log_info() {
+        # Blue text to stderr
+        printf "\033[34m%s\033[0m\n" "$1" >&2
+    }
+
+    log_error() {
+        # Red text to stderr
+        printf "\033[31mError: %s\033[0m\n" "$1" >&2
+    }
+
+    # Function to check if we have uncommitted changes (including untracked files)
+    has_uncommitted_changes() {
+        # Check for staged, unstaged, and untracked files
+        if [ -n "$(git status --porcelain)" ]; then
+            return 0  # Has changes
+        else
+            return 1  # No changes
+        fi
+    }
+
+    # Function to check if current directory is the main repo
+    is_main_repo() {
+        current_path="$(pwd)"
+        if [ "$current_path" = "$MAIN_REPO_PATH" ]; then
+            return 0  # Is main repo
+        else
+            return 1  # Not main repo
+        fi
+    }
+
+    # Function to check if current directory is a worktree of the main repo
+    is_worktree_of_main_repo() {
+        # Check if we're in a git repo first
+        if ! git rev-parse --git-dir >/dev/null 2>&1; then
+            return 1  # Not a git repo
+        fi
+        
+        # Get the path of the main working tree
+        main_worktree_path="$(git worktree list | head -n 1 | awk '{print $1}')"
+        
+        # Check if the main worktree is our expected path
+        if [ "$main_worktree_path" = "$MAIN_REPO_PATH" ]; then
+            return 0  # Is a worktree of main repo
+        else
+            return 1  # Not a worktree of main repo
+        fi
+    }
+
+    # Function to check if last commit has a specific message
+    last_commit_has_message() {
+        message="$1"
+        last_commit_msg="$(git log -1 --pretty=format:%s)"
+        if [ "$last_commit_msg" = "$message" ]; then
+            return 0  # Has the message
+        else
+            return 1  # Doesn't have the message
+        fi
+    }
+
+    # Function to cleanup WIP commits and return to initial directory
+    cleanup_and_exit() {
+        exit_code="$1"
+        
+        if git rev-parse --git-dir >/dev/null 2>&1 && last_commit_has_message "WIP before-protogen"; then
+            log_info "Undoing temporary WIP before-protogen commit"
+            git reset --mixed HEAD~1
+        fi
+        
+        if [ "$(pwd)" != "$initial_working_directory" ]; then
+            cd "$initial_working_directory"
+            
+            if git rev-parse --git-dir >/dev/null 2>&1 && last_commit_has_message "WIP before-protogen"; then
+                log_info "Undoing temporary WIP before-protogen commit in worktree"
+                git reset --mixed HEAD~1
+            fi
+        fi
+        
+        exit "$exit_code"
+    }
+
+    # Main execution starts here
+    initial_working_directory="$(pwd)"
+
+    # Check if we're in the right location
+    if is_main_repo; then
+        log_info "Running in main repo, executing protobuf generation directly"
+        exec ./bin/generate_protobufs "$@"
+    elif is_worktree_of_main_repo; then
+        log_info "Running in worktree, performing complex synchronization"
+        
+        if has_uncommitted_changes; then
+            log_info "Temporarily committing uncommitted changes"
+            git add -A
+            git commit -m "WIP before-protogen" --no-verify
+        fi
+        
+        branch_name_from_worktree="$(git branch --show-current)"
+        log_info "Working on branch: $branch_name_from_worktree"
+        
+        log_info "Switching to main repo directory"
+        cd "$MAIN_REPO_PATH"
+        
+        if has_uncommitted_changes; then
+            log_error "Would be dangerous to continue due to potentially losing other work in the main repo"
+            cleanup_and_exit 1
+        fi
+        
+        original_git_branch_in_main_worktree="$(git branch --show-current)"
+        log_info "Storing original branch: $original_git_branch_in_main_worktree"
+        
+        log_info "Checking out worktree branch: $branch_name_from_worktree"
+        git checkout "$branch_name_from_worktree" --ignore-other-worktrees
+        
+        log_info "Running protobuf generation"
+        if ./bin/generate_protobufs "$@"; then
+            log_info "Protobuf generation succeeded"
+            
+            log_info "Committing generated changes"
+            git add -A
+            git commit -m "WIP protogen" --no-verify
+            
+            log_info "Returning to original branch: $original_git_branch_in_main_worktree"
+            git checkout "$original_git_branch_in_main_worktree" --ignore-other-worktrees
+            
+            log_info "Returning to worktree directory"
+            cd "$initial_working_directory"
+            
+            log_info "Pulling in changes and cleaning up temporary commits"
+            git checkout HEAD
+            git reset --hard
+            git reset --mixed HEAD~1
+            
+            cleanup_and_exit 0
+        else
+            protogen_exit_code="$?"
+            log_error "Protobuf generation failed"
+            
+            log_info "Cleaning up after failure"
+            git reset --hard
+            git checkout "$original_git_branch_in_main_worktree"
+            
+            log_info "Returning to worktree directory"
+            cd "$initial_working_directory"
+            
+            log_error "Unable to generate protobuf due to error in ./bin/generate_protobufs"
+            cleanup_and_exit "$protogen_exit_code"
+        fi
+        
+    else
+        log_error "This script must be run from either ~/src/github.com/monzo/wearedev or a worktree of that repo"
+        exit 1
+    fi
+  '';
+
   linear-get = pkgs.writeShellScriptBin "linear-get" ''
     if [ $# -ne 1 ]; then
         echo "Usage: linear-get <ticket_url_or_branch>"
@@ -581,6 +779,7 @@ let
     pid
     pkgs.brag
     prod
+    protogen
     s
     s101
     shipl
@@ -589,6 +788,7 @@ let
     tdiff
     tpr
     wt
+    wt-helper
   ];
 
   mkOption = pkgs.lib.mkOption;
@@ -605,5 +805,16 @@ in
     };
   };
 
-  config.home.packages = if config.shell.work.enable then work_pkgs else [ ];
+  config = pkgs.lib.mkIf config.shell.work.enable {
+    home.packages = work_pkgs;
+    
+    # Source the wt function in bash and zsh
+    programs.bash.initExtra = ''
+      source ${wt}/bin/wt-function.sh
+    '';
+    
+    programs.zsh.initExtra = ''
+      source ${wt}/bin/wt-function.sh
+    '';
+  };
 }
