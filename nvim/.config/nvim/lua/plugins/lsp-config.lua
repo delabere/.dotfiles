@@ -9,7 +9,7 @@ local servers = {
   -- "html",
   "svelte",
   "gopls",
-  "protols",
+  -- "protols",
   -- "pbls", -- protobuf
   -- "buf_ls",
   -- "htmx",
@@ -40,9 +40,17 @@ return {
         filetypes = { "go", "yml" },
       })
 
-      vim.lsp.config("protols", {
-        root_dir = service_root_dir,
+      -- vim.lsp.config("protols", {
+      --   root_dir = service_root_dir,
+      -- })
+
+      vim.lsp.config("protols_go", {
+        cmd = { "protols", "serve", "--stdio", "--default-log-level", "info" },
+        filetypes = { "proto" },
+        root_markers = { ".git" },
       })
+
+      vim.lsp.enable("protols_go")
     end,
   },
 }
