@@ -1,5 +1,4 @@
 { config, pkgs, ... }:
-
 {
   services.caddy = {
     enable = true;
@@ -39,16 +38,16 @@
 #   virtualHosts."localhost".extraConfig = ''
 #     respond "Hello, world!"
 #   '';
-# # Define the virtual hosts
-# virtualHosts = {
-#   # This is your existing main domain configuration (as an example)
-#   "delabere.com" = {
-#     # Optional: extra configuration for the main domain
-#     extraConfig = ''
-#       root * /var/www/yourdomain.com
-#       file_server
-#     '';
-#   };
+#   # Define the virtual hosts
+#   virtualHosts = {
+#     # This is your existing main domain configuration (as an example)
+#     "delabere.com" = {
+#       # Optional: extra configuration for the main domain
+#       extraConfig = ''
+#         root * /var/www/yourdomain.com
+#         file_server
+#       '';
+#     };
 
 # # --- Add your new subdomain configuration here ---
 # "blog.yourdomain.com" = {
@@ -65,6 +64,6 @@
 # You can add more subdomains by creating new entries
 # "wiki.yourdomain.com" = { ... };
 
-# };
+# }
 
 # ... other NixOS configurations ...

@@ -14,9 +14,10 @@
       ./../../services/home-assistant.nix
       ./../../services/monitoring.nix
       ./../../services/samba.nix
+      ./../../services/caddy.nix
       # ./../../services/docker.nix
-      ./../../services/n8n.nix
-      ./../../services/silverbullet.nix
+      # ./../../services/n8n.nix
+      # ./../../services/silverbullet.nix
       # ./../../services/librechat_beta.nix
     ];
 
