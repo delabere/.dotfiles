@@ -22,8 +22,8 @@
   # in a module and be set by an option
   home.packages = with pkgs; [
     claude-code
-    nodePackages_latest.prettier
-    prettierd
+    # nodePackages_latest.prettier
+    # prettierd
     pyright
     rust-analyzer
     svelte-language-server

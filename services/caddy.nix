@@ -4,17 +4,27 @@
   services.caddy = {
     enable = true;
     virtualHosts."www.delabere.com".extraConfig = ''
-      respond "Hello, world you sucka!"
+      reverse_proxy 127.0.0.1:3002
     '';
     virtualHosts."delabere.com".extraConfig = ''
-      respond "Hello, world you sucka!"
+      reverse_proxy 127.0.0.1:3002
     '';
     virtualHosts."wubalubadubdub.delabere.com".extraConfig = ''
       respond "Hello, world wubalubadubdub!!"
     '';
     virtualHosts."n8n.delabere.com".extraConfig = ''
       reverse_proxy 127.0.0.1:5678
+
     ''; # n8n port
+    virtualHosts."breathe.delabere.com".extraConfig = ''
+      reverse_proxy 127.0.0.1:3001
+    '';
+    virtualHosts."property-pulse.delabere.com".extraConfig = ''
+      reverse_proxy 127.0.0.1:3003
+    '';
+    virtualHosts."pulse.delabere.com".extraConfig = ''
+      reverse_proxy 127.0.0.1:3003
+    '';
   };
   networking.firewall.allowedTCPPorts = [ 80 443 ];
 

@@ -74,7 +74,17 @@
         # N8N_SSL_CERT = "/services/brain.degu-vega.ts.net.crt";
         # N8N_SSL_KEY = "/services/brain.degu-vega.ts.net.key";
         # N8N_PROTOCOL = "https";
-        # WEBHOOK_URL = "https://brain.degu-vega.ts.net:8443/";
+        # to get this working I run
+        # sudo tailscale funnel 5678
+        # but that needs to stay up
+        # with a combination of env variables and a config files: https://tailscale.com/blog/docker-tailscale-guide
+        # it seems possible to have this open up by default.
+        # The other option here is to set up a reverse proxy which *might* be a better idea as it will 
+        # be reusable for my other applications (generally a good idea)
+        # if I can find a way to set up the reverse proxy configuration within the service config that would be a winner too
+
+        # https://blog.kolaente.de/2024/10/making-tailscale-services-available-on-the-public-internet-with-nixos/ to read later
+        WEBHOOK_URL = "https://n8n.delabere.com/"; # see caddy.nix
         # WEBHOOK_URL = "localhost:5678";
       };
       extraOptions = [
@@ -82,27 +92,45 @@
       ];
     };
 
-    supergateway = {
-      image = "supercorp/supergateway";
-      ports = [ "8000:8000" ];
+    # supergateway = {
+    #   image = "supercorp/supergateway";
+    #   ports = [ "8000:8000" ];
+    #
+    #   cmd = [
+    #     "--stdio"
+    #     "npx -y @modelcontextprotocol/server-filesystem ."
+    #     "--port"
+    #     "8000"
+    #     "--outputTransport"
+    #     "sse"
+    #     "--messagePath"
+    #     "/message"
+    #   ];
+    #   extraOptions = [
+    #     "--rm" # Remove container when it exits
+    #   ];
+    # };
 
-      # volumes = [
-      #   "n8n_data:/home/node/.n8n"
-      #   # "/home/delabere/.dotfiles/services:/services"
-      # ];
-      # ports = [ "5678:5678" ];
-      # cmd = [ "--tunnel" ];
-      # networks = [ "skynet" ];
+    todoist-mcp = {
+      image = "supercorp/supergateway";
+      ports = [ "8001:8001" ];
+
       cmd = [
         "--stdio"
-        "npx -y @modelcontextprotocol/server-filesystem ."
+        "npx @abhiz123/todoist-mcp-server"
+        # "npx -y @smithery/cli install @abhiz123/todoist-mcp-server"
         "--port"
-        "8000"
+        "8001"
         "--outputTransport"
         "sse"
         "--messagePath"
         "/message"
+        "--logLevel debug"
       ];
+
+      environment = {
+        TODOIST_API_TOKEN = "";
+      };
       extraOptions = [
         "--rm" # Remove container when it exits
       ];

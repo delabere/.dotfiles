@@ -84,7 +84,10 @@
               inherit system;
               modules = [
                 ./machines/oracle-free/configuration.nix
-                { nixpkgs.config.allowUnfree = true; }
+                {
+                  nixpkgs.config.allowUnfree = true;
+                  nixpkgs.overlays = [ (import ./overlay.nix inputs) ];
+                }
                 home-manager.nixosModules.home-manager
                 {
                   home-manager.useGlobalPkgs = true;
@@ -102,7 +105,10 @@
                 ./machines/brain/configuration.nix
                 agenix.nixosModules.default
                 nixarr.nixosModules.default
-                { nixpkgs.config.allowUnfree = true; }
+                {
+                  nixpkgs.config.allowUnfree = true;
+                  nixpkgs.overlays = [ (import ./overlay.nix inputs) ];
+                }
                 home-manager.nixosModules.home-manager
                 {
                   home-manager.useGlobalPkgs = true;
