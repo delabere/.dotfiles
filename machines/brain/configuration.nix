@@ -17,7 +17,8 @@
       ./../../services/caddy.nix
       # ./../../services/docker.nix
       # ./../../services/n8n.nix
-      # ./../../services/silverbullet.nix
+      ./../../services/silverbullet.nix
+      ./../../services/rclone.nix
       # ./../../services/librechat_beta.nix
     ];
 
@@ -99,7 +100,7 @@
     };
     groups = {
       media = {
-        members = [ "radarr" "sonarr" "plex" "transmission" "torrenter" ];
+        members = [ "radarr" "sonarr" "plex" "transmission" "torrenter" "prowlarr" ];
       };
     };
   };

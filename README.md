@@ -24,6 +24,9 @@ Build the following command depending on the configuration you need and run:
 nix run github:delabere/.dotfiles#switch.work
 ```
 
+On NixOS
+❯ sudo nixos-rebuild switch --flake .#brain
+
 ## Nvim setup
 Neovim gets installed as part of the home-manager setup. But it won't find your configuration in the default home directory (`~/.config/nvim/`) unless you stow the nvim directory first.
 
