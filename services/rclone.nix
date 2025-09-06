@@ -12,9 +12,7 @@
     serviceConfig.Type = "simple";
     path = with pkgs; [ rclone bash ];
     script = ''
-      echo "hello"
-      ${pkgs.rclone}/bin/rclone bisync /home/delabere/notes gdrive:notes --resync --create-empty-src-dirs --log-file=/home/delabere/rclone-sync.log --log-level INFO
-
+      ${pkgs.rclone}/bin/rclone bisync /home/delabere/notes gdrive:notes --resilient --create-empty-src-dirs
     '';
     serviceConfig.User = "delabere"; # run as your user
     serviceConfig.WorkingDirectory = "/home/delabere";
