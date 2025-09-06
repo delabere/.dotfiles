@@ -107,6 +107,7 @@
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default. wget
     stow
     gcc
+    # drive # you need to set this up manually once (or be smarter and use secrets) before the systemd service can sync for you
   ];
 
   nixpkgs.config.allowUnsupportedSystem = true;

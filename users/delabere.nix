@@ -27,5 +27,6 @@
     pyright
     rust-analyzer
     svelte-language-server
+    rclone
   ];
 }
