@@ -24,6 +24,9 @@
     virtualHosts."pulse.delabere.com".extraConfig = ''
       reverse_proxy 127.0.0.1:3003
     '';
+    virtualHosts."brain.degu-vega.ts.net".extraConfig = ''
+      reverse_proxy 0.0.0.0:4040
+    '';
   };
   networking.firewall.allowedTCPPorts = [ 80 443 ];
 

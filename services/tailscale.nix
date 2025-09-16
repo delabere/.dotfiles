@@ -9,6 +9,11 @@
 
   services.tailscale = {
     enable = true;
+
+    # allows caddy to get certificates from taiscale daemon
+    # https://tailscale.com/kb/1190/caddy-certificates
+    permitCertUid = "caddy";
+
     openFirewall = true;
     authKeyFile = config.age.secrets.tailscale-authkey.path;
     extraUpFlags = [
