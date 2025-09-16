@@ -74,4 +74,26 @@
   #     "/var/lib/tailscale"
   #   ];
   # };
+
+  # by default the certificates need renewing every 30 days
+  systemd.services.tailscale-cert = {
+    description = "Renew Tailscale certificates";
+    serviceConfig.Type = "simple";
+    path = with pkgs; [ tailscale ];
+    script = ''
+      ${pkgs.tailscale}/bin/tailscale cert
+    '';
+    serviceConfig.User = "delabere";
+    serviceConfig.WorkingDirectory = "/home/delabere";
+  };
+
+  systemd.timers.tailscale-cert = {
+    description = "Run Tailscale cert renewal daily";
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "daily";
+      Persistent = true;
+      Unit = "tailscale-cert.service";
+    };
+  };
 }
