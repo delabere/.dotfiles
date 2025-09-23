@@ -13,7 +13,8 @@
     };
     goprotomocker = {
       url = "github:delabere/goprotomocker";
-      inputs.nixpkgs.follows = "nixpkgs";
+      # temporary until this issue is resolved: https://github.com/golang/go/issues/74462
+      # inputs.nixpkgs.follows = "nixpkgs";
     };
     flake-utils = {
       url = "github:numtide/flake-utils";
