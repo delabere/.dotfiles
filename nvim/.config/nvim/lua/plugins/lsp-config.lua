@@ -33,9 +33,7 @@ return {
     enabled = path:new(os.getenv("HOME") .. "/src/github.com/monzo/wearedev"):exists(),
     config = function()
       vim.lsp.config("gopls", {
-        -- cmd = { "env", "GO111MODULE=off", "gopls", "-remote=auto" },
         cmd = { "env", "GO111MODULE=off", "gopls", "-remote=auto" },
-        -- cmd = { "env", "GO111MODULE=off", "gopls", "-remote=auto", "-rpc.trace", "serve", "--debug=localhost:6060" },
         root_dir = service_root_dir,
         filetypes = { "go", "yml" },
       })
