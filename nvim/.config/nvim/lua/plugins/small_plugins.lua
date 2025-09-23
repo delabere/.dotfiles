@@ -161,7 +161,7 @@ return {
   },
   "Hoffs/omnisharp-extended-lsp.nvim",
   {
-    "echasnovski/mini.surround",
+    "nvim-mini/mini.surround",
     version = "*",
     opts = {
       search_method = "cover_or_next",
@@ -178,5 +178,28 @@ return {
         suffix_next = "n", -- Suffix to search with "next" method
       },
     },
+  },
+  {
+    "nvimtools/none-ls.nvim",
+    opts = function()
+      local null_ls = require("null-ls")
+      local git_dir = vim.fs.root(0, ".git")
+      return {
+        debug = true,
+        sources = {
+          null_ls.builtins.diagnostics.semgrep.with({
+            extra_args = {
+              "--config=" .. git_dir .. "/static-check-rules",
+              "--severity=WARNING",
+              "--severity=ERROR",
+            },
+            timeout = 10000,
+            ignore_stderr = true,
+            method = null_ls.methods.DIAGNOSTICS_ON_SAVE,
+          }),
+          null_ls.builtins.diagnostics.buf,
+        },
+      }
+    end,
   },
 }
