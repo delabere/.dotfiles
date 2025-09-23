@@ -92,7 +92,7 @@ return {
   },
   {
     "nvim-neotest/neotest",
-    dependencies = { "nvim-neotest/neotest-go" },
+    dependencies = { "fredrikaverpil/neotest-golang" },
     config = function()
       -- get neotest namespace (api call creates or returns namespace)
       local neotest_ns = vim.api.nvim_create_namespace("neotest")
@@ -105,7 +105,7 @@ return {
         },
       }, neotest_ns)
 
-      local go_adapter = require("neotest-go")({
+      local go_adapter = require("neotest-golang")({
         experimental = {
           test_table = true,
         },
@@ -118,8 +118,11 @@ return {
         return this_file_directory
       end
 
+      ---@diagnostic disable-next-line: missing-fields
       require("neotest").setup({
         discovery = {
+          enabled = true,
+          concurrent = 15,
           filter_dir = function(name, rel_path, root)
             print("name: ", name, "rel_path", rel_path, "root", root)
             if root == "/Users/jackrickards/src/github.com/monzo/wearedev" then
