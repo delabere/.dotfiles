@@ -105,12 +105,7 @@ return {
         },
       }, neotest_ns)
 
-      local go_adapter = require("neotest-golang")({
-        experimental = {
-          test_table = true,
-        },
-        args = { "-count=1", "-timeout=60s" },
-      })
+      local go_adapter = require("neotest-golang")()
 
       go_adapter.root = function()
         local this_file_directory = vim.fn.fnamemodify(vim.fn.expand("%"), ":p:h")
@@ -141,7 +136,7 @@ return {
     keys = {
       { "<leader>t", "", desc = "+test" },
       { "<leader>tt", function() require("neotest").run.run(vim.fn.expand("%")) end, desc = "Run File", },
-      -- { "<leader>tT", function() require("neotest").run.run(vim.uv.cwd()) end, desc = "Run All Test Files" },
+      { "<leader>tT", function() require("neotest").run.run(vim.uv.cwd()) end, desc = "Run All Test Files" },
       { "<leader>tr", function() require("neotest").run.run() end, desc = "Run Nearest", },
       { "<leader>tl", function() require("neotest").run.run_last() end, desc = "Run Last", },
       { "<leader>ts", function() require("neotest").summary.toggle() end, desc = "Toggle Summary", },
