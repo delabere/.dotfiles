@@ -24,6 +24,15 @@
     virtualHosts."pulse.delabere.com".extraConfig = ''
       reverse_proxy 127.0.0.1:3003
     '';
+    virtualHosts."roam.delabere.com".extraConfig = ''
+      reverse_proxy 127.0.0.1:3004
+    '';
+    virtualHosts."www.get-roaming.com".extraConfig = ''
+      reverse_proxy 127.0.0.1:3004
+    '';
+    virtualHosts."get-roaming.com".extraConfig = ''
+      reverse_proxy 127.0.0.1:3004
+    '';
     virtualHosts."brain.degu-vega.ts.net".extraConfig = ''
       reverse_proxy 0.0.0.0:4040
     '';
