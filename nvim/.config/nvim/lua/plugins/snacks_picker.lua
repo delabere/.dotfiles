@@ -3,6 +3,15 @@ local oil = require("oil")
 
 local M = {}
 
+-- Helper function to get the directory from oil buffer or current file
+M.get_current_directory = function()
+  local oil_dir = oil.get_current_dir()
+  if oil_dir then
+    return oil_dir
+  end
+  return vim.fn.expand("%:p:h")
+end
+
 local path_join = function(...)
   local args = { ... }
   return table.concat(args, "/")
@@ -117,6 +126,10 @@ return {
   keys = {
         -- Custom/work
     { "<leader>fs", M.picker_goto_service_no_cd, desc = "Jump to Component"},
+        -- File/text search that respects oil directory
+    { "<leader><space>", function() Snacks.picker.files({ cwd = M.get_current_directory() }) end, desc = "Find Files (Oil-aware)" },
+    { "<leader>ff", function() Snacks.picker.files({ cwd = M.get_current_directory() }) end, desc = "Find Files (Oil-aware)" },
+    { "<leader>gs", function() Snacks.picker.grep({ cwd = M.get_current_directory() }) end, desc = "Grep (Oil-aware)" },
         -- LSP
     { "gd", function() Snacks.picker.lsp_definitions() end, desc = "Goto Definition" },
     { "gD", function() Snacks.picker.lsp_declarations() end, desc = "Goto Declaration" },
