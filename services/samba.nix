@@ -11,7 +11,8 @@
         "workgroup" = "WORKGROUP";
         "server string" = "smbnix";
         "netbios name" = "smbnix";
-        "map to guest" = "bad user";
+        "security" = "user";
+        "passdb backend" = "tdbsam";
       };
       "public" = {
         "path" = "/mnt/bigboi/share";
@@ -22,6 +23,17 @@
         "guest ok" = "yes";
         "create mask" = "0644";
         "directory mask" = "0755";
+      };
+      "delabere" = {
+        "path" = "/mnt/bigboi/share";
+        "browseable" = "yes";
+        "writable" = "yes";
+        "read only" = "no";
+        "valid users" = "delabere";
+        "force user" = "nobody";
+        "force group" = "nogroup";
+        "create mask" = "0664";
+        "directory mask" = "0775";
       };
     };
   };
