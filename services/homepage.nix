@@ -147,8 +147,8 @@
       { search = { provider = "google"; target = "_blank"; }; }
       { resources = { label = "system"; cpu = true; memory = true; }; }
       { resources = { label = "internal storage"; disk = [ "/" ]; }; }
-      { resources = { label = "external storage"; disk = [ "/mnt/bigboi" ]; }; }
-      { resources = { label = "external 2"; disk = [ "/mnt/external" ]; }; }
+      { resources = { label = "internal bigboi"; disk = [ "/mnt/bigboi" ]; }; }
+      { resources = { label = "external storage"; disk = [ "/mnt/external" ]; }; }
       {
         openmeteo = {
           label = "London";
