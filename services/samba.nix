@@ -13,6 +13,7 @@
         "netbios name" = "smbnix";
         "security" = "user";
         "passdb backend" = "tdbsam";
+        "follow symlinks" = "yes";
       };
       "public" = {
         "path" = "/mnt/bigboi/share";
@@ -34,6 +35,7 @@
         "force group" = "nogroup";
         "create mask" = "0664";
         "directory mask" = "0775";
+        "wide links" = "yes";
       };
     };
   };
