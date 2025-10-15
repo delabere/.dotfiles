@@ -20,7 +20,7 @@
   # if they have a more permanent place in the config then they should live
   # in a module and be set by an option
   home.packages = with pkgs; [
-    claude-code
+    # claude-code
     graphviz
     gotestsum
 
