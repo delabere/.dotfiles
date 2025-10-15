@@ -5,11 +5,19 @@
 }:
 let
   s = pkgs.writeShellScriptBin "s" ''
-    £ -e s101 "$*"
+    if [ -z "$*" ]; then
+      £ -e s101
+    else
+      £ -e s101 "$*"
+    fi
   '';
 
   p = pkgs.writeShellScriptBin "p" ''
-    £ -e prod "$*"
+    if [ -z "$*" ]; then
+      £ -e prod
+    else
+      £ -e prod "$*"
+    fi
   '';
 
   s101 = pkgs.writeShellScriptBin "s101" ''
