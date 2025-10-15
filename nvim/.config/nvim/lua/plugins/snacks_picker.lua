@@ -1,15 +1,25 @@
 local Snacks = require("snacks")
 local oil = require("oil")
+local helpers = require("config.helpers")
 
 local M = {}
 
--- Helper function to get the directory from oil buffer or current file
+-- Helper function to get the service root directory from oil buffer or current file
 M.get_current_directory = function()
   local oil_dir = oil.get_current_dir()
   if oil_dir then
-    return oil_dir
+    -- If in an oil buffer, find the service root from the oil directory
+    return helpers.find_service_root(oil_dir) or oil_dir
   end
-  return vim.fn.expand("%:p:h")
+
+  -- If in a regular file buffer, find the service root from the file path
+  local file_path = vim.fn.expand("%:p")
+  if file_path and file_path ~= "" then
+    return helpers.find_service_root(file_path) or vim.fn.expand("%:p:h")
+  end
+
+  -- Fallback to cwd
+  return vim.fn.getcwd()
 end
 
 local path_join = function(...)

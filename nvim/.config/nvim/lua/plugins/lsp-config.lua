@@ -1,5 +1,6 @@
 local lspconfig = require("lspconfig")
 local path = require("plenary.path")
+local helpers = require("config.helpers")
 
 local servers = {
   "pyright",
@@ -20,13 +21,6 @@ for _, lsp in ipairs(servers) do
   vim.lsp.enable(lsp)
 end
 
-local function service_root_dir(bufnr, cb)
-  local buffer_filepath = vim.api.nvim_buf_get_name(bufnr)
-  local root_markers = { "main.go", "README.md", "go.mod", "LICENSE" } -- Add more as needed
-  local root_directory = lspconfig.util.root_pattern(root_markers)(buffer_filepath)
-  cb(root_directory)
-end
-
 return {
   {
     dir = "~",
@@ -36,12 +30,12 @@ return {
         -- cmd = { "env", "GO111MODULE=off", "gopls", "-remote=auto" },
         cmd = { "env", "GO111MODULE=off", "gopls", "-remote=auto" },
         -- cmd = { "env", "GO111MODULE=off", "gopls", "-remote=auto", "-rpc.trace", "serve", "--debug=localhost:6060" },
-        root_dir = service_root_dir,
+        root_dir = helpers.service_root_dir_lsp,
         filetypes = { "go", "yml" },
       })
 
       -- vim.lsp.config("protols", {
-      --   root_dir = service_root_dir,
+      --   root_dir = helpers.service_root_dir_lsp,
       -- })
 
       vim.lsp.config("protols_go", {
