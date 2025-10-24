@@ -33,6 +33,12 @@
     virtualHosts."get-roaming.com".extraConfig = ''
       reverse_proxy 127.0.0.1:3004
     '';
+    virtualHosts."jack.delabere.com".extraConfig = ''
+      reverse_proxy 127.0.0.1:3005
+    '';
+    virtualHosts."jimmy.delabere.com".extraConfig = ''
+      reverse_proxy 127.0.0.1:3006
+    '';
     virtualHosts."brain.degu-vega.ts.net".extraConfig = ''
       reverse_proxy 0.0.0.0:4040
     '';
