@@ -15,7 +15,7 @@ let
   go_work_pkgs = with pkgs; [
     go_1_24
     gotest
-    goprotomocker
+    # goprotomocker
     gopls
   ];
 
