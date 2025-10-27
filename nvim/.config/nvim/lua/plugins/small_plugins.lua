@@ -73,9 +73,64 @@ return {
   { "ruanyl/vim-gh-line" },
   {
     "ruifm/gitlinker.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
 
     config = function()
-      require("gitlinker").setup()
+      local hosts = require("gitlinker.hosts")
+      local actions = require("gitlinker.actions")
+
+      -- Store the original github callback
+      local original_github_callback = hosts.get_github_type_url
+
+      -- Create a wrapper that prompts for branch choice
+      local function github_with_branch_prompt(url_data)
+        -- Store original rev
+        local original_rev = url_data.rev
+
+        -- Show prompt
+        vim.ui.select(
+          { "Current branch/commit", "master" },
+          {
+            prompt = "Generate permalink for:",
+          },
+          function(choice)
+            if not choice then
+              return
+            end
+
+            -- Modify rev if master is chosen
+            if choice == "master" then
+              url_data.rev = "master"
+            end
+
+            -- Generate URL with the original callback
+            local url = original_github_callback(url_data)
+
+            -- Copy to clipboard and notify
+            vim.fn.setreg("+", url)
+            vim.notify("Copied: " .. url)
+
+            -- Restore original rev for any subsequent calls
+            url_data.rev = original_rev
+          end
+        )
+
+        -- Return empty string to prevent default action_callback from running
+        return ""
+      end
+
+      require("gitlinker").setup({
+        callbacks = {
+          ["github.com"] = github_with_branch_prompt,
+        },
+        action_callback = function(url)
+          -- Don't do anything if url is empty (handled by our callback)
+          if url ~= "" then
+            actions.copy_to_clipboard(url)
+          end
+        end,
+        print_url = false,
+      })
     end,
   },
 
