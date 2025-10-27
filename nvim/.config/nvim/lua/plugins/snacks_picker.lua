@@ -139,7 +139,8 @@ return {
         -- File/text search that respects oil directory
     { "<leader><space>", function() Snacks.picker.files({ cwd = M.get_current_directory() }) end, desc = "Find Files (Oil-aware)" },
     { "<leader>ff", function() Snacks.picker.files({ cwd = M.get_current_directory() }) end, desc = "Find Files (Oil-aware)" },
-    { "<leader>gs", function() Snacks.picker.grep({ cwd = M.get_current_directory() }) end, desc = "Grep (Oil-aware)" },
+    { "<leader>sg", function() Snacks.picker.grep({ cwd = M.get_current_directory() }) end, desc = "Grep (Oil-aware)" },
+    { "<leader>sG", function() Snacks.picker.grep({ cwd = vim.fn.getcwd() }) end, desc = "Grep (Root Dir)" },
         -- LSP
     { "gd", function() Snacks.picker.lsp_definitions() end, desc = "Goto Definition" },
     { "gD", function() Snacks.picker.lsp_declarations() end, desc = "Goto Declaration" },
