@@ -15,6 +15,7 @@ local servers = {
   -- "buf_ls",
   -- "htmx",
   -- "tsserver",
+  -- "yaml-language-server",
 }
 
 for _, lsp in ipairs(servers) do
@@ -25,7 +26,7 @@ return {
   {
     dir = "~",
     enabled = path:new(os.getenv("HOME") .. "/src/github.com/monzo/wearedev"):exists(),
-    config = function()
+     caconfig = function() 
       vim.lsp.config("gopls", {
         -- cmd = { "env", "GO111MODULE=off", "gopls", "-remote=auto" },
         cmd = { "env", "GO111MODULE=off", "gopls", "-remote=auto" },
@@ -45,6 +46,20 @@ return {
       })
 
       vim.lsp.enable("protols_go")
+
+      vim.lsp.config("yamlls", {
+        settings = {
+          yaml = {
+            format = {
+              enable = true,
+            },
+            schemas = {
+              [vim.fn.expand("~") .. "/src/github.com/monzo/wearedev/libraries/cassandra/schema/schema.bundled.generated.json"] = "*/config/schema.yml",
+            },
+          },
+        },
+      })
+      vim.lsp.enable("yamlls")
     end,
   },
 }

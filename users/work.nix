@@ -31,6 +31,7 @@
     cargo # needed to compile pbls, protobuf lsp
     # protols
 
+    yaml-language-server
 
     scrcpy # for droid
   ];
