@@ -24,8 +24,10 @@
     fd.enable = true;
     git = {
       enable = true;
-      userName = "delabere";
-      userEmail = "jack.rickards@hotmail.co.uk";
+      settings.user = {
+        name = "delabere";
+        email = "jack.rickards@hotmail.co.uk";
+      };
     };
     zoxide = {
       enable = true;
@@ -238,7 +240,7 @@
     delve
     difftastic
     nixpkgs-fmt
-    sumneko-lua-language-server
+    lua-language-server
     # nodejs_20
     btop
     gh
