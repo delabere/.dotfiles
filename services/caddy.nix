@@ -39,6 +39,9 @@
     virtualHosts."jimmy.delabere.com".extraConfig = ''
       reverse_proxy 127.0.0.1:3006
     '';
+    virtualHosts."dev.roam.delabere.com".extraConfig = ''
+      reverse_proxy 127.0.0.1:3007
+    '';
     virtualHosts."brain.degu-vega.ts.net".extraConfig = ''
       reverse_proxy 0.0.0.0:4040
     '';
