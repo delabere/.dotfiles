@@ -60,6 +60,16 @@ return {
         },
       })
       vim.lsp.enable("yamlls")
+
+      -- Command to toggle between service-scoped and global LSP root
+      vim.api.nvim_create_user_command("LspToggleGlobalRoot", function()
+        helpers.use_global_lsp_root = not helpers.use_global_lsp_root
+        local mode = helpers.use_global_lsp_root and "global (wearedev)" or "service-scoped"
+        vim.notify("LSP root mode: " .. mode, vim.log.levels.INFO)
+
+        -- Restart gopls to apply new root directory
+        vim.cmd("LspRestart gopls")
+      end, { desc = "Toggle between service-scoped and global LSP root" })
     end,
   },
 }
