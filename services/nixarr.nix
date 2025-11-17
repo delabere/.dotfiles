@@ -28,6 +28,7 @@
         # peer-port-random-on-start = true;
         ratio-limit-enabled = true;
         ratio-limit = 1;
+        download-queue-size = 15;
       };
     };
   };
