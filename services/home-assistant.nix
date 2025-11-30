@@ -20,7 +20,8 @@
       "ecovacs"
       "speedtestdotnet"
       "met"
-      "tesla_fleet"
+      "tesla_fleet",
+      "bthome"
     ];
 
     customLovelaceModules = with pkgs.home-assistant-custom-lovelace-modules; [
