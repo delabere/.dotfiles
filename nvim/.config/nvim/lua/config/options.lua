@@ -36,6 +36,8 @@ vim.opt.expandtab = true -- On pressing tab, insert 4 spaces
 -- vim.opt.autochdir = true
 -- vim.api.nvim_command("set noswapfile")
 -- vim.opt.scrolloff = 16 -- starts page scrolling when n lines from top/bottom
+-- Set scroll distance for Ctrl-d/Ctrl-u to quarter of window height (half the default movement)
+vim.opt.scroll = 6
 vim.api.nvim_command("set nofoldenable") -- no folds please
 -- vim.opt.signcolumn = 'yes' --creates a dedicated column for git status so line numbers still show up
 -- vim.opt.ignorecase = true --ignore case in searching
