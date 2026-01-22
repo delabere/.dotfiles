@@ -91,15 +91,21 @@ let
     # Configuration
     WORKTREES_BASE="$HOME/projects/worktrees"
     USERNAME="jackrickards"
-    
+
     # Ensure worktrees directory exists
     mkdir -p "$WORKTREES_BASE"
-    
+
     # Function to get current repo name
     get_repo_name() {
         basename "$(git rev-parse --show-toplevel 2>/dev/null || echo "unknown")"
     }
-    
+
+    # Function to check if repo needs GOPATH structure
+    needs_gopath_structure() {
+        local repo="$1"
+        [[ "$repo" == "wearedev" ]]
+    }
+
     # Function to list existing worktrees for a repo
     list_worktrees() {
         local repo="$1"
@@ -107,49 +113,130 @@ let
             find "$WORKTREES_BASE/$repo" -maxdepth 1 -type d -name "*" -exec basename {} \; | grep -v "^$repo$" | sort
         fi
     }
-    
-    # Function to create or access a worktree
-    handle_worktree() {
+
+    # Function to get worktree path for a branch
+    get_worktree_path() {
         local repo="$1"
         local branch="$2"
-        
+
         # Check if branch already starts with username
         if [[ "$branch" == "$USERNAME-"* ]]; then
             local worktree_name="$branch"
         else
             local worktree_name="$USERNAME-$branch"
         fi
-        
-        local worktree_path="$WORKTREES_BASE/$repo/$worktree_name"
-        
+
+        local worktree_base="$WORKTREES_BASE/$repo/$worktree_name"
+
+        # Determine if we need GOPATH structure
+        if needs_gopath_structure "$repo"; then
+            echo "$worktree_base/src/github.com/monzo/wearedev"
+        else
+            echo "$worktree_base"
+        fi
+    }
+
+    # Function to create or access a worktree
+    handle_worktree() {
+        local repo="$1"
+        local branch="$2"
+
+        # Check if branch already starts with username
+        if [[ "$branch" == "$USERNAME-"* ]]; then
+            local worktree_name="$branch"
+        else
+            local worktree_name="$USERNAME-$branch"
+        fi
+
+        local worktree_base="$WORKTREES_BASE/$repo/$worktree_name"
+
+        # Determine if we need GOPATH structure
+        if needs_gopath_structure "$repo"; then
+            local worktree_path="$worktree_base/src/github.com/monzo/wearedev"
+        else
+            local worktree_path="$worktree_base"
+        fi
+
         # Create worktree if it doesn't exist
         if [ ! -d "$worktree_path" ]; then
             echo "Creating worktree: $worktree_name" >&2
-            
+
             # Create the base directory for this repo's worktrees
-            mkdir -p "$WORKTREES_BASE/$repo"
-            
-            # Create the worktree
-            git worktree add "$worktree_path" -b "$branch" >&2 2>/dev/null || git worktree add "$worktree_path" "$branch" >&2
-            
+            mkdir -p "$(dirname "$worktree_path")"
+
+            # Create the worktree based on master
+            git worktree add "$worktree_path" -b "$branch" master >&2 2>/dev/null || git worktree add "$worktree_path" "$branch" >&2
+
             # Copy .claude directory if it exists
             if [ -d ".claude" ]; then
                 cp -r .claude "$worktree_path/"
             fi
+
+            # For GOPATH repos, create .envrc and install proto tools
+            if needs_gopath_structure "$repo"; then
+                cat > "$worktree_base/.envrc" <<EOF
+# Auto-set GOPATH for this worktree
+export GOPATH="$worktree_base"
+echo "GOPATH set to: \$GOPATH"
+EOF
+                echo "Created .envrc at $worktree_base" >&2
+                echo "Run 'direnv allow $worktree_base' to enable auto GOPATH switching" >&2
+
+                # Install proto tools with the worktree's GOPATH
+                echo "Installing proto tools for worktree..." >&2
+                (cd "$worktree_path" && GOPATH="$worktree_base" ./bin/_install_proto_tools) >&2 2>&1 || echo "Warning: Failed to install proto tools" >&2
+            fi
         fi
-        
+
         echo "$worktree_path"
     }
-    
+
+    # Function to remove a worktree
+    remove_worktree() {
+        local repo="$1"
+        local branch="$2"
+
+        # Check if branch already starts with username
+        if [[ "$branch" == "$USERNAME-"* ]]; then
+            local worktree_name="$branch"
+        else
+            local worktree_name="$USERNAME-$branch"
+        fi
+
+        local worktree_base="$WORKTREES_BASE/$repo/$worktree_name"
+
+        # Determine if we need GOPATH structure
+        if needs_gopath_structure "$repo"; then
+            local worktree_path="$worktree_base/src/github.com/monzo/wearedev"
+        else
+            local worktree_path="$worktree_base"
+        fi
+
+        if [ ! -d "$worktree_path" ]; then
+            echo "Error: Worktree '$worktree_name' does not exist"
+            exit 1
+        fi
+
+        echo "Removing worktree: $worktree_name"
+        git worktree remove "$worktree_path" --force
+
+        # Clean up the base directory if it exists and is empty or only contains GOPATH structure
+        if [ -d "$worktree_base" ]; then
+            rm -rf "$worktree_base"
+            echo "Cleaned up worktree directory: $worktree_base"
+        fi
+    }
+
     # Main logic
     if [ $# -eq 0 ]; then
         echo "Usage: wt <branch> [command...]"
-        echo "       wt <branch>              # cd to worktree"
+        echo "       wt <branch>              # cd to worktree (creates if needed)"
         echo "       wt <branch> claude       # run Claude in worktree"
         echo "       wt <branch> git status   # run git status in worktree"
+        echo "       wt remove <branch>       # remove a worktree"
         echo ""
         echo "Current repo: $(get_repo_name)"
-        
+
         current_repo=$(get_repo_name)
         if [ "$current_repo" != "unknown" ]; then
             worktrees=$(list_worktrees "$current_repo")
@@ -160,33 +247,58 @@ let
         fi
         exit 0
     fi
-    
+
     # Auto-discover current repo
     REPO=$(get_repo_name)
     if [ "$REPO" = "unknown" ]; then
         echo "Error: Not in a git repository"
         exit 1
     fi
-    
+
+    # Handle remove subcommand
+    if [ "$1" = "remove" ]; then
+        if [ -z "$2" ]; then
+            echo "Error: Branch name required for remove"
+            echo "Usage: wt remove <branch>"
+            exit 1
+        fi
+        remove_worktree "$REPO" "$2"
+        exit 0
+    fi
+
     BRANCH="$1"
     shift 1
     COMMAND="$@"
-    
+
     if [ -z "$BRANCH" ]; then
         echo "Error: Branch name required"
         exit 1
     fi
-    
+
     # Handle the worktree (create if needed)
     WORKTREE_PATH=$(handle_worktree "$REPO" "$BRANCH")
-    
+
     if [ -n "$COMMAND" ]; then
         echo "Running: $COMMAND"
         echo "In: $WORKTREE_PATH"
-        cd "$WORKTREE_PATH" && eval "$COMMAND"
+
+        # For GOPATH repos, set GOPATH before running command
+        if needs_gopath_structure "$REPO"; then
+            # Extract worktree base (remove /src/github.com/monzo/wearedev suffix)
+            WORKTREE_BASE="''${WORKTREE_PATH%/src/github.com/monzo/wearedev}"
+            cd "$WORKTREE_PATH" && GOPATH="$WORKTREE_BASE" eval "$COMMAND"
+        else
+            cd "$WORKTREE_PATH" && eval "$COMMAND"
+        fi
     else
-        echo "Worktree ready: $WORKTREE_PATH"
-        echo "Run: cd \"$WORKTREE_PATH\""
+        # CD into worktree by spawning a new shell
+        echo "Entering worktree: $WORKTREE_PATH"
+        if needs_gopath_structure "$REPO"; then
+            WORKTREE_BASE="''${WORKTREE_PATH%/src/github.com/monzo/wearedev}"
+            cd "$WORKTREE_PATH" && GOPATH="$WORKTREE_BASE" exec $SHELL
+        else
+            cd "$WORKTREE_PATH" && exec $SHELL
+        fi
     fi
   '';
 
