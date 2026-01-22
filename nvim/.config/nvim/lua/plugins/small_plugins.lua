@@ -1,10 +1,7 @@
 return {
   {
     -- github PR reviews in nvim
-    -- "pwntester/octo.nvim",
-    -- TODO: go back to pwntester if my pr gets merged in
-    -- https://github.com/pwntester/octo.nvim/pull/538
-    "delabere/octo.nvim",
+    "pwntester/octo.nvim",
     dependencies = {
       "nvim-lua/plenary.nvim",
       "nvim-telescope/telescope.nvim",
@@ -13,6 +10,9 @@ return {
     cmd = "Octo",
     event = { { event = "BufReadCmd", pattern = "octo://*" } },
     opts = {
+      reviews = {
+        auto_show_threads = false,
+      },
       enable_builtin = true,
       use_local_fs = true,
       suppress_missing_scope = {
@@ -88,32 +88,28 @@ return {
         local original_rev = url_data.rev
 
         -- Show prompt
-        vim.ui.select(
-          { "Current branch/commit", "master" },
-          {
-            prompt = "Generate permalink for:",
-          },
-          function(choice)
-            if not choice then
-              return
-            end
-
-            -- Modify rev if master is chosen
-            if choice == "master" then
-              url_data.rev = "master"
-            end
-
-            -- Generate URL with the original callback
-            local url = original_github_callback(url_data)
-
-            -- Copy to clipboard and notify
-            vim.fn.setreg("+", url)
-            vim.notify("Copied: " .. url)
-
-            -- Restore original rev for any subsequent calls
-            url_data.rev = original_rev
+        vim.ui.select({ "Current branch/commit", "master" }, {
+          prompt = "Generate permalink for:",
+        }, function(choice)
+          if not choice then
+            return
           end
-        )
+
+          -- Modify rev if master is chosen
+          if choice == "master" then
+            url_data.rev = "master"
+          end
+
+          -- Generate URL with the original callback
+          local url = original_github_callback(url_data)
+
+          -- Copy to clipboard and notify
+          vim.fn.setreg("+", url)
+          vim.notify("Copied: " .. url)
+
+          -- Restore original rev for any subsequent calls
+          url_data.rev = original_rev
+        end)
 
         -- Return empty string to prevent default action_callback from running
         return ""
