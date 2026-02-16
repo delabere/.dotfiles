@@ -20,7 +20,7 @@
       "ecovacs"
       "speedtestdotnet"
       "met"
-      "tesla_fleet",
+      "tesla_fleet"
       "bthome"
     ];
 

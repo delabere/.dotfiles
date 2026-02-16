@@ -11,10 +11,6 @@
     virtualHosts."wubalubadubdub.delabere.com".extraConfig = ''
       respond "Hello, world wubalubadubdub!!"
     '';
-    virtualHosts."n8n.delabere.com".extraConfig = ''
-      reverse_proxy 127.0.0.1:5678
-
-    ''; # n8n port
     virtualHosts."breathe.delabere.com".extraConfig = ''
       reverse_proxy 127.0.0.1:3001
     '';
@@ -28,19 +24,22 @@
       reverse_proxy 127.0.0.1:3004
     '';
     virtualHosts."www.get-roaming.com".extraConfig = ''
-      reverse_proxy 127.0.0.1:3004
+      reverse_proxy 127.0.0.1:3010
     '';
     virtualHosts."get-roaming.com".extraConfig = ''
-      reverse_proxy 127.0.0.1:3004
-    '';
-    virtualHosts."jack.delabere.com".extraConfig = ''
-      reverse_proxy 127.0.0.1:3005
+      reverse_proxy 127.0.0.1:3010
     '';
     virtualHosts."jimmy.delabere.com".extraConfig = ''
       reverse_proxy 127.0.0.1:3006
     '';
     virtualHosts."dev.roam.delabere.com".extraConfig = ''
       reverse_proxy 127.0.0.1:3007
+    '';
+    virtualHosts."staging.delabere.com".extraConfig = ''
+      reverse_proxy 127.0.0.1:3009
+    '';
+    virtualHosts."production.delabere.com".extraConfig = ''
+      reverse_proxy 127.0.0.1:3010
     '';
     virtualHosts."brain.degu-vega.ts.net".extraConfig = ''
       reverse_proxy 0.0.0.0:4040
