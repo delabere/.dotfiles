@@ -12,7 +12,7 @@
       enable = true;
       wgConf = config.age.secrets."wg.conf".path;
     };
-    # jellyfin.enable = true;
+    jellyfin.enable = true;
     radarr.enable = true;
     bazarr.enable = true;
     prowlarr.enable = true;
@@ -42,6 +42,8 @@
     dataDir = "/data/.state/plex";
     openFirewall = true;
   };
+
+
 
 
   #   virtualisation = {
