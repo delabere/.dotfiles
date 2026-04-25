@@ -19,7 +19,7 @@
       # ./../../services/n8n.nix
       ./../../services/silverbullet.nix
       ./../../services/rclone.nix
-      # ./../../services/librechat_beta.nix
+      ./../../services/terminus.nix
     ];
 
 
@@ -131,7 +131,7 @@
         in
         lib.splitString "\n" contents;
 
-      delabereKeys = githubKeys "delabere" "sha256-auNnTulhj3ypQa7hTAfb5f7YJpV+IQK7ppC29x8lVfU=";
+      delabereKeys = githubKeys "delabere" "sha256-wsPveFxWULKyfw0n3vB8mGPJ7amjhreZT5bUO4KruH4=";
       # olehKeys = githubKeys "stolyaroleh" "sha256-nU4h0fTLZ8AThYk1V8X+sEyqUO3ly2kwRJEgmVho6TU=";
     in
     delabereKeys;
