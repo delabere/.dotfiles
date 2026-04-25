@@ -28,6 +28,7 @@
         name = "delabere";
         email = "jack.rickards@hotmail.co.uk";
       };
+      signing.format = null;
     };
     zoxide = {
       enable = true;
@@ -122,12 +123,6 @@
     bat = {
       enable = true;
       config.theme = "TwoDark";
-    };
-
-    neovim = {
-      enable = true;
-      vimAlias = true;
-      viAlias = true;
     };
 
     tmux = {
@@ -253,6 +248,7 @@
     watch
     xclip
     marksman
+    neovim
     #    pngpaste # for obsidian nvim plugin
     sesh
     nerd-fonts.jetbrains-mono
