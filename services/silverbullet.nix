@@ -8,6 +8,14 @@
     user = "delabere"; # files are stored in userspace
   };
   networking.firewall.allowedTCPPorts = [ 4040 ];
+
+  # we can move this out of silverbullet.nix later when it becomes a permanenet fixture
+  services.karakeep.enable = true;
+  services.karakeep.extraEnvironment = {
+    PORT = "4000";
+    OPENAI_API_KEY = "";
+  };
+
 }
 
 
