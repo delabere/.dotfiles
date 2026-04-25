@@ -12,6 +12,7 @@
       };
     };
   };
+  services.grafana.settings.security.secret_key = "";
 
   services.prometheus = {
     enable = true;
