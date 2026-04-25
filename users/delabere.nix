@@ -28,5 +28,6 @@
     rust-analyzer
     svelte-language-server
     rclone
+    gemini-cli
   ];
 }
