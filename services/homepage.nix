@@ -11,7 +11,7 @@
   services.homepage-dashboard = {
     allowedHosts = "*";
     enable = true;
-    environmentFile = config.age.secrets.homepage-env.path;
+    environmentFiles = [ config.age.secrets.homepage-env.path ];
     bookmarks = [{
       dev = [
         {
