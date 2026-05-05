@@ -57,7 +57,7 @@ end
 ---@param p snacks.Picker
 M.filter_test_files_new = function(p)
   p._test_filter = not p._test_filter
-  local pattern = p._test_filter and "!_test.go" or ""
+  local pattern = p._test_filter and "!_test.go !.pb.go" or ""
   p.matcher:init(pattern)
   p.input.filter.pattern = pattern
   p.matcher:run(p)
