@@ -262,7 +262,8 @@
         "home-manager": "home-manager_2",
         "nixarr": "nixarr",
         "nixpkgs": "nixpkgs",
-        "session-x": "session-x"
+        "session-x": "session-x",
+        "workmux": "workmux"
       }
     },
     "rust-overlay": {
@@ -406,6 +407,26 @@
       "original": {
         "owner": "rasmus-kirk",
         "repo": "website-builder",
+        "type": "github"
+      }
+    },
+    "workmux": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1778009406,
+        "narHash": "sha256-Fhfnbq/J1RVUCOCjLeUUjYn9WGljbgiwxUQeXeos2UM=",
+        "owner": "raine",
+        "repo": "workmux",
+        "rev": "0fd03893105d3444e1014de36434fa4639bdf6db",
+        "type": "github"
+      },
+      "original": {
+        "owner": "raine",
+        "repo": "workmux",
         "type": "github"
       }
     }
