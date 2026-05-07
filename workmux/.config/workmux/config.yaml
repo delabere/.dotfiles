@@ -1,0 +1,40 @@
+nerdfont: true
+agent: claude
+base_branch: master
+mode: session
+theme: phosphor-arcade
+
+panes:
+  - command: vim
+  - command: <agent>
+    focus: true
+    split: horizontal
+  - command: lg
+    split: vertical
+
+# wearedev requires GOPATH set so $GOPATH/src/github.com/monzo/wearedev resolves
+# to the repo checkout. We create a GOPATH overlay with a symlink back to the worktree.
+post_create:
+  - |
+    if [ "$(basename "$WM_PROJECT_ROOT")" = "wearedev" ]; then
+      GOPATH_ROOT="$HOME/projects/gopath-wt/$WM_HANDLE"
+      mkdir -p "$GOPATH_ROOT/src/github.com/monzo"
+      ln -sfn "$WM_WORKTREE_PATH" "$GOPATH_ROOT/src/github.com/monzo/wearedev"
+      cat > "$WM_WORKTREE_PATH/.envrc" <<ENVRC
+    export GOPATH="$GOPATH_ROOT"
+    PATH_add "$GOPATH_ROOT/bin"
+    ENVRC
+      direnv allow "$WM_WORKTREE_PATH"
+      GOPATH="$GOPATH_ROOT" ./bin/_install_proto_tools
+    fi
+
+pre_remove:
+  - |
+    if [ "$(basename "$WM_PROJECT_ROOT")" = "wearedev" ]; then
+      GOPATH_ROOT="$HOME/projects/gopath-wt/$WM_HANDLE"
+      rm -rf "$GOPATH_ROOT"
+    fi
+
+files:
+  copy:
+    - .claude/
