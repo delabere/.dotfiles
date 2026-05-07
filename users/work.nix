@@ -23,6 +23,7 @@
     # claude-code
     graphviz
     gotestsum
+    workmux
 
     # web
     nodejs_24
@@ -38,9 +39,15 @@
 
   programs = {
     zsh = {
+      shellAliases = {
+        w = "workmux";
+      };
       envExtra = ''
         # work configuration
         [ -f $HOME/src/github.com/monzo/starter-pack/zshenv ] && source $HOME/src/github.com/monzo/starter-pack/zshenv
+
+        # monzo worktree tool shell integration
+        [[ -f "$HOME/.config/monzo/worktree.zsh" ]] && source "$HOME/.config/monzo/worktree.zsh"
 
         # custom environment variables
         [ -f $HOME/.dotfiles/env.sh ] && source $HOME/.dotfiles/env.sh

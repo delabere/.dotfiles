@@ -1,10 +1,12 @@
 { session-x
 , brag
 , goprotomocker
+, workmux
 , ...
 } @ inputs: final: prev: {
   brag = brag.packages.${final.system}.default;
   goprotomocker = goprotomocker.packages.${final.system}.default;
+  workmux = workmux.packages.${final.system}.default;
 
   tmuxPlugins =
     prev.tmuxPlugins
