@@ -160,10 +160,15 @@
 
         set-option -g default-shell $SHELL
         # let copying use default clipboard
+
         unbind C-y
-        unbind C-p
         bind C-y run "tmux save-buffer - | xclip -i -sel clipboard"
+
+        unbind C-p
         bind C-p run "tmux set-buffer '$(xclip -o -sel clipboard)'; tmux paste-buffer"
+
+        unbind w
+        bind w new-window "/Users/jackrickards/.nix-profile/bin/workmux dashboard"
 
         # change window splits key
         unbind %
