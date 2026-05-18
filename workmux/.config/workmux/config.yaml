@@ -1,4 +1,13 @@
 nerdfont: true
+
+files:
+  symlink:
+    - vendor
+
+post_create:
+  - git ls-files -z vendor/ | xargs -0 git update-index --skip-worktree
+  - grep -qxF vendor "$(git rev-parse --git-common-dir)/info/exclude" || echo vendor >> "$(git rev-parse --git-common-dir)/info/exclude"
+
 agent: claude
 base_branch: master
 mode: session
