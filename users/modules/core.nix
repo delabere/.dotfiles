@@ -168,7 +168,7 @@
         bind C-p run "tmux set-buffer '$(xclip -o -sel clipboard)'; tmux paste-buffer"
 
         unbind w
-        bind w new-window "/Users/jackrickards/.nix-profile/bin/workmux dashboard"
+        bind w new-window "workmux dashboard"
 
         # change window splits key
         unbind %
