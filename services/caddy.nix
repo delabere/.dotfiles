@@ -39,7 +39,7 @@
       reverse_proxy 127.0.0.1:3009
     '';
     virtualHosts."production.delabere.com".extraConfig = ''
-      reverse_proxy 127.0.0.1:3010
+      reverse_proxy 127.0.0.1:3011
     '';
     virtualHosts."brain.degu-vega.ts.net".extraConfig = ''
       reverse_proxy 0.0.0.0:4040
