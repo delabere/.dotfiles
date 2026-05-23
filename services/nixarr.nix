@@ -21,6 +21,7 @@
       enable = true;
       flood.enable = true;
       vpn.enable = true;
+      peerPort = 51413;
       openFirewall = true;
       extraSettings = {
         download-dir = "/mnt/bigboi/torrents";
