@@ -161,6 +161,22 @@
   nixpkgs.config.allowUnsupportedSystem = true;
   nix = {
     extraOptions = "experimental-features = nix-command flakes";
+    gc = {
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-than 30d";
+    };
+    settings.auto-optimise-store = true;
+  };
+
+  # Custom service to keep only the last 20 system generations
+  systemd.services.nix-trim-generations = {
+    description = "Keep only the last 20 system generations";
+    serviceConfig.Type = "oneshot";
+    script = ''
+      ${pkgs.nix}/bin/nix-env --profile /nix/var/nix/profiles/system --delete-generations +20
+    '';
+    startAt = "weekly";
   };
 
   # sonarr won't work without these
