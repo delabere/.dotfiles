@@ -29,6 +29,9 @@
     virtualHosts."get-roaming.com".extraConfig = ''
       reverse_proxy 127.0.0.1:3010
     '';
+    virtualHosts."staging.get-roaming.com".extraConfig = ''
+      reverse_proxy 127.0.0.1:3013
+    '';
     virtualHosts."jimmy.delabere.com".extraConfig = ''
       reverse_proxy 127.0.0.1:3006
     '';
