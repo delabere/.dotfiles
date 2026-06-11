@@ -1,10 +1,7 @@
 nerdfont: true
 
-files:
-  symlink:
-    - vendor
-
 post_create:
+  - rm -rf vendor && ln -s ../../wearedev/vendor vendor
   - git ls-files -z vendor/ | xargs -0 git update-index --skip-worktree
   - grep -qxF vendor "$(git rev-parse --git-common-dir)/info/exclude" || echo vendor >> "$(git rev-parse --git-common-dir)/info/exclude"
 

@@ -39,9 +39,21 @@
 
   programs = {
     zsh = {
-      shellAliases = {
-        w = "workmux";
-      };
+      initExtra = ''
+        w() {
+          if [[ "$1" == "add" && -n "$2" && "$2" != origin/* ]]; then
+            local branch="$2"
+            shift 2
+            if git ls-remote --exit-code --heads origin "$branch" &>/dev/null; then
+              workmux add "origin/$branch" "$@"
+            else
+              workmux add "$branch" "$@"
+            fi
+          else
+            workmux "$@"
+          fi
+        }
+      '';
       envExtra = ''
         # work configuration
         [ -f $HOME/src/github.com/monzo/starter-pack/zshenv ] && source $HOME/src/github.com/monzo/starter-pack/zshenv
