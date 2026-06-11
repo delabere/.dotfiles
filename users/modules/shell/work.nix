@@ -69,11 +69,30 @@ let
 
   copypr = pkgs.writeShellScriptBin "copypr" ''
     echo "⏳    Reading pull request $1..."
-    content=$(gh pr view $1 --json title,url)
+    content=$(gh pr view $1 --json title,url,files)
     title=$(echo $content | jq -r .title)
     url=$(echo $content | jq -r .url)
-    echo -e ":octocat: $title\n:pr-arrow: $url" | pbcopy
-    echo "✅    Pull request copied to clipboard in Slack format."
+
+    additions=$(echo $content | jq '[.files[] | select(.path | test("/proto/.*\\.go$") | not) | .additions] | add // 0')
+    deletions=$(echo $content | jq '[.files[] | select(.path | test("/proto/.*\\.go$") | not) | .deletions] | add // 0')
+    lines=$((additions + deletions))
+
+    if [ "$lines" -lt 10 ]; then
+      animal="🐜"
+    elif [ "$lines" -lt 50 ]; then
+      animal="🐇"
+    elif [ "$lines" -lt 200 ]; then
+      animal="🐕"
+    elif [ "$lines" -lt 500 ]; then
+      animal="🦏"
+    elif [ "$lines" -lt 1000 ]; then
+      animal="🐋"
+    else
+      animal="🏔️"
+    fi
+
+    echo -e "$animal :octocat: $title (+$additions -$deletions)\n:pr-arrow: $url" | pbcopy
+    echo "✅    Copied to clipboard ($animal +$additions -$deletions, excluding proto)"
   '';
 
 
