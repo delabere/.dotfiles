@@ -8,7 +8,7 @@
       # Includes dependencies for a basic setup
       # https://www.home-assistant.io/integrations/default_config/
       default_config = { };
-      lovelace.mode = "storage";
+      lovelace.resource_mode = "yaml";
       automation = "!include automations.yaml";
       script = "!include scripts.yaml";
       scene = "!include scenes.yaml";
