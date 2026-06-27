@@ -29,5 +29,6 @@
     svelte-language-server
     rclone
     gemini-cli
+    codex
   ];
 }
