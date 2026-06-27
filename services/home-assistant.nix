@@ -22,6 +22,7 @@
       "met"
       "tesla_fleet"
       "bthome"
+      "homekit_controller"
     ];
 
     customLovelaceModules = with pkgs.home-assistant-custom-lovelace-modules; [
