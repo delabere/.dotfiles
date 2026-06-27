@@ -23,6 +23,9 @@
       "tesla_fleet"
       "bthome"
       "homekit_controller"
+      "androidtv_remote"
+      "radio_browser"
+      "cast"
     ];
 
     customLovelaceModules = with pkgs.home-assistant-custom-lovelace-modules; [
