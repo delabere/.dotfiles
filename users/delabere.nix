@@ -24,9 +24,6 @@
     claude-code
     # nodePackages_latest.prettier
     # prettierd
-    pyright
-    rust-analyzer
-    svelte-language-server
     rclone
     gemini-cli
     codex

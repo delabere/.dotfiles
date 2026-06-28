@@ -1,18 +1,5 @@
 return {
-  {
-    "mason-org/mason.nvim",
-    opts = {
-      ensure_installed = {
-        "black",
-        "debugpy",
-        "go-debug-adapter",
-        -- "gopls",
-        "pyright",
-        "rnix-lsp",
-        "shfmt",
-        "stylua",
-        -- "flake8",
-      },
-    },
-  },
+  { "mason-org/mason.nvim", enabled = false },
+  { "mason-org/mason-lspconfig.nvim", enabled = false },
+  { "jay-babu/mason-nvim-dap.nvim", enabled = false },
 }

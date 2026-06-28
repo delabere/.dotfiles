@@ -241,23 +241,36 @@
     inputs.agenix.packages."${system}".default
     alejandra
     inputs.brag
+    python312Packages.black
+    python312Packages.debugpy
     delve
     difftastic
     nixpkgs-fmt
+    python312Packages.isort
     lua-language-server
     # nodejs_20
     btop
+    cargo
     gh
     lazygit
     ranger
     ripgrep
+    ruff
+    rust-analyzer
+    rustfmt
+    shfmt
     stow
+    stylua
+    svelte-language-server
     tldr
     tree
+    tree-sitter
+    unzip
     watch
     xclip
     marksman
     neovim
+    pyright
     #    pngpaste # for obsidian nvim plugin
     sesh
     nerd-fonts.jetbrains-mono
