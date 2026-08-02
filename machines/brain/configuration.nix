@@ -190,6 +190,8 @@
     writeable = true;
     entrypoint = [ (lib.getExe pkgs.btop) ];
   };
+  systemd.services.ttyd.environment.LD_LIBRARY_PATH =
+    lib.makeLibraryPath [ pkgs.libwebsockets ];
 
   # allows users to use port 80 (required for hosting applications as a user)
   boot.kernel.sysctl."net.ipv4.ip_unprivileged_port_start" = 0;

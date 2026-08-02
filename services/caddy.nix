@@ -44,6 +44,12 @@
     virtualHosts."production.delabere.com".extraConfig = ''
       reverse_proxy 127.0.0.1:3011
     '';
+    virtualHosts."trmnl.delabere.com".extraConfig = ''
+      reverse_proxy 127.0.0.1:3012
+    '';
+    virtualHosts."compactor.delabere.com".extraConfig = ''
+      reverse_proxy 127.0.0.1:3014
+    '';
     virtualHosts."brain.degu-vega.ts.net".extraConfig = ''
       reverse_proxy 0.0.0.0:4040
     '';
