@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ pkgs, lib, ... }: {
   imports = [
     ./modules/modules.nix # optional extras, enabled through config options
     ./modules/core.nix # essentials which should be included in all configurations
@@ -15,6 +15,8 @@
     enable = true;
     work = true;
   };
+
+  tools.herdr.enable = true;
 
   # use this for packages that haven't permanently made it into this config
   # if they have a more permanent place in the config then they should live
@@ -39,7 +41,7 @@
 
   programs = {
     zsh = {
-      initExtra = ''
+      initContent = lib.mkAfter ''
         w() {
           if [[ "$1" == "add" && -n "$2" && "$2" != origin/* ]]; then
             local branch="$2"

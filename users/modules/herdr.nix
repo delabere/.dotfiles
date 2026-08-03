@@ -24,15 +24,47 @@ let
   herd = pkgs.writeShellScriptBin "herd" ''
     set -uo pipefail
 
+    config="$HOME/.config/herdr/config.toml"
+    stamp="$HOME/.config/herdr/.herd-config-stamp"
+    current=$(readlink "$config" 2>/dev/null || echo plain)
+
+    restart=0
+    args=()
+    for a in "$@"; do
+      if [ "$a" = "--restart" ]; then restart=1; else args+=("$a"); fi
+    done
+
+    if [ "$restart" -eq 1 ]; then
+      ${herdrBin} server stop >/dev/null 2>&1 || true
+      for _ in 1 2 3 4 5 6 7 8 9 10; do
+        ${herdrBin} status server 2>/dev/null | grep -q "status: running" || break
+        sleep 0.2
+      done
+    fi
+
+    if ${herdrBin} status server 2>/dev/null | grep -q "status: running"; then
+      # Live reload only covers theme and UI settings. The prefix and keybindings
+      # are bound when the server starts, so a stale server keeps serving the old
+      # keymap however many times the config is reloaded.
+      ${herdrBin} server reload-config >/dev/null 2>&1 || true
+      if [ -f "$stamp" ] && [ "$(cat "$stamp")" != "$current" ]; then
+        echo "herd: config changed since the server started." >&2
+        echo "herd: prefix/keybinding changes need: herd --restart" >&2
+      fi
+    else
+      # About to start a fresh server, which will read the current config.
+      printf '%s\n' "$current" > "$stamp"
+    fi
+
     if [ -z "''${TMUX:-}" ]; then
-      exec ${herdrBin} "$@"
+      exec ${herdrBin} ''${args[@]+"''${args[@]}"}
     fi
 
     session=$(${tmuxBin} display-message -p '#{session_id}')
     client=$(${tmuxBin} display-message -p '#{client_tty}')
 
     # Quote the launch command so the shell tmux spawns re-parses it correctly.
-    launch=$(printf '%q ' ${herdrBin} "$@")
+    launch=$(printf '%q ' ${herdrBin} ''${args[@]+"''${args[@]}"})
 
     # The session id is single-quoted so the spawned shell treats it literally
     # rather than expanding it as a positional parameter.
@@ -58,7 +90,10 @@ let
 
     base="''${HERD_BASE_BRANCH:-${cfg.baseBranch}}"
 
-    root=$(${pkgs.git}/bin/git rev-parse --show-toplevel)
+    # Resolve the primary checkout rather than the current one: --show-toplevel
+    # returns the worktree path when run from inside a linked worktree, which
+    # would nest new worktrees inside each other.
+    root=$(dirname "$(${pkgs.git}/bin/git rev-parse --path-format=absolute --git-common-dir)")
     repo=$(basename "$root")
 
     # Reproduce the repo's path relative to $HOME inside the worktree, so Go
@@ -66,7 +101,10 @@ let
     rel=''${root#"$HOME"/}
     path="${worktreeRoot}/$repo/$branch/$rel"
 
+    # --cwd pins the source repo to the primary checkout, so this works from
+    # inside a worktree workspace too, unlike the built-in new_worktree dialog.
     ${herdrBin} worktree create \
+      --cwd "$root" \
       --branch "$branch" \
       --base "$base" \
       --path "$path" \
@@ -153,9 +191,10 @@ in
       delivery = "herdr"
 
       [keys]
-      # Matches the tmux prefix, which is safe because tmux is detached while
-      # herdr is running.
-      prefix = "ctrl+a"
+      # Matches the tmux secondary prefix, which is the one that is comfortable
+      # on the split external keyboard. herdr supports a single prefix only:
+      # there is no equivalent of tmux's prefix2, so ctrl+a is not available here.
+      prefix = "ctrl+b"
 
       # Splits mirror the tmux bindings: v beside, x below.
       split_vertical = "prefix+v"
@@ -163,6 +202,15 @@ in
 
       # prefix+c is deliberately left unbound, as it is in tmux.
       new_tab = "prefix+t"
+
+      # Direct (prefix-less) pane movement, matching the ctrl+hjkl muscle memory
+      # that vim-tmux-navigator provides under tmux. herdr has no equivalent of
+      # that plugin, so these are intercepted globally and are NOT forwarded to
+      # the focused application: use <C-w>hjkl for splits inside nvim.
+      focus_pane_left = "ctrl+h"
+      focus_pane_down = "ctrl+j"
+      focus_pane_up = "ctrl+k"
+      focus_pane_right = "ctrl+l"
 
       detach = "prefix+d"
       zoom = "prefix+m"
@@ -176,16 +224,22 @@ in
       # Worktree-backed workspaces are the workmux equivalent. open_worktree
       # adopts worktrees that already exist on disk, including workmux's.
       new_worktree = "prefix+shift+g"
-      open_worktree = "prefix+alt+o"
+      open_worktree = "prefix+shift+o"
+
+      # Moved off prefix+shift+n, which creates a worktree workspace below.
+      new_workspace = "prefix+shift+e"
+
+      # alt chords are avoided throughout: they are terminal-dependent and this
+      # terminal is known to mis-deliver them as a lone escape.
 
       # Create a worktree workspace with the agent already running in it.
       [[keys.command]]
-      key = "prefix+alt+n"
+      key = "prefix+shift+n"
       type = "pane"
       command = "${herd-wt}/bin/herd-wt"
 
       [[keys.command]]
-      key = "prefix+alt+g"
+      key = "prefix+shift+l"
       type = "popup"
       command = "${pkgs.lazygit}/bin/lazygit"
       width = "90%"
