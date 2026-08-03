@@ -62,7 +62,7 @@
               ];
 
               extraSpecialArgs = {
-                inherit inputs system name brag;
+                inherit inputs name brag;
               };
             };
           homeConfigurations = {
@@ -97,7 +97,7 @@
                   home-manager.useGlobalPkgs = true;
                   home-manager.useUserPackages = true;
                   home-manager.users.delabere = import ./users/delabere.nix;
-                  home-manager.extraSpecialArgs = { inherit inputs system brag; };
+                  home-manager.extraSpecialArgs = { inherit inputs brag; };
                 }
               ];
             };
@@ -118,7 +118,7 @@
                   home-manager.useGlobalPkgs = true;
                   home-manager.useUserPackages = true;
                   home-manager.users.delabere = import ./users/delabere.nix;
-                  home-manager.extraSpecialArgs = { inherit inputs system brag; };
+                  home-manager.extraSpecialArgs = { inherit inputs brag; };
                 }
               ];
             };
