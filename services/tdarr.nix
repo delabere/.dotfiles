@@ -14,8 +14,8 @@
     };
 
     nodes.main = {
-      # Configure the first library and flow before allowing work to start.
-      startPaused = true;
+      # Resume queued work automatically when Tdarr starts.
+      startPaused = false;
       workers = {
         transcodeCPU = 1;
         transcodeGPU = 0;
