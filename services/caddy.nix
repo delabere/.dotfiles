@@ -50,6 +50,9 @@
     virtualHosts."compactor.delabere.com".extraConfig = ''
       reverse_proxy 127.0.0.1:3014
     '';
+    virtualHosts."ha.delabere.com".extraConfig = ''
+      reverse_proxy 127.0.0.1:8123
+    '';
     virtualHosts."brain.degu-vega.ts.net".extraConfig = ''
       reverse_proxy 0.0.0.0:4040
     '';

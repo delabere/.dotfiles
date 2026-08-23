@@ -10,6 +10,7 @@
       ./hardware-configuration.nix
       ./../../services/tailscale.nix
       ./../../services/nixarr.nix
+      ./../../services/tdarr.nix
       ./../../services/homepage.nix
       ./../../services/home-assistant.nix
       ./../../services/monitoring.nix
@@ -77,6 +78,13 @@
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
+
+  swapDevices = [
+    {
+      device = "/swapfile";
+      size = 16 * 1024;
+    }
+  ];
 
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
@@ -183,6 +191,7 @@
   nixpkgs.config.permittedInsecurePackages = [
     "dotnet-sdk-6.0.428"
     "aspnetcore-runtime-6.0.36"
+    "pnpm-9.15.9"
   ];
 
   services.ttyd = {

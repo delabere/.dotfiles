@@ -93,6 +93,17 @@
             };
           }
           {
+            Tdarr = {
+              icon = "tdarr.png";
+              href = "http://brain:8265";
+              description = "media transcoding";
+              widget = {
+                type = "tdarr";
+                url = "http://127.0.0.1:8265";
+              };
+            };
+          }
+          {
             HomeAssistant = {
               icon = "home-assistant.png";
               href = "http://brain:8123";

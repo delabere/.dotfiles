@@ -1,4 +1,4 @@
-{ config, pkgs, ... }: {
+{ config, lib, pkgs, ... }: {
 
   age.secrets = {
     "wg.conf" = {
@@ -15,7 +15,12 @@
     jellyfin.enable = true;
     radarr.enable = true;
     bazarr.enable = true;
-    prowlarr.enable = true;
+    prowlarr = {
+      enable = true;
+      # Virgin Media blocks several public indexer domains at the TLS layer.
+      # Route Prowlarr through the existing kill-switched WireGuard namespace.
+      vpn.enable = true;
+    };
     sonarr.enable = true;
     transmission = {
       enable = true;
@@ -34,8 +39,40 @@
     };
   };
 
-  # services.flaresolverr.enable = true;
-  # services.flaresolverr.openFirewall = true;
+  # Prowlarr uses FlareSolverr for indexers protected by Cloudflare. Keep it
+  # loopback-only: it provides an unrestricted browser proxy and should never
+  # be exposed to the LAN or internet.
+  services.flaresolverr = {
+    enable = true;
+    openFirewall = false;
+  };
+  systemd.services.flaresolverr.environment = {
+    HOST = "127.0.0.1";
+    LOG_LEVEL = "info";
+    LOG_HTML = "false";
+    TZ = config.time.timeZone;
+  };
+  # Prowlarr and FlareSolverr must share a network namespace so that the
+  # loopback-only proxy is reachable and both use the same VPN egress.
+  systemd.services.flaresolverr.vpnConfinement = {
+    enable = true;
+    vpnNamespace = "wg";
+  };
+
+  # Nixarr proxies VPN-confined Prowlarr through nginx. Its recommended proxy
+  # headers use `$host`, which drops the non-standard :9696 port and makes
+  # Prowlarr generate broken grab URLs. Reattach the fixed, trusted port.
+  services.nginx.virtualHosts."127.0.0.1:9696".locations."/" = {
+    recommendedProxySettings = lib.mkForce false;
+    extraConfig = ''
+      proxy_set_header Host $host:9696;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+      proxy_set_header X-Forwarded-Host $host:9696;
+      proxy_set_header X-Forwarded-Server $hostname;
+    '';
+  };
 
   # not provided by nixarr, but it makes sense to live here
   services.plex = {
@@ -43,38 +80,4 @@
     dataDir = "/data/.state/plex";
     openFirewall = true;
   };
-
-
-
-
-  #   virtualisation = {
-  #     podman = {
-  #       enable = true;
-  #
-  #       # Create a `docker` alias for podman, to use it as a drop-in replacement
-  #       dockerCompat = true;
-  #
-  #       # Required for containers under podman-compose to be able to talk to each other.
-  #       defaultNetwork.settings.dns_enabled = true;
-  #     };
-  #
-  #     # the flare-solverr package is not working on nix for darwin yet:
-  #     # https://github.com/NixOS/nixpkgs/issues/294789#issuecomment-2016820757
-  #     oci-containers = {
-  #       backend = "podman";
-  #       containers = {
-  #         flare-solvarr = {
-  #           image = "ghcr.io/flaresolverr/flaresolverr:latest";
-  #           autoStart = true;
-  #           ports = [ "127.0.0.1:8191:8191" ];
-  #           environment = {
-  #             LOG_LEVEL = "info";
-  #             LOG_HTML = "false";
-  #             CAPTCHA_SOLVER = "hcaptcha-solver";
-  #             # TZ = "America/New_York";
-  #           };
-  #         };
-  #       };
-  #     };
-  #   };
 }
