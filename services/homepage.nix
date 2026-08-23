@@ -46,6 +46,13 @@
             };
           }
           {
+            Jellyfin = {
+              icon = "jellyfin.png";
+              href = "http://brain:8096";
+              description = "media streaming";
+            };
+          }
+          {
             Radarr = {
               icon = "radarr.png";
               href = "http://brain:7878";
@@ -141,6 +148,20 @@
               icon = "terminal.png";
               href = "http://brain:7681";
               description = "btop";
+            };
+          }
+          {
+            Terminus = {
+              icon = "mdi-monitor-dashboard";
+              href = "http://brain:2300";
+              description = "TRMNL management";
+            };
+          }
+          {
+            Compactor = {
+              icon = "https://compactor.delabere.com/icon-192.png";
+              href = "https://compactor.delabere.com";
+              description = "tasks and ideas";
             };
           }
         ];
