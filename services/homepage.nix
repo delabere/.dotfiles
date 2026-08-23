@@ -150,12 +150,12 @@
       title = "ranger's dashboard";
       favicon = "https://jnsgr.uk/favicon.ico";
       headerStyle = "clean";
+      useEqualHeights = true;
       layout = {
         media = { style = "row"; columns = 3; };
       };
     };
     widgets = [
-      { search = { provider = "google"; target = "_blank"; }; }
       { resources = { label = "system"; cpu = true; memory = true; }; }
       { resources = { label = "internal storage"; disk = [ "/" ]; }; }
       { resources = { label = "internal bigboi"; disk = [ "/mnt/bigboi" ]; }; }
