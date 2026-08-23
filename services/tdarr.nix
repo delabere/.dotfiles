@@ -30,6 +30,9 @@
   users.users.tdarr.extraGroups = [ "render" "video" ];
 
   systemd.tmpfiles.rules = [
+    "d /data/.state/tdarr/nodes 0750 tdarr media -"
+    "d /data/.state/tdarr/nodes/main 0750 tdarr media -"
+    "d /data/.state/tdarr/nodes/main/configs 0750 tdarr media -"
     "d /mnt/bigboi/tdarr-cache 2770 tdarr media -"
   ];
 
