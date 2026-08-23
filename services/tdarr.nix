@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, pkgs, ... }:
 
 {
   services.tdarr = {
@@ -35,6 +35,11 @@
     "d /data/.state/tdarr/nodes/main/configs 0750 tdarr media -"
     "d /mnt/bigboi/tdarr-cache 2770 tdarr media -"
   ];
+
+  # Community plugins install their JavaScript dependencies with pnpm at
+  # runtime. pnpm requires a POSIX shell, which is not otherwise present in
+  # the hardened node service's PATH.
+  systemd.services.tdarr-node-main.path = lib.mkAfter [ pkgs.bash ];
 
   # The upstream NixOS module hardens the node with ProtectSystem=strict, so
   # explicitly grant writes only to the libraries and transcode cache.
