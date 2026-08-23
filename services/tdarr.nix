@@ -41,11 +41,17 @@
   # the hardened node service's PATH.
   systemd.services.tdarr-node-main.path = lib.mkAfter [ pkgs.bash ];
 
-  # The upstream NixOS module hardens the node with ProtectSystem=strict, so
-  # explicitly grant writes only to the libraries and transcode cache.
-  systemd.services.tdarr-node-main.serviceConfig.ReadWritePaths = lib.mkAfter [
-    "/mnt/bigboi/PlexMedia/Movies"
-    "/mnt/bigboi/PlexMedia/TV"
-    "/mnt/bigboi/tdarr-cache"
-  ];
+  systemd.services.tdarr-node-main.serviceConfig = {
+    # Use idle CPU freely, but yield to interactive media services under load.
+    CPUWeight = 10;
+    Nice = 10;
+
+    # The upstream NixOS module hardens the node with ProtectSystem=strict, so
+    # explicitly grant writes only to the libraries and transcode cache.
+    ReadWritePaths = lib.mkAfter [
+      "/mnt/bigboi/PlexMedia/Movies"
+      "/mnt/bigboi/PlexMedia/TV"
+      "/mnt/bigboi/tdarr-cache"
+    ];
+  };
 }
