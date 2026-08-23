@@ -15,6 +15,10 @@
     jellyfin.enable = true;
     radarr.enable = true;
     bazarr.enable = true;
+    seerr = {
+      enable = true;
+      openFirewall = true;
+    };
     prowlarr = {
       enable = true;
       # Virgin Media blocks several public indexer domains at the TLS layer.

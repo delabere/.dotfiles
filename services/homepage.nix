@@ -53,6 +53,13 @@
             };
           }
           {
+            Seerr = {
+              icon = "jellyseerr.png";
+              href = "http://brain:5055";
+              description = "media requests";
+            };
+          }
+          {
             Radarr = {
               icon = "radarr.png";
               href = "http://brain:7878";
