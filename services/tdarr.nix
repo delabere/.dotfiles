@@ -6,15 +6,12 @@
     dataDir = "/data/.state/tdarr";
     group = "media";
 
-    # Match the other media services: expose the UI on the home network so it
-    # can be opened directly from Homepage. Do not publish this port externally.
     server = {
       serverIP = "0.0.0.0";
       serverBindIP = true;
     };
 
     nodes.main = {
-      # Resume queued work automatically when Tdarr starts.
       startPaused = false;
       workers = {
         transcodeCPU = 1;
@@ -25,8 +22,6 @@
     };
   };
 
-  # Tdarr runs with the media group as its primary group. The supplementary
-  # groups expose the AMD render device for optional VAAPI transcoding.
   users.users.tdarr.extraGroups = [ "render" "video" ];
 
   systemd.tmpfiles.rules = [
@@ -36,18 +31,27 @@
     "d /mnt/bigboi/tdarr-cache 2770 tdarr media -"
   ];
 
-  # Community plugins install their JavaScript dependencies with pnpm at
-  # runtime. pnpm requires a POSIX shell, which is not otherwise present in
-  # the hardened node service's PATH.
+  # Community plugins install JavaScript dependencies at runtime and need a
+  # POSIX shell in the otherwise hardened node service's PATH.
   systemd.services.tdarr-node-main.path = lib.mkAfter [ pkgs.bash ];
 
   systemd.services.tdarr-node-main.serviceConfig = {
     # Use idle CPU freely, but yield to interactive media services under load.
     CPUWeight = 10;
     Nice = 10;
+    UMask = "0002";
 
-    # The upstream NixOS module hardens the node with ProtectSystem=strict, so
-    # explicitly grant writes only to the libraries and transcode cache.
+    ReadWritePaths = lib.mkAfter [
+      "/mnt/bigboi/PlexMedia/Movies"
+      "/mnt/bigboi/PlexMedia/TV"
+      "/mnt/bigboi/tdarr-cache"
+    ];
+  };
+
+  # Tdarr performs the final cache-to-library move in the server process, not
+  # the node process, so the server needs the same narrowly scoped write access.
+  systemd.services.tdarr-server.serviceConfig = {
+    UMask = "0002";
     ReadWritePaths = lib.mkAfter [
       "/mnt/bigboi/PlexMedia/Movies"
       "/mnt/bigboi/PlexMedia/TV"
