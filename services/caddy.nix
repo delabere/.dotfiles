@@ -56,8 +56,24 @@
     virtualHosts."brain.degu-vega.ts.net".extraConfig = ''
       reverse_proxy 0.0.0.0:4040
     '';
+    virtualHosts."podcasts.delabere.com".extraConfig = ''
+      # RSS, enclosures, transcripts, chapters, and artwork are public so
+      # third-party podcast clients can fetch them. Administration stays on
+      # the Tailscale-only listener below until MinusPod login is configured.
+      @admin path /api /api/* /ui /ui/*
+      handle @admin {
+        respond 404
+      }
+      handle {
+        header X-Robots-Tag "noindex, nofollow"
+        reverse_proxy 127.0.0.1:8000
+      }
+    '';
+    virtualHosts."https://brain.degu-vega.ts.net:8443".extraConfig = ''
+      reverse_proxy 127.0.0.1:8000
+    '';
   };
-  networking.firewall.allowedTCPPorts = [ 80 443 ];
+  networking.firewall.allowedTCPPorts = [ 80 443 8443 ];
 
 }
 #

@@ -35,6 +35,7 @@
       extraSettings = {
         download-dir = "/mnt/bigboi/torrents";
         incomplete-dir = "/mnt/bigboi/torrents/.incomplete";
+        rpc-host-whitelist = "brain,brain.degu-vega.ts.net";
         # peer-port-random-on-start = true;
         ratio-limit-enabled = true;
         ratio-limit = 1;

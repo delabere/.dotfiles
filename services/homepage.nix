@@ -98,11 +98,11 @@
           {
             Transmission = {
               icon = "transmission.png";
-              href = "http://192.168.1.11:9091";
+              href = "http://brain:9091";
               description = "torrents";
               widget = {
                 type = "transmission";
-                url = "http://192.168.1.11:9091";
+                url = "http://brain:9091";
               };
             };
           }
@@ -115,6 +115,13 @@
                 type = "tdarr";
                 url = "http://127.0.0.1:8265";
               };
+            };
+          }
+          {
+            MinusPod = {
+              icon = "mdi-podcast";
+              href = "https://brain.degu-vega.ts.net:8443/ui/";
+              description = "ad-free podcast feeds";
             };
           }
           {
