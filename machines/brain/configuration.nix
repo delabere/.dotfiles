@@ -17,6 +17,7 @@
       ./../../services/samba.nix
       ./../../services/caddy.nix
       ./../../services/docker.nix
+      ./../../services/minuspod.nix
       # ./../../services/n8n.nix
       ./../../services/silverbullet.nix
       ./../../services/rclone.nix
