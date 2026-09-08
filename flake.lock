@@ -294,11 +294,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1776544171,
-        "narHash": "sha256-ve1nZslZil30yWfrlzYGEMY9hRH2lJjoPuEBjwHvBz4=",
+        "lastModified": 1788252454,
+        "narHash": "sha256-PwLydbmzS/YJqtMRpc19FpeJP3zfgzM8P14WYr2zdoA=",
         "owner": "omerxx",
         "repo": "tmux-sessionx",
-        "rev": "c9aaa1d309791871b5e8c1f9bfb91ecc5fa7da3a",
+        "rev": "628575be60646f5712e4c8c2f76683b03b072515",
         "type": "github"
       },
       "original": {
