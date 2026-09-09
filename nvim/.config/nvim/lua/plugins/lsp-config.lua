@@ -42,7 +42,7 @@ return {
       vim.lsp.config("protols_go", {
         cmd = { "protols", "serve", "--stdio", "--default-log-level", "info" },
         filetypes = { "proto" },
-        root_markers = { ".git" },
+        root_dir = helpers.service_root_dir_lsp,
       })
 
       vim.lsp.enable("protols_go")
