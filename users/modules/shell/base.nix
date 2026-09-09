@@ -32,17 +32,12 @@ let
       echo "$(date +%d/%m/%Y) | $1" >> $HOME/learnit.txt
     fi
   '';
-  gitprune =
-    pkgs.writeShellScriptBin "gitprune" ''
-    '';
-
   _pkgs = [
     switch
     switch-remote
     todo
     note
     learnit
-    gitprune
   ];
 
   mkOption = pkgs.lib.mkOption;

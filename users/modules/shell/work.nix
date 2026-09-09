@@ -32,6 +32,153 @@ let
     shipper deploy local-changes --s101 --no-docker $1
   '';
 
+  gitprune = pkgs.writeShellApplication {
+    name = "gitprune";
+    runtimeInputs = with pkgs; [ git ];
+    text = ''
+      set -uo pipefail
+
+      repo="$HOME/src/github.com/monzo/wearedev"
+      force=false
+      assume_yes=false
+
+      usage() {
+        cat <<'EOF'
+      Usage: gitprune [--force] [--yes]
+
+      Remove every linked worktree registered to the wearedev repository. The
+      main worktree and all local branches are kept.
+
+        -f, --force  remove worktrees with uncommitted changes and unlock locked worktrees
+        -y, --yes    skip the confirmation prompt
+        -h, --help   show this help
+      EOF
+      }
+
+      while [ "$#" -gt 0 ]; do
+        case "$1" in
+          -f|--force)
+            force=true
+            ;;
+          -y|--yes)
+            assume_yes=true
+            ;;
+          -h|--help)
+            usage
+            exit 0
+            ;;
+          *)
+            printf 'Unknown option: %s\n\n' "$1" >&2
+            usage >&2
+            exit 2
+            ;;
+        esac
+        shift
+      done
+
+      if ! git -C "$repo" rev-parse --git-common-dir >/dev/null 2>&1; then
+        printf 'The wearedev repository was not found at %s.\n' "$repo" >&2
+        exit 1
+      fi
+
+      git -C "$repo" worktree prune --expire now
+
+      main_worktree=""
+      targets=()
+      while IFS= read -r -d "" field; do
+        case "$field" in
+          "worktree "*)
+            path="''${field#worktree }"
+            if [ -z "$main_worktree" ]; then
+              main_worktree="$path"
+            else
+              targets+=("$path")
+            fi
+            ;;
+        esac
+      done < <(git -C "$repo" worktree list --porcelain -z)
+
+      total="''${#targets[@]}"
+      if [ "$total" -eq 0 ]; then
+        printf 'No linked wearedev worktrees to remove.\n'
+        exit 0
+      fi
+
+      printf 'Main worktree: %s\n' "$main_worktree"
+      printf 'Linked worktrees to remove: %d\n' "$total"
+      for path in "''${targets[@]}"; do
+        printf '  %s\n' "$path"
+      done
+      printf '\nLocal branches will be kept.\n'
+
+      if [ "$force" = true ]; then
+        printf 'Force mode will discard uncommitted changes and unlock worktrees.\n'
+      fi
+
+      if [ "$assume_yes" = false ]; then
+        printf 'Continue? [y/N] '
+        read -r answer
+        case "$answer" in
+          y|Y|yes|YES)
+            ;;
+          *)
+            printf 'Cancelled.\n'
+            exit 0
+            ;;
+        esac
+      fi
+
+      completed=0
+      removed=0
+      failed=0
+      bar_width=30
+
+      draw_progress() {
+        label="$1"
+        percentage=$((completed * 100 / total))
+        filled=$((completed * bar_width / total))
+        empty=$((bar_width - filled))
+        filled_bar=$(printf '%*s' "$filled" "" | tr ' ' '=')
+        empty_bar=$(printf '%*s' "$empty" "")
+        printf '\r[%s%s] %3d%% (%d/%d) %s' \
+          "$filled_bar" "$empty_bar" "$percentage" "$completed" "$total" "$label"
+      }
+
+      draw_progress "Starting"
+
+      for path in "''${targets[@]}"; do
+        name="''${path##*/}"
+        remove_args=()
+
+        draw_progress "Removing $name"
+
+        if [ "$force" = true ]; then
+          git -C "$repo" worktree unlock "$path" >/dev/null 2>&1 || true
+          remove_args+=(--force)
+        fi
+
+        if output=$(git -C "$repo" worktree remove "''${remove_args[@]}" "$path" 2>&1); then
+          removed=$((removed + 1))
+          status="Removed $name"
+        else
+          failed=$((failed + 1))
+          status="Skipped $name"
+          printf '\r\033[2KUnable to remove %s:\n%s\n' "$path" "$output" >&2
+        fi
+
+        completed=$((completed + 1))
+        draw_progress "$status"
+      done
+
+      printf '\nRemoved %d worktree(s)' "$removed"
+      if [ "$failed" -gt 0 ]; then
+        printf '; skipped %d. Re-run with --force to remove them.\n' "$failed"
+        exit 1
+      fi
+      printf '.\n'
+    '';
+  };
+
   prod = pkgs.writeShellScriptBin "prod" ''
     shipper deploy --prod $1
   '';
@@ -647,6 +794,7 @@ let
     brag_old
     copypr
     deepl
+    gitprune
     linear
     linear-get
     linear-projects

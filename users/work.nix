@@ -6,6 +6,12 @@
 
   home.username = "jackrickards";
 
+  nix.gc = {
+    automatic = true;
+    frequency = "weekly";
+    options = "--delete-older-than 14d";
+  };
+
   shell = {
     base.enable = true;
     work.enable = true;
