@@ -37,6 +37,28 @@
         "directory mask" = "0775";
         "wide links" = "yes";
       };
+      "plex-media" = {
+        "path" = "/mnt/bigboi/PlexMedia";
+        "browseable" = "yes";
+        "writable" = "yes";
+        "read only" = "no";
+        "valid users" = "delabere";
+        "force user" = "nobody";
+        "force group" = "nogroup";
+        "create mask" = "0664";
+        "directory mask" = "0775";
+      };
+      "tdarr-cache" = {
+        "path" = "/mnt/bigboi/tdarr-cache";
+        "browseable" = "yes";
+        "writable" = "yes";
+        "read only" = "no";
+        "valid users" = "delabere";
+        "force user" = "nobody";
+        "force group" = "nogroup";
+        "create mask" = "0664";
+        "directory mask" = "0775";
+      };
     };
   };
 
