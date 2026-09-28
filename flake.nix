@@ -34,6 +34,10 @@
       url = "github:rasmus-kirk/nixarr";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -105,6 +109,7 @@
           packages.nixosConfigurations.brain =
             nixpkgs.lib.nixosSystem {
               inherit system;
+              specialArgs = { inherit inputs; };
               modules = [
                 ./machines/brain/configuration.nix
                 agenix.nixosModules.default
