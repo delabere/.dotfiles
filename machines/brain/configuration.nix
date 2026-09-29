@@ -165,9 +165,9 @@
     stow
     gcc
     lm_sensors
-    inputs.llm-agents.packages.${pkgs.system}.codex
-    inputs.llm-agents.packages.${pkgs.system}.claude-code
-    inputs.llm-agents.packages.${pkgs.system}.antigravity-cli
+    codex
+    claude-code
+    antigravity-cli
   ];
 
   nixpkgs.config.allowUnsupportedSystem = true;
