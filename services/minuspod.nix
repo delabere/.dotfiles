@@ -31,7 +31,7 @@ in
     volumes = [ "/data/.state/minuspod:/app/data:rw" ];
     extraOptions = [
       "--cpus=6"
-      "--memory=10g"
+      "--memory=4g"
       "--pids-limit=512"
       "--user=1000:1000"
       "--init"
