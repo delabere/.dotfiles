@@ -34,8 +34,8 @@
       url = "github:rasmus-kirk/nixarr";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    llm-agents = {
-      url = "github:numtide/llm-agents.nix";
+    darwin = {
+      url = "github:LnL7/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -47,6 +47,7 @@
     , brag
     , agenix
     , nixarr
+    , darwin
     , ...
     } @ inputs:
     flake-utils.lib.eachDefaultSystem
@@ -120,6 +121,26 @@
                 }
                 home-manager.nixosModules.home-manager
                 {
+                  home-manager.useGlobalPkgs = true;
+                  home-manager.useUserPackages = true;
+                  home-manager.users.delabere = import ./users/delabere.nix;
+                  home-manager.extraSpecialArgs = { inherit inputs brag; };
+                }
+              ];
+            };
+
+          packages.darwinConfigurations.Mac =
+            darwin.lib.darwinSystem {
+              inherit system;
+              specialArgs = { inherit inputs; };
+              modules = [
+                home-manager.darwinModules.home-manager
+                {
+                  nix.linux-builder.enable = true;
+                  services.nix-daemon.enable = true;
+                  nix.settings.trusted-users = [ "root" "delabere" ];
+                  nixpkgs.config.allowUnfree = true;
+                  nixpkgs.overlays = [ (import ./overlay.nix inputs) ];
                   home-manager.useGlobalPkgs = true;
                   home-manager.useUserPackages = true;
                   home-manager.users.delabere = import ./users/delabere.nix;
