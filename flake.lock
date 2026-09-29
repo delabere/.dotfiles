@@ -208,6 +208,22 @@
         "type": "indirect"
       }
     },
+    "nixpkgs-cached": {
+      "locked": {
+        "lastModified": 1790570722,
+        "narHash": "sha256-Avcz96Q+8OkfUIUXipBBVsQn19L622BtKP7mk6M+uls=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "419fe0f449b3fbe3bdd53d9840288db4509ec32e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "419fe0f449b3fbe3bdd53d9840288db4509ec32e",
+        "type": "github"
+      }
+    },
     "nixpkgs-lib": {
       "locked": {
         "dir": "lib",
@@ -236,6 +252,7 @@
         "home-manager": "home-manager",
         "nixarr": "nixarr",
         "nixpkgs": "nixpkgs",
+        "nixpkgs-cached": "nixpkgs-cached",
         "session-x": "session-x",
         "workmux": "workmux"
       }

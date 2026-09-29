@@ -3,6 +3,8 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
+    # Known-good cached commit for darwin.linux-builder to prevent cache misses on bleeding-edge nixos-unstable
+    nixpkgs-cached.url = "github:NixOS/nixpkgs/419fe0f449b3fbe3bdd53d9840288db4509ec32e";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -129,26 +131,31 @@
               ];
             };
 
-          packages.darwinConfigurations.Mac =
-            darwin.lib.darwinSystem {
-              inherit system;
-              specialArgs = { inherit inputs; };
-              modules = [
-                home-manager.darwinModules.home-manager
-                {
-                  nix.linux-builder.enable = true;
-                  services.nix-daemon.enable = true;
-                  nix.settings.trusted-users = [ "root" "delabere" ];
-                  nixpkgs.config.allowUnfree = true;
-                  nixpkgs.overlays = [ (import ./overlay.nix inputs) ];
-                  home-manager.useGlobalPkgs = true;
-                  home-manager.useUserPackages = true;
-                  home-manager.users.delabere = import ./users/delabere.nix;
-                  home-manager.extraSpecialArgs = { inherit inputs brag; name = "delabere"; };
-                }
-              ];
-            };
         }
-      );
+      ) // {
+        darwinConfigurations.Mac =
+          darwin.lib.darwinSystem {
+            system = "aarch64-darwin";
+            specialArgs = { inherit inputs; };
+            modules = [
+              home-manager.darwinModules.home-manager
+              {
+                nix.linux-builder.enable = true;
+                nix.linux-builder.package = inputs.nixpkgs-cached.legacyPackages.aarch64-darwin.darwin.linux-builder-x86_64;
+                nix.linux-builder.systems = [ "x86_64-linux" ];
+                ids.gids.nixbld = 30000;
+                system.stateVersion = 7;
+                nix.settings.trusted-users = [ "root" "delabere" ];
+                nix.settings.experimental-features = [ "nix-command" "flakes" ];
+                nixpkgs.config.allowUnfree = true;
+                users.users.delabere.home = "/Users/delabere";
+                home-manager.useGlobalPkgs = true;
+                home-manager.useUserPackages = true;
+                home-manager.users.delabere = import ./users/delabere.nix;
+                home-manager.extraSpecialArgs = { inherit inputs brag; name = "delabere"; };
+              }
+            ];
+          };
+      };
 }
 

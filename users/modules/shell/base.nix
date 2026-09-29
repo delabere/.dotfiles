@@ -6,7 +6,8 @@
 let
   switch = pkgs.writeShellScriptBin "switch" (
     if pkgs.stdenv.hostPlatform.isDarwin && name == "delabere" then ''
-      darwin-rebuild switch --flake ~/.dotfiles#packages.$(nix eval --raw --impure --expr builtins.currentSystem).darwinConfigurations.Mac
+      nix build ~/.dotfiles#darwinConfigurations.Mac.system \
+        && sudo ./result/sw/bin/darwin-rebuild switch --flake ~/.dotfiles#Mac
     '' else ''
       nix run ~/.dotfiles#switch.${name}
     ''
