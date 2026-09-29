@@ -21,6 +21,12 @@
   # if they have a more permanent place in the config then they should live
   # in a module and be set by an option
   home.packages = with pkgs; [
+    (pkgs.writeShellScriptBin "switch-brain" ''
+      nixos-rebuild switch --flake ~/.dotfiles#packages.x86_64-linux.nixosConfigurations.brain \
+        --build-host localhost \
+        --target-host delabere@brain \
+        --use-remote-sudo
+    '')
     claude-code
     # nodePackages_latest.prettier
     # prettierd

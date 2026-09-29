@@ -144,7 +144,7 @@
                   home-manager.useGlobalPkgs = true;
                   home-manager.useUserPackages = true;
                   home-manager.users.delabere = import ./users/delabere.nix;
-                  home-manager.extraSpecialArgs = { inherit inputs brag; };
+                  home-manager.extraSpecialArgs = { inherit inputs brag; name = "delabere"; };
                 }
               ];
             };

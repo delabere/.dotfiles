@@ -4,9 +4,13 @@
 , ...
 }:
 let
-  switch = pkgs.writeShellScriptBin "switch" ''
-    nix run ~/.dotfiles#switch.${name}
-  '';
+  switch = pkgs.writeShellScriptBin "switch" (
+    if pkgs.stdenv.isDarwin && name == "delabere" then ''
+      darwin-rebuild switch --flake ~/.dotfiles#packages.$(nix eval --raw --impure --expr builtins.currentSystem).darwinConfigurations.Mac
+    '' else ''
+      nix run ~/.dotfiles#switch.${name}
+    ''
+  );
 
   switch-remote = pkgs.writeShellScriptBin "switch-remote" ''
     nix run github:delabere/.dotfiles#switch.${name} --refresh
