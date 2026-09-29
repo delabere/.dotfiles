@@ -30,7 +30,6 @@
     extraComponents = [
       "shelly"
       "tuya"
-      "tado"
       "ecovacs"
       "speedtestdotnet"
       "met"
