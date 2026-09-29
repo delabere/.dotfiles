@@ -20,9 +20,21 @@
       ./../../services/minuspod.nix
       # ./../../services/n8n.nix
       ./../../services/silverbullet.nix
-      ./../../services/rclone.nix
+      ./../../services/notes-git.nix
       ./../../services/terminus.nix
+      ./../../services/vellum.nix
     ];
+
+  services.vellum.instances = {
+    main = {
+      domain = "vellum.delabere.com";
+      port = 7830;
+    };
+    # business = {
+    #   domain = "<business>.delabere.com";
+    #   port = 7831;
+    # };
+  };
 
 
   # Use the systemd-boot EFI boot loader.
@@ -178,8 +190,40 @@
       dates = "weekly";
       options = "--delete-older-than 30d";
     };
-    settings.auto-optimise-store = true;
+    settings = {
+      auto-optimise-store = true;
+      # Defaults (max-jobs=auto, cores=0) allow 16 jobs x 16 threads on this
+      # 16GB box, which already runs ~8GB into swap from services. Big builds
+      # then thrash swap until sshd and everything else stall for hours.
+      max-jobs = 2;
+      cores = 4;
+    };
+    # Builds yield CPU and IO to running services.
+    daemonCPUSchedPolicy = "batch";
+    daemonIOSchedClass = "idle";
   };
+
+  # Hard cap on build memory: a runaway build fails instead of freezing the box.
+  systemd.services.nix-daemon.serviceConfig = {
+    MemoryHigh = "5G";
+    MemoryMax = "6G";
+    MemorySwapMax = "2G";
+  };
+
+  # Kill the biggest offender before swap is exhausted, rather than thrashing.
+  services.earlyoom = {
+    enable = true;
+    freeMemThreshold = 5;
+    freeSwapThreshold = 10;
+    extraArgs = [
+      "--prefer" "^(cc1plus|cc1|rustc|ld|ld\\.lld|go|node|nix-build|ghc)$"
+      "--avoid" "^(sshd|tailscaled|systemd|systemd-journal|dockerd|containerd)$"
+    ];
+  };
+
+  # Keep remote access alive even under memory pressure.
+  systemd.services.sshd.serviceConfig.OOMScoreAdjust = -1000;
+  systemd.services.tailscaled.serviceConfig.OOMScoreAdjust = -1000;
 
   # Custom service to keep only the last 20 system generations
   systemd.services.nix-trim-generations = {
