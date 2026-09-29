@@ -90,49 +90,49 @@
               )
               homeConfigurations;
 
-          packages.nixosConfigurations.nixos =
-            nixpkgs.lib.nixosSystem {
-              inherit system;
-              modules = [
-                ./machines/oracle-free/configuration.nix
-                {
-                  nixpkgs.config.allowUnfree = true;
-                  nixpkgs.overlays = [ (import ./overlay.nix inputs) ];
-                }
-                home-manager.nixosModules.home-manager
-                {
-                  home-manager.useGlobalPkgs = true;
-                  home-manager.useUserPackages = true;
-                  home-manager.users.delabere = import ./users/delabere.nix;
-                  home-manager.extraSpecialArgs = { inherit inputs brag; };
-                }
-              ];
-            };
-
-          packages.nixosConfigurations.brain =
-            nixpkgs.lib.nixosSystem {
-              inherit system;
-              specialArgs = { inherit inputs; };
-              modules = [
-                ./machines/brain/configuration.nix
-                agenix.nixosModules.default
-                nixarr.nixosModules.default
-                {
-                  nixpkgs.config.allowUnfree = true;
-                  nixpkgs.overlays = [ (import ./overlay.nix inputs) ];
-                }
-                home-manager.nixosModules.home-manager
-                {
-                  home-manager.useGlobalPkgs = true;
-                  home-manager.useUserPackages = true;
-                  home-manager.users.delabere = import ./users/delabere.nix;
-                  home-manager.extraSpecialArgs = { inherit inputs brag; };
-                }
-              ];
-            };
-
         }
       ) // {
+        nixosConfigurations.nixos =
+          nixpkgs.lib.nixosSystem {
+            system = "x86_64-linux";
+            modules = [
+              ./machines/oracle-free/configuration.nix
+              {
+                nixpkgs.config.allowUnfree = true;
+                nixpkgs.overlays = [ (import ./overlay.nix inputs) ];
+              }
+              home-manager.nixosModules.home-manager
+              {
+                home-manager.useGlobalPkgs = true;
+                home-manager.useUserPackages = true;
+                home-manager.users.delabere = import ./users/delabere.nix;
+                home-manager.extraSpecialArgs = { inherit inputs brag; name = "delabere"; };
+              }
+            ];
+          };
+
+        nixosConfigurations.brain =
+          nixpkgs.lib.nixosSystem {
+            system = "x86_64-linux";
+            specialArgs = { inherit inputs; };
+            modules = [
+              ./machines/brain/configuration.nix
+              agenix.nixosModules.default
+              nixarr.nixosModules.default
+              {
+                nixpkgs.config.allowUnfree = true;
+                nixpkgs.overlays = [ (import ./overlay.nix inputs) ];
+              }
+              home-manager.nixosModules.home-manager
+              {
+                home-manager.useGlobalPkgs = true;
+                home-manager.useUserPackages = true;
+                home-manager.users.delabere = import ./users/delabere.nix;
+                home-manager.extraSpecialArgs = { inherit inputs brag; name = "delabere"; };
+              }
+            ];
+          };
+
         darwinConfigurations.Mac =
           darwin.lib.darwinSystem {
             system = "aarch64-darwin";
@@ -140,9 +140,7 @@
             modules = [
               home-manager.darwinModules.home-manager
               {
-                nix.linux-builder.enable = true;
-                nix.linux-builder.package = inputs.nixpkgs-cached.legacyPackages.aarch64-darwin.darwin.linux-builder-x86_64;
-                nix.linux-builder.systems = [ "x86_64-linux" ];
+                security.pam.services.sudo_local.touchIdAuth = true;
                 ids.gids.nixbld = 30000;
                 system.stateVersion = 7;
                 nix.settings.trusted-users = [ "root" "delabere" ];
