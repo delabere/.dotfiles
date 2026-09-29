@@ -25,7 +25,6 @@
     # nodePackages_latest.prettier
     # prettierd
     rclone
-    gemini-cli
     codex
   ];
 }
