@@ -72,6 +72,12 @@
     virtualHosts."https://brain.degu-vega.ts.net:8443".extraConfig = ''
       reverse_proxy 127.0.0.1:8000
     '';
+    virtualHosts."flashfriend.app".extraConfig = ''
+      redir https://delabere.com{uri}
+    '';
+    virtualHosts."www.flashfriend.app".extraConfig = ''
+      redir https://delabere.com{uri}
+    '';
   };
   networking.firewall.allowedTCPPorts = [ 80 443 8443 ];
 

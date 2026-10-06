@@ -5,8 +5,27 @@
 # Mirrors what `vellum hatch --docker` does (cli/src/lib/statefulset.ts): each
 # instance is three containers sharing the assistant's network namespace —
 # assistant (daemon), gateway (the only thing clients talk to) and
-# credential-executor. Only the gateway is published, on localhost, and Caddy
-# fronts it. Pair a phone with `sudo vellum-pair <instance>`.
+# credential-executor — plus a Caddy "edge" in the same namespace standing in
+# for the nginx edge `vellum tunnel` runs (cli/src/lib/nginx-ingress.ts): it
+# serves the web app and is what the gateway trusts as its proxy, because it
+# connects from loopback. Only the edge is published, on localhost, and the
+# host Caddy fronts it with TLS. Pair a phone with `sudo vellum-pair <instance>`.
+#
+# `vellum hatch` also stores the model API key and creates the
+# `<provider>-personal` connection the default profiles use; ANTHROPIC_API_KEY
+# in the environment is NOT picked up afterwards. For a new instance, once:
+#   docker exec vellum-<name>-assistant assistant inference providers create \
+#     anthropic-personal --provider anthropic --credential credential/anthropic/api_key
+#   docker exec -it vellum-<name>-assistant assistant credentials prompt \
+#     --service anthropic --field api_key   # asks for the key in the paired app
+# Both live in the workspace volume, so they survive restarts and upgrades.
+# Or run on Vellum credits instead: `sudo vellum-link <name>`.
+#
+# The web app served from the edge runs in "remote-gateway" mode, which blocks
+# every call to the Vellum platform (Vellum's own edge does the same), so the
+# app's "connect Google" style buttons fail. Connect OAuth providers from the
+# host instead; managed mode goes through Vellum's OAuth app once linked:
+#   sudo docker exec -it vellum-<name>-assistant assistant oauth connect google --no-browser
 
 let
   cfg = config.services.vellum;
@@ -15,16 +34,18 @@ let
   # Fixed by the images (packages/local-mode DEFAULT_PORTS).
   assistantPort = 7821;
   gatewayPort = 7830;
+  edgePort = 7840;
+  edgeImage = "caddy:2.11.4-alpine";
 
   instanceOpts = { name, ... }: {
     options = {
       domain = lib.mkOption {
         type = lib.types.str;
-        description = "Public hostname Caddy serves this assistant's gateway on.";
+        description = "Public hostname Caddy serves this assistant on.";
       };
       port = lib.mkOption {
         type = lib.types.port;
-        description = "Host port (bound to 127.0.0.1) the gateway is published on.";
+        description = "Host port (bound to 127.0.0.1) the edge is published on.";
       };
       version = lib.mkOption {
         type = lib.types.str;
@@ -52,6 +73,103 @@ let
     };
   };
 
+  # The web SPA (pair page, browser chat) that `vellum tunnel` serves from its
+  # nginx edge at /assistant/. The gateway itself only speaks /v1.
+  webDist = pkgs.fetchzip {
+    url = "https://registry.npmjs.org/@vellumai/web/-/web-${lib.removePrefix "v" cfg.version}.tgz";
+    hash = cfg.webHash;
+  };
+
+  # Per-instance copy of the SPA with its runtime config baked into index.html,
+  # as buildRemoteWebIndexHtml in cli/src/lib/nginx-ingress.ts does.
+  mkWebRoot = name: icfg:
+    let
+      webConfig = builtins.toJSON {
+        mode = "remote-gateway";
+        apiBaseUrl = "/v1";
+        platformDisabled = true;
+        disablePlatform = true;
+        assistantName = name;
+        assistantId = name;
+      };
+      script = "<script>window.__VELLUM_CONFIG__=${
+        builtins.replaceStrings [ "<" ">" ] [ "\\u003c" "\\u003e" ] webConfig
+      }</script>";
+    in
+    pkgs.runCommand "vellum-web-${name}" { } ''
+      cp -r ${webDist}/dist $out
+      chmod u+w $out $out/index.html
+      substituteInPlace $out/index.html --replace-fail '</head>' ${lib.escapeShellArg "${script}</head>"}
+      cp ${pkgs.writeText "config.json" webConfig} $out/__config.json
+    '';
+
+  # Host-only gateway routes the edge must never expose (DENYLIST_LOCATIONS).
+  deniedPaths = lib.concatMapStringsSep " " (p: "${p} ${p}/") [
+    "/auth/token"
+    "/v1/pair"
+    "/v1/pair/web-init"
+    "/v1/devices"
+    "/v1/devices/revoke"
+    "/v1/guardian/init"
+    "/v1/guardian/reset-bootstrap"
+    "/v1/remote-web/pairing-requests"
+    "/v1/remote-web/pairing-requests/approve"
+    "/v1/remote-web/pairing-requests/deny"
+    "/v1/remote-web/pairing-verification"
+  ] + " /assistant/__local/* /assistant/__gateway/* /assistant/__gateway-paired/*";
+
+  # Mirrors the nginx edge's buildRemoteWebIngressLocations. The host Caddy
+  # reaches it through Docker's port forwarding (a private-range peer), so its
+  # X-Forwarded-For is trusted to give the real client address.
+  mkEdgeCaddyfile = name: icfg: pkgs.writeText "vellum-${name}-edge.Caddyfile" ''
+    {
+      admin off
+      auto_https off
+      persist_config off
+      servers {
+        trusted_proxies static private_ranges
+      }
+    }
+
+    http://:${toString edgePort} {
+      @denied path ${deniedPaths}
+      handle @denied {
+        respond 404
+      }
+
+      @gateway path /healthz /readyz /v1/* /webhooks/*
+      handle @gateway {
+        reverse_proxy 127.0.0.1:${toString gatewayPort} {
+          header_up X-Vellum-Edge-Forwarded 1
+          header_up X-Vellum-Client-Ip {client_ip}
+          flush_interval -1
+        }
+      }
+
+      @root path / /assistant
+      redir @root /assistant/ 302
+
+      # Only the static SPA is compressed: the proxied API carries secrets
+      # alongside attacker-influenced content (BREACH).
+      handle_path /assistant/* {
+        root * /srv
+        @assets path /assets/*
+        @shell not path /assets/* /__config
+        header @assets Cache-Control "public, max-age=31536000, immutable"
+        header @shell Cache-Control "no-cache"
+        header /__config Cache-Control "no-store"
+        rewrite /__config /__config.json
+        try_files {path} /index.html
+        encode gzip
+        file_server
+      }
+
+      handle {
+        respond 404
+      }
+    }
+  '';
+
   mkInstance = name: icfg:
     let
       prefix = "vellum-${name}";
@@ -74,6 +192,9 @@ let
           environmentFiles = [ secretsFile ] ++ lib.optional (icfg.environmentFile != null) icfg.environmentFile;
           environment = {
             IS_CONTAINERIZED = "true";
+            # Selects platform.vellum.ai (unset means dev-platform); the published
+            # CLI forwards this from the host.
+            VELLUM_ENVIRONMENT = "production";
             DEBUG_STDOUT_LOGS = "1";
             VELLUM_CLOUD = "docker";
             VELLUM_ASSISTANT_NAME = name;
@@ -89,7 +210,7 @@ let
             ASSISTANT_IPC_SOCKET_DIR = "/run/assistant-ipc";
             TZ = config.time.timeZone;
           } // icfg.extraEnvironment;
-          ports = [ "127.0.0.1:${toString icfg.port}:${toString gatewayPort}" ];
+          ports = [ "127.0.0.1:${toString icfg.port}:${toString edgePort}" ];
           volumes = [
             "${vol "workspace"}:/workspace"
             "${vol "socket"}:/run/ces-bootstrap"
@@ -104,6 +225,7 @@ let
           user = "0";
           environmentFiles = [ secretsFile ];
           environment = {
+            VELLUM_ENVIRONMENT = "production";
             VELLUM_WORKSPACE_DIR = "/workspace";
             GATEWAY_SECURITY_DIR = "/gateway-security";
             ASSISTANT_HOST = "localhost";
@@ -134,6 +256,20 @@ let
             "${vol "workspace"}:/workspace:ro"
             "${vol "socket"}:/run/ces-bootstrap"
             "${vol "ces-sec"}:/ces-security"
+          ];
+        };
+
+        "${prefix}-edge" = sidecar // {
+          image = edgeImage;
+          volumes = [
+            "${mkEdgeCaddyfile name icfg}:/etc/caddy/Caddyfile:ro"
+            "${mkWebRoot name icfg}:/srv:ro"
+          ];
+          extraOptions = sidecar.extraOptions ++ [
+            "--cap-drop=ALL"
+            # The image's caddy binary carries this file capability; exec fails without it.
+            "--cap-add=NET_BIND_SERVICE"
+            "--security-opt=no-new-privileges:true"
           ];
         };
       };
@@ -174,6 +310,30 @@ let
           after = [ init ];
           requires = [ init ];
         };
+
+        # Workspace config `vellum tunnel` would set: the public address used
+        # for OAuth callbacks and webhooks. Reapplied on every start.
+        "${prefix}-configure" = {
+          description = "Configure Vellum assistant '${name}'";
+          after = [ assistantUnit ];
+          bindsTo = [ assistantUnit ];
+          wantedBy = [ assistantUnit ];
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+          };
+          script = ''
+            for _ in $(seq 60); do
+              if ${docker} exec ${prefix}-assistant assistant config set \
+                  ingress.publicBaseUrl https://${icfg.domain}; then
+                exit 0
+              fi
+              sleep 5
+            done
+            echo "assistant never became ready" >&2
+            exit 1
+          '';
+        };
         # Sidecars live in the assistant's network namespace, so they must
         # restart whenever it does.
         "docker-${prefix}-gateway" = {
@@ -184,10 +344,16 @@ let
           bindsTo = [ assistantUnit ];
           partOf = [ assistantUnit ];
         };
+        "docker-${prefix}-edge" = {
+          bindsTo = [ assistantUnit ];
+          partOf = [ assistantUnit ];
+        };
       };
 
       caddy."${icfg.domain}".extraConfig = ''
-        reverse_proxy 127.0.0.1:${toString icfg.port}
+        reverse_proxy 127.0.0.1:${toString icfg.port} {
+          flush_interval -1
+        }
       '';
     };
 
@@ -230,13 +396,43 @@ let
       echo "Expires:   $(jq -r .expiresAt <<<"$challenge")"
     '';
   };
+
+  # Link an instance to a Vellum Platform account so it runs on Vellum credits.
+  vellumLink = pkgs.writeShellApplication {
+    name = "vellum-link";
+    runtimeInputs = with pkgs; [ config.virtualisation.docker.package jq curl openssl coreutils gnused ];
+    text = ''
+      declare -A domains=(${lib.concatStrings (lib.mapAttrsToList (n: d: "[${n}]=${d} ") domains)})
+      VELLUM_VERSION=${cfg.version}
+    '' + builtins.readFile ./vellum-link.sh;
+  };
 in
 {
+  # Upgrading Vellum: bump `version` and `webHash` together.
+  #   1. Pick a tag that exists for all three images (they release in
+  #      lockstep, and the web app is published to npm under the same version):
+  #        curl -s 'https://hub.docker.com/v2/repositories/vellumai/vellum-assistant/tags?page_size=5&ordering=last_updated' | jq -r '.results[].name'
+  #   2. Hash the matching web app (version without the leading "v"):
+  #        v=0.12.6; nix hash convert --hash-algo sha256 --to sri \
+  #          "$(nix-prefetch-url --unpack "https://registry.npmjs.org/@vellumai/web/-/web-$v.tgz")"
+  #      (or set webHash = lib.fakeHash, rebuild, and copy the "got:" hash).
+  #   3. Rebuild. Assistants migrate their own data on start; check
+  #      `journalctl -u docker-vellum-<name>-assistant` and `/readyz`.
+  #      If the edge misbehaves after an upgrade, diff DENYLIST_LOCATIONS and
+  #      buildRemoteWebIngressLocations in cli/src/lib/nginx-ingress.ts
+  #      upstream against mkEdgeCaddyfile / deniedPaths here.
+  # A per-instance `version` override only changes that instance's images; the
+  # web app always follows the top-level `version`.
   options.services.vellum = {
     version = lib.mkOption {
       type = lib.types.str;
-      default = "v0.12.5";
+      default = "v0.12.6";
       description = "Default image tag (see hub.docker.com/r/vellumai/vellum-assistant/tags).";
+    };
+    webHash = lib.mkOption {
+      type = lib.types.str;
+      default = "sha256-4a5t5d2LKe0OJbwzN6w1TCSpcifSkFN85oe05JIUCoA=";
+      description = "Hash of the @vellumai/web tarball matching `version`; bump alongside it.";
     };
     instances = lib.mkOption {
       type = lib.types.attrsOf (lib.types.submodule instanceOpts);
@@ -248,6 +444,6 @@ in
     virtualisation.oci-containers.containers = collect "containers";
     systemd.services = collect "services";
     services.caddy.virtualHosts = collect "caddy";
-    environment.systemPackages = [ vellumPair ];
+    environment.systemPackages = [ vellumPair vellumLink ];
   };
 }

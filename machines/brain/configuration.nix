@@ -27,13 +27,13 @@
 
   services.vellum.instances = {
     main = {
-      domain = "vellum.delabere.com";
+      domain = "vellum-main.delabere.com";
       port = 7830;
     };
-    # business = {
-    #   domain = "<business>.delabere.com";
-    #   port = 7831;
-    # };
+    business = {
+      domain = "vellum-business.delabere.com";
+      port = 7831;
+    };
   };
 
 
