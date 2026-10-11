@@ -79,15 +79,9 @@
       redir https://delabere.com{uri}
     '';
     virtualHosts."app.flashfriend.app".extraConfig = ''
-      basic_auth {
-        flashfriend $2a$14$SbweoB4zL6N6CV4G4hly9.3CSWAs3AYF3Xs.0GqImy0jn2SxmVG2e
-      }
       reverse_proxy 127.0.0.1:3015
     '';
     virtualHosts."app-staging.flashfriend.app".extraConfig = ''
-      basic_auth {
-        flashfriend $2a$14$SbweoB4zL6N6CV4G4hly9.3CSWAs3AYF3Xs.0GqImy0jn2SxmVG2e
-      }
       reverse_proxy 127.0.0.1:3016
     '';
   };
