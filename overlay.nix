@@ -30,4 +30,17 @@ in
       };
     });
   };
+  sesh = prev.sesh.overrideAttrs (old: {
+    nativeBuildInputs = builtins.filter (p: !(final.lib.hasInfix "mockery" (p.name or ""))) old.nativeBuildInputs;
+    preBuild = "";
+    doCheck = false;
+  });
+
+  pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
+    (pyFinal: pyPrev: {
+      anyio = pyPrev.anyio.overridePythonAttrs {
+        doCheck = false;
+      };
+    })
+  ];
 }

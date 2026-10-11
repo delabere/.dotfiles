@@ -33,7 +33,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixarr = {
-      url = "github:rasmus-kirk/nixarr";
+      # Pinned to PR #187 commit for Jellyfin 12.2 OpenAPI hash support
+      url = "github:rasmus-kirk/nixarr/9cc4ca8e0353eb2d7e147ea77087be36c88aaf66";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     darwin = {
