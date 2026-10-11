@@ -192,10 +192,14 @@
     };
     settings = {
       auto-optimise-store = true;
-      # Defaults (max-jobs=auto, cores=0) allow 16 jobs x 16 threads on this
-      # 16GB box, which already runs ~8GB into swap from services. Big builds
-      # then thrash swap until sshd and everything else stall for hours.
-      max-jobs = 2;
+      # Baseline services (grafana + ~7 node servers + 2 chromium renderers)
+      # now run ~8-9GB resident on their own. max-jobs=2 let two heavy C++
+      # builds (nodejs/v8 + onnxruntime) run at once, each allowed up to
+      # `cores` parallel compiles — that plus the baseline blew past 16GB
+      # and thrashed swap for hours despite the cgroup cap below (that cap
+      # only bounds the build's own footprint, not the whole box). Serialize
+      # builds instead so only one heavy compile competes with services.
+      max-jobs = 1;
       cores = 4;
     };
     # Builds yield CPU and IO to running services.
@@ -204,17 +208,21 @@
   };
 
   # Hard cap on build memory: a runaway build fails instead of freezing the box.
+  # Tightened from 6G/2G: with max-jobs=1 this still covers one big build, but
+  # leaves more headroom for the growing set of always-on services.
   systemd.services.nix-daemon.serviceConfig = {
-    MemoryHigh = "5G";
-    MemoryMax = "6G";
-    MemorySwapMax = "2G";
+    MemoryHigh = "3G";
+    MemoryMax = "4G";
+    MemorySwapMax = "1G";
   };
 
   # Kill the biggest offender before swap is exhausted, rather than thrashing.
+  # Raised from 10: trip earlier so we act well before swap is fully pinned
+  # and the box has already been unresponsive for a while.
   services.earlyoom = {
     enable = true;
-    freeMemThreshold = 5;
-    freeSwapThreshold = 10;
+    freeMemThreshold = 10;
+    freeSwapThreshold = 20;
     extraArgs = [
       "--prefer" "^(cc1plus|cc1|rustc|ld|ld\\.lld|go|node|nix-build|ghc)$"
       "--avoid" "^(sshd|tailscaled|systemd|systemd-journal|dockerd|containerd)$"
