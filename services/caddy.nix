@@ -72,11 +72,19 @@
     virtualHosts."https://brain.degu-vega.ts.net:8443".extraConfig = ''
       reverse_proxy 127.0.0.1:8000
     '';
+    # Flashfriend's marketing site (flashfriend repo: nix/deploy.nix, flashfriend-<env>-site units).
+    # Until the production site has been deployed, a 502 falls back to the old redirect.
     virtualHosts."flashfriend.app".extraConfig = ''
-      redir https://delabere.com{uri}
+      reverse_proxy 127.0.0.1:3017
+      handle_errors 502 {
+        redir https://delabere.com{uri}
+      }
     '';
     virtualHosts."www.flashfriend.app".extraConfig = ''
-      redir https://delabere.com{uri}
+      redir https://flashfriend.app{uri} permanent
+    '';
+    virtualHosts."staging.flashfriend.app".extraConfig = ''
+      reverse_proxy 127.0.0.1:3018
     '';
     virtualHosts."app.flashfriend.app".extraConfig = ''
       reverse_proxy 127.0.0.1:3015
