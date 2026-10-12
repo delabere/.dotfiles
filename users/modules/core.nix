@@ -244,12 +244,11 @@ in
     inputs.agenix.packages."${system}".default
     alejandra
     inputs.brag
-    python312Packages.black
-    python312Packages.debugpy
+    python3Packages.debugpy
     delve
     difftastic
     nixpkgs-fmt
-    python312Packages.isort
+    isort
     lua-language-server
     # nodejs_20
     btop
