@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ pkgs, config, ... }: {
   imports = [
     ./modules/modules.nix # optional extras, enabled through config options
     ./modules/core.nix # essentials which should be included in all configurations
@@ -27,4 +27,18 @@
     rclone
     codex
   ];
+
+  # Claude Code: use Opus for planning, Sonnet for execution.
+  # Merged into settings.json (rather than symlinked wholesale) so Claude
+  # Code can still rewrite the rest of the file itself (e.g. via /theme).
+  home.activation.claudeOpusPlan = config.lib.dag.entryAfter [ "writeBoundary" ] ''
+    settings="$HOME/.claude/settings.json"
+    mkdir -p "$(dirname "$settings")"
+    if [ -f "$settings" ]; then
+      tmp="$(mktemp)"
+      ${pkgs.jq}/bin/jq '.model = "opusplan"' "$settings" > "$tmp" && mv "$tmp" "$settings"
+    else
+      echo '{"model": "opusplan"}' | ${pkgs.jq}/bin/jq '.' > "$settings"
+    fi
+  '';
 }
