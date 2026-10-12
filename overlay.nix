@@ -36,11 +36,16 @@ in
     doCheck = false;
   });
 
-  pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
-    (pyFinal: pyPrev: {
+  # anyio's tests fail on python 3.12 here, so it isn't in the binary cache.
+  # Scoped to 3.12 only: overriding it via pythonPackagesExtensions changes
+  # anyio for every python, which knocks all of python 3.14 (Home Assistant,
+  # afdko, ...) out of the cache and rebuilds hundreds of packages.
+  python312 = prev.python312.override {
+    packageOverrides = pyFinal: pyPrev: {
       anyio = pyPrev.anyio.overridePythonAttrs {
         doCheck = false;
       };
-    })
-  ];
+    };
+  };
+  python312Packages = final.python312.pkgs;
 }
