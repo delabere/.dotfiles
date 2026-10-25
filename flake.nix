@@ -146,6 +146,14 @@
                 system.stateVersion = 7;
                 nix.settings.trusted-users = [ "root" "delabere" ];
                 nix.settings.experimental-features = [ "nix-command" "flakes" ];
+                # keep /nix/store from filling the disk: drop system generations
+                # older than two weeks and collect garbage every Sunday at 03:00
+                nix.gc = {
+                  automatic = true;
+                  interval = { Weekday = 0; Hour = 3; Minute = 0; };
+                  options = "--delete-older-than 14d";
+                };
+                nix.optimise.automatic = true;
                 nixpkgs.config.allowUnfree = true;
                 users.users.delabere.home = "/Users/delabere";
                 home-manager.useGlobalPkgs = true;

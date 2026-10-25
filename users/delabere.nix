@@ -13,6 +13,14 @@
 
   home.username = "delabere";
 
+  # home-manager generations live in the user profile, which the system gc
+  # doesn't prune, so expire them here too
+  nix.gc = {
+    automatic = true;
+    frequency = "weekly";
+    options = "--delete-older-than 14d";
+  };
+
   # if you disable this you will have to run the full switch command
   shell.base.enable = true;
   languages.go.enable = true;
