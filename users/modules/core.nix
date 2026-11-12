@@ -241,7 +241,7 @@ in
   programs.home-manager.enable = true;
 
   home.packages = with pkgs; [
-    inputs.agenix.packages."${system}".default
+    agenix
     alejandra
     inputs.brag
     # the lldb attach test fails in the darwin sandbox, so debugpy isn't cached there

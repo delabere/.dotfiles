@@ -13,6 +13,23 @@ let
     ''
   );
 
+  # Build brain's system on the Mac (the Rosetta builder VM does the x86_64
+  # work) and activate it over SSH, so brain never compiles anything itself.
+  #   build-brain             switch now
+  #   build-brain boot        activate on next reboot
+  #   build-brain build       build only, don't touch brain
+  #   build-brain switch -L   extra args go to nixos-rebuild
+  build-brain = pkgs.writeShellApplication {
+    name = "build-brain";
+    runtimeInputs = [ pkgs.nixos-rebuild-ng ];
+    text = ''
+      action=''${1:-switch}
+      [ $# -gt 0 ] && shift
+      exec nixos-rebuild "$action" --flake "$HOME/.dotfiles#brain" \
+        --target-host delabere@brain --elevate sudo --use-substitutes "$@"
+    '';
+  };
+
   switch-remote = pkgs.writeShellScriptBin "switch-remote" ''
     nix run github:delabere/.dotfiles#switch.${name} --refresh
   '';
@@ -43,7 +60,7 @@ let
     todo
     note
     learnit
-  ];
+  ] ++ pkgs.lib.optional (pkgs.stdenv.hostPlatform.isDarwin && name == "delabere") build-brain;
 
   mkOption = pkgs.lib.mkOption;
   types = pkgs.lib.types;

@@ -3,8 +3,6 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
-    # Known-good cached commit for darwin.linux-builder to prevent cache misses on bleeding-edge nixos-unstable
-    nixpkgs-cached.url = "github:NixOS/nixpkgs/419fe0f449b3fbe3bdd53d9840288db4509ec32e";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -171,11 +169,9 @@
             ];
           };
 
-        # The Rosetta builder's VM image is itself aarch64-linux, so the very
-        # first time it needs another Linux builder to build it. One-off:
-        #   sudo darwin-rebuild switch --flake ~/.dotfiles#Mac-bootstrap
-        #   sudo darwin-rebuild switch --flake ~/.dotfiles#Mac
-        # After that `#Mac` rebuilds the Rosetta builder with itself.
+        # The Rosetta builder rebuilds its own VM image. On a fresh Mac it needs
+        # another Linux builder the first time: switch once with
+        # `{ nix.linux-builder.enable = true; }` in place of the module below.
         darwinConfigurations.Mac = mkMac [
           inputs.nix-rosetta-builder.darwinModules.default
           {
@@ -187,16 +183,6 @@
               cores = 8;
               memory = "8GiB";
               diskSize = "60GiB";
-            };
-          }
-        ];
-
-        darwinConfigurations.Mac-bootstrap = mkMac [
-          {
-            nix.linux-builder = {
-              enable = true;
-              # pinned so the builder image comes from the binary cache
-              package = inputs.nixpkgs-cached.legacyPackages.aarch64-darwin.darwin.linux-builder;
             };
           }
         ];

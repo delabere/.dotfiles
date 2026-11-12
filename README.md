@@ -33,17 +33,17 @@ instead. The Mac runs `nix-rosetta-builder`, a Linux VM that builds
 `x86_64-linux` through Rosetta 2. It boots when a build needs it and powers
 off after 30 idle minutes.
 
-One-off setup (the builder's VM image needs a Linux builder to build it the first time):
-```sh
-sudo darwin-rebuild switch --flake ~/.dotfiles#Mac-bootstrap
-sudo darwin-rebuild switch --flake ~/.dotfiles#Mac
-```
+On a fresh Mac the builder's VM image needs another Linux builder the first
+time: switch once with `{ nix.linux-builder.enable = true; }` in place of the
+`nix-rosetta-builder` module, then switch back.
 
-Then, to update and deploy:
+To update and deploy:
 ```sh
 nix flake update
-nix run nixpkgs#nixos-rebuild-ng -- switch --flake ~/.dotfiles#brain \
-  --target-host delabere@brain --elevate sudo --use-substitutes
+build-brain            # = nixos-rebuild switch --flake ~/.dotfiles#brain \
+                       #     --target-host delabere@brain --elevate sudo --use-substitutes
+build-brain boot       # activate on next reboot instead
+build-brain build      # build only, don't touch brain
 ```
 Everything is built on the Mac. brain fetches what it can from cache.nixos.org
 (`--use-substitutes`), receives the rest over SSH, and only activates.
