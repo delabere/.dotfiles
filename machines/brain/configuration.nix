@@ -139,23 +139,13 @@
     settings.PermitRootLogin = "yes";
   };
 
+  # Copy of https://github.com/delabere.keys (it was hash-pinned before, so
+  # this is the same content). Reading a local file avoids fetching it during
+  # evaluation, which forced an x86_64-linux build before a deploy from the Mac
+  # could even start evaluating. Refresh with:
+  #   curl -fsSL https://github.com/delabere.keys > machines/brain/authorized_keys
   users.users."delabere".openssh.authorizedKeys.keys =
-    let
-      githubKeys = user: sha256:
-        let
-          file =
-            pkgs.fetchurl {
-              url = "https://github.com/${user}.keys";
-              sha256 = sha256;
-            };
-          contents = builtins.readFile file;
-        in
-        lib.splitString "\n" contents;
-
-      delabereKeys = githubKeys "delabere" "sha256-wsPveFxWULKyfw0n3vB8mGPJ7amjhreZT5bUO4KruH4=";
-      # olehKeys = githubKeys "stolyaroleh" "sha256-nU4h0fTLZ8AThYk1V8X+sEyqUO3ly2kwRJEgmVho6TU=";
-    in
-    delabereKeys;
+    lib.filter (k: k != "") (lib.splitString "\n" (builtins.readFile ./authorized_keys));
 
   #Open ports in the firewall. networking.firewall.allowedTCPPorts = [ ... ]; networking.firewall.allowedUDPPorts = [ ... ]; Or disable the firewall altogether. 
   networking.firewall.enable = false;
@@ -192,6 +182,9 @@
     };
     settings = {
       auto-optimise-store = true;
+      # Lets the Mac push closures it built (`nixos-rebuild --target-host`)
+      # without signing them.
+      trusted-users = [ "root" "delabere" ];
       # Baseline services (grafana + ~7 node servers + 2 chromium renderers)
       # now run ~8-9GB resident on their own. max-jobs=2 let two heavy C++
       # builds (nodejs/v8 + onnxruntime) run at once, each allowed up to

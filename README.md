@@ -27,6 +27,27 @@ nix run github:delabere/.dotfiles#switch.work
 On NixOS
 ❯ sudo nixos-rebuild switch --flake .#brain
 
+## Deploying brain from the Mac
+Building on brain itself can starve its services of memory, so build on the Mac
+instead. The Mac runs `nix-rosetta-builder`, a Linux VM that builds
+`x86_64-linux` through Rosetta 2. It boots when a build needs it and powers
+off after 30 idle minutes.
+
+One-off setup (the builder's VM image needs a Linux builder to build it the first time):
+```sh
+sudo darwin-rebuild switch --flake ~/.dotfiles#Mac-bootstrap
+sudo darwin-rebuild switch --flake ~/.dotfiles#Mac
+```
+
+Then, to update and deploy:
+```sh
+nix flake update
+nix run nixpkgs#nixos-rebuild-ng -- switch --flake ~/.dotfiles#brain \
+  --target-host delabere@brain --elevate sudo --use-substitutes
+```
+Everything is built on the Mac. brain fetches what it can from cache.nixos.org
+(`--use-substitutes`), receives the rest over SSH, and only activates.
+
 ## Nvim setup
 Neovim gets installed as part of the home-manager setup. But it won't find your configuration in the default home directory (`~/.config/nvim/`) unless you stow the nvim directory first.
 

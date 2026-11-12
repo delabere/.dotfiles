@@ -244,7 +244,12 @@ in
     inputs.agenix.packages."${system}".default
     alejandra
     inputs.brag
-    python3Packages.debugpy
+    # the lldb attach test fails in the darwin sandbox, so debugpy isn't cached there
+    (if stdenv.hostPlatform.isDarwin
+     then python3Packages.debugpy.overridePythonAttrs (old: {
+       disabledTests = (old.disabledTests or [ ]) ++ [ "test_lldb_command" ];
+     })
+     else python3Packages.debugpy)
     delve
     difftastic
     nixpkgs-fmt

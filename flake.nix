@@ -33,12 +33,16 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixarr = {
-      # Pinned to PR #187 commit for Jellyfin 12.2 OpenAPI hash support
-      url = "github:rasmus-kirk/nixarr/9cc4ca8e0353eb2d7e147ea77087be36c88aaf66";
+      url = "github:rasmus-kirk/nixarr";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     darwin = {
       url = "github:LnL7/nix-darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    # Linux VM on the Mac that builds x86_64-linux (brain) through Rosetta 2
+    nix-rosetta-builder = {
+      url = "github:cpick/nix-rosetta-builder";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -53,6 +57,39 @@
     , darwin
     , ...
     } @ inputs:
+    let
+      # nix-darwin config for the Mac; `extra` adds the Linux builder variant
+      mkMac = extra:
+        darwin.lib.darwinSystem {
+          system = "aarch64-darwin";
+          specialArgs = { inherit inputs; };
+          modules = [
+            home-manager.darwinModules.home-manager
+            {
+              security.pam.services.sudo_local.touchIdAuth = true;
+              ids.gids.nixbld = 30000;
+              system.stateVersion = 7;
+              nix.settings.trusted-users = [ "root" "delabere" ];
+              nix.settings.experimental-features = [ "nix-command" "flakes" ];
+              # keep /nix/store from filling the disk: drop system generations
+              # older than two weeks and collect garbage every Sunday at 03:00
+              nix.gc = {
+                automatic = true;
+                interval = { Weekday = 0; Hour = 3; Minute = 0; };
+                options = "--delete-older-than 14d";
+              };
+              nix.optimise.automatic = true;
+              nixpkgs.config.allowUnfree = true;
+              nixpkgs.overlays = [ (import ./overlay.nix inputs) ];
+              users.users.delabere.home = "/Users/delabere";
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.users.delabere = import ./users/delabere.nix;
+              home-manager.extraSpecialArgs = { inherit inputs brag; name = "delabere"; };
+            }
+          ] ++ extra;
+        };
+    in
     flake-utils.lib.eachDefaultSystem
       (
         system:
@@ -134,35 +171,34 @@
             ];
           };
 
-        darwinConfigurations.Mac =
-          darwin.lib.darwinSystem {
-            system = "aarch64-darwin";
-            specialArgs = { inherit inputs; };
-            modules = [
-              home-manager.darwinModules.home-manager
-              {
-                security.pam.services.sudo_local.touchIdAuth = true;
-                ids.gids.nixbld = 30000;
-                system.stateVersion = 7;
-                nix.settings.trusted-users = [ "root" "delabere" ];
-                nix.settings.experimental-features = [ "nix-command" "flakes" ];
-                # keep /nix/store from filling the disk: drop system generations
-                # older than two weeks and collect garbage every Sunday at 03:00
-                nix.gc = {
-                  automatic = true;
-                  interval = { Weekday = 0; Hour = 3; Minute = 0; };
-                  options = "--delete-older-than 14d";
-                };
-                nix.optimise.automatic = true;
-                nixpkgs.config.allowUnfree = true;
-                users.users.delabere.home = "/Users/delabere";
-                home-manager.useGlobalPkgs = true;
-                home-manager.useUserPackages = true;
-                home-manager.users.delabere = import ./users/delabere.nix;
-                home-manager.extraSpecialArgs = { inherit inputs brag; name = "delabere"; };
-              }
-            ];
-          };
+        # The Rosetta builder's VM image is itself aarch64-linux, so the very
+        # first time it needs another Linux builder to build it. One-off:
+        #   sudo darwin-rebuild switch --flake ~/.dotfiles#Mac-bootstrap
+        #   sudo darwin-rebuild switch --flake ~/.dotfiles#Mac
+        # After that `#Mac` rebuilds the Rosetta builder with itself.
+        darwinConfigurations.Mac = mkMac [
+          inputs.nix-rosetta-builder.darwinModules.default
+          {
+            nix-rosetta-builder = {
+              # boot the VM when a Linux build is queued, power it off when idle
+              onDemand = true;
+              onDemandLingerMinutes = 30;
+              # the Mac has 10 cores / 16GB; leave it room while building
+              cores = 8;
+              memory = "8GiB";
+              diskSize = "60GiB";
+            };
+          }
+        ];
+
+        darwinConfigurations.Mac-bootstrap = mkMac [
+          {
+            nix.linux-builder = {
+              enable = true;
+              # pinned so the builder image comes from the binary cache
+              package = inputs.nixpkgs-cached.legacyPackages.aarch64-darwin.darwin.linux-builder;
+            };
+          }
+        ];
       };
 }
-

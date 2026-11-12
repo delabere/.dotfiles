@@ -17,7 +17,7 @@
   # doesn't prune, so expire them here too
   nix.gc = {
     automatic = true;
-    frequency = "weekly";
+    dates = "weekly";
     options = "--delete-older-than 14d";
   };
 
