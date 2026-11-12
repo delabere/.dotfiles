@@ -256,6 +256,10 @@ let
             "${vol "workspace"}:/workspace:ro"
             "${vol "socket"}:/run/ces-bootstrap"
             "${vol "ces-sec"}:/ces-security"
+            # CES keeps its credential metadata catalog here; without a volume it
+            # is wiped whenever the container is recreated and the gateway stops
+            # seeing channel credentials (e.g. Telegram 503s).
+            "${vol "ces-data"}:/ces-data"
           ];
         };
 
