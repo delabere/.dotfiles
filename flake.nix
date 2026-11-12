@@ -64,7 +64,12 @@
           modules = [
             home-manager.darwinModules.home-manager
             {
-              security.pam.services.sudo_local.touchIdAuth = true;
+              # Touch ID for sudo; reattach (pam_reattach) makes it work inside
+              # tmux too, whose processes are detached from the login session
+              security.pam.services.sudo_local = {
+                touchIdAuth = true;
+                reattach = true;
+              };
               ids.gids.nixbld = 30000;
               system.stateVersion = 7;
               nix.settings.trusted-users = [ "root" "delabere" ];
