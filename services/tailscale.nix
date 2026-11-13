@@ -16,10 +16,11 @@
 
     openFirewall = true;
     authKeyFile = config.age.secrets.tailscale-authkey.path;
-    extraUpFlags = [
-      "--advertise-routes=10.0.0.0/8"
-      # "--advertise-exit-node"
-      # "--accept-routes"
+    # `tailscale set` runs on every start, unlike extraUpFlags (first login
+    # only). Advertise the home LAN so tailnet devices can reach it remotely;
+    # approve the route once in the Tailscale admin console.
+    extraSetFlags = [
+      "--advertise-routes=192.168.1.0/24"
     ];
     # useRoutingFeatures = "both";
   };

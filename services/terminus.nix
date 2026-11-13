@@ -45,7 +45,7 @@ in
         "POSTGRES_USER" = "terminus";
       };
       volumes = [ "terminus_database-data:/var/lib/postgresql:rw" ];
-      ports = [ "5432:5432/tcp" ];
+      # No published port: the app reaches it as `database` on terminus_default.
       cmd = [ "-p" "5432" ];
       extraOptions = [
         "--cpus=1"
@@ -59,7 +59,7 @@ in
     "terminus-keyvalue" = {
       image = "valkey/valkey:9-alpine";
       volumes = [ "terminus_keyvalue-data:/data:rw" ];
-      ports = [ "6379:6379/tcp" ];
+      # No published port: the app reaches it as `keyvalue` on terminus_default.
       cmd = [ "valkey-server" "--requirepass" "redis_secret" "--maxmemory" "512mb" "--maxmemory-policy" "noeviction" "--port" "6379" ];
       extraOptions = [
         "--cpus=0.5"

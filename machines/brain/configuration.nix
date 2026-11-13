@@ -54,8 +54,6 @@
   # Select internationalisation properties.
   i18n.defaultLocale = "en_GB.UTF-8";
 
-  # Enable the X11 windowing system.
-  services.xserver.enable = true;
 
   # Enable the GNOME Desktop Environment.
   # services.xserver.displayManager.gdm.enable = true;
@@ -80,17 +78,13 @@
     }
   ];
 
-  # Configure keymap in X11
-  services.xserver.xkb = {
-    layout = "gb";
-    variant = "";
-  };
+
+  # Keep the journal from growing without bound (was 3.9G).
+  services.journald.settings.Journal.SystemMaxUse = "1G";
 
   # Configure console keymap
   console.keyMap = "uk";
 
-  # Enable CUPS to print documents.
-  services.printing.enable = true;
 
   swapDevices = [
     {
@@ -99,15 +93,6 @@
     }
   ];
 
-  # Enable sound with pipewire.
-  services.pulseaudio.enable = false;
-  security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-  };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users = {
@@ -155,7 +140,6 @@
   system.stateVersion = "25.05"; # Did you read the comment?
 
   programs = {
-    firefox.enable = true;
     vim.enable = true;
     zsh.enable = true;
   };
@@ -243,10 +227,19 @@
     "pnpm-9.15.9"
   ];
 
+  # Writable btop in the browser: only reachable over Tailscale, never the LAN.
   services.ttyd = {
     enable = true;
+    interface = "tailscale0";
     writeable = true;
     entrypoint = [ (lib.getExe pkgs.btop) ];
+  };
+  # tailscale0 only has an address once tailscaled is up; retry until it does.
+  systemd.services.ttyd = {
+    after = [ "tailscaled.service" ];
+    wants = [ "tailscaled.service" ];
+    serviceConfig.Restart = lib.mkForce "on-failure";
+    serviceConfig.RestartSec = 10;
   };
   systemd.services.ttyd.environment.LD_LIBRARY_PATH =
     lib.makeLibraryPath [ pkgs.libwebsockets ];
