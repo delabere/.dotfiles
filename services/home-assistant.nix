@@ -39,6 +39,14 @@
       "androidtv_remote"
       "radio_browser"
       "cast"
+      "samsungtv"
+      "dlna_dmr"
+    ];
+
+    # Pinned by nixpkgs rather than HACS: the hand-installed 13.x broke when
+    # Octopus changed its API (rate sensors stopped setting up).
+    customComponents = with pkgs.home-assistant-custom-components; [
+      octopus_energy
     ];
 
     customLovelaceModules = with pkgs.home-assistant-custom-lovelace-modules; [
