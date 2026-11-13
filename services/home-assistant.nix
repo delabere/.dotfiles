@@ -46,6 +46,8 @@
 
     customLovelaceModules = with pkgs.home-assistant-custom-lovelace-modules; [
       mini-graph-card
+      # Downstairs heating chart: temperature with gas/underfloor bands
+      apexcharts-card
     ];
   };
 }
