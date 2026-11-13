@@ -13,15 +13,10 @@
         external_url = "https://ha.delabere.com";
         internal_url = "http://brain:8123";
       };
-      http = {
-        use_x_forwarded_for = true;
-        trusted_proxies = [
-          "127.0.0.1"
-          "::1"
-        ];
-        ip_ban_enabled = true;
-        login_attempts_threshold = 5;
-      };
+      # http: is no longer read from YAML (HA 2026.x migrated it into
+      # .storage/http). Reverse-proxy settings for Caddy (trust 127.0.0.1/::1,
+      # use X-Forwarded-For) and the ban threshold live there now: Settings >
+      # System > Network.
       lovelace.resource_mode = "yaml";
       automation = "!include automations.yaml";
       script = "!include scripts.yaml";
