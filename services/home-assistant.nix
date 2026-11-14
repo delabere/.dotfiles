@@ -230,6 +230,10 @@ in
     ];
   };
 
+  # Restart HA whenever the repo-managed config (automations, helpers, dashboards…) changes,
+  # so a deploy always leaves the running system matching the repo.
+  systemd.services.home-assistant.restartTriggers = [ ./home-assistant/config ];
+
   # Writable folder for the Tado-vs-phones presence log
   # (allowlisted via homeassistant.allowlist_external_dirs above).
   systemd.tmpfiles.rules = [

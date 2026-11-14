@@ -1164,17 +1164,17 @@ views:
         annotations:
           yaxis:
           - y: 6
-            borderColor: '#ff6b6b'
+            borderColor: '#3fcf86'
             strokeDashArray: 5
             label:
-              text: 6 h allowance
+              text: full allowance (6 h)
               position: left
               textAnchor: start
               offsetX: 4
               borderWidth: 0
               style:
                 background: transparent
-                color: '#ff6b6b'
+                color: '#3fcf86'
       yaxis:
       - min: 0
         max: 8
@@ -1182,22 +1182,33 @@ views:
         apex_config:
           tickAmount: 4
       series:
-      - entity: sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_cap_hours
-        name: Used
-        type: area
-        curve: stepline
-        color: '#2fc4c4'
-        opacity: 0.35
-        stroke_width: 2
-        extend_to: now
-        show:
-          in_header: true
-          legend_value: false
       - entity: sensor.cheap_charging_left
         name: Left
         type: line
         curve: stepline
         color: '#3fcf86'
+        stroke_width: 0
+        show:
+          in_header: true
+          in_chart: false
+          legend_value: false
+      - entity: sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_cap_hours
+        name: Left
+        type: area
+        curve: stepline
+        color: '#3fcf86'
+        opacity: 0.3
+        stroke_width: 2
+        extend_to: now
+        transform: return Math.max(0, 6 - parseFloat(x));
+        show:
+          in_header: false
+          legend_value: false
+      - entity: sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_cap_hours
+        name: Used
+        type: line
+        curve: stepline
+        color: '#2fc4c4'
         stroke_width: 0
         show:
           in_header: true

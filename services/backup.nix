@@ -70,6 +70,10 @@ in
     offsite = common // {
       repository = "rclone:gdrive:backups/brain-restic";
       rcloneConfigFile = config.age.secrets.rclone-conf.path;
+      # Google Drive rate-limits API calls per minute (hard on rclone's shared client_id):
+      # bigger pack files mean fewer uploads, and rclone is capped at 4 requests/s.
+      extraBackupArgs = common.extraBackupArgs ++ [ "--pack-size=64" ];
+      extraOptions = [ "rclone.args='serve restic --stdio --tpslimit 4 --tpslimit-burst 4'" ];
       paths = essentialPaths;
       exclude = common.exclude ++ [
         # rebuildable media-server libraries stay local only
