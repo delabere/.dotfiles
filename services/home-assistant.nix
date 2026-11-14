@@ -18,6 +18,37 @@
       # use X-Forwarded-For) and the ban threshold live there now: Settings >
       # System > Network.
       lovelace.resource_mode = "yaml";
+
+      # Octopus re-plans the car's charging slots about every 30 minutes, so
+      # "what was planned" has to be pinned to a moment: 21:00 each night, and
+      # whenever a plan appears after there was none (car plugged in). The
+      # Car page compares this frozen plan with what actually charged.
+      template = [
+        {
+          trigger = [
+            { trigger = "time"; at = "21:00:00"; }
+            { trigger = "homeassistant"; event = "start"; }
+            {
+              trigger = "state";
+              entity_id = "binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching";
+              attribute = "planned_dispatches";
+            }
+          ];
+          condition = [{
+            condition = "template";
+            value_template = "{{ trigger.platform == 'time' or (trigger.platform == 'homeassistant' and states('sensor.car_charging_plan_snapshot') in ['unknown', 'unavailable']) or (trigger.platform == 'state' and (trigger.from_state.attributes.planned_dispatches or []) | count == 0 and (trigger.to_state.attributes.planned_dispatches or []) | count > 0) }}";
+          }];
+          sensor = [{
+            name = "Car charging plan snapshot";
+            unique_id = "car_charging_plan_snapshot";
+            icon = "mdi:calendar-clock";
+            device_class = "timestamp";
+            state = "{{ now().isoformat() }}";
+            # plain ISO strings, so the dashboard can read the list
+            attributes.planned = "{% set ns = namespace(out=[]) %}{% for x in state_attr('binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching', 'planned_dispatches') or [] %}{% set ns.out = ns.out + [{'start': as_datetime(x.start | string).isoformat(), 'end': as_datetime(x.end | string).isoformat(), 'kwh': (x.charge_in_kwh | float(0)) | abs | round(2)}] %}{% endfor %}{{ ns.out }}";
+          }];
+        }
+      ];
       automation = "!include automations.yaml";
       script = "!include scripts.yaml";
       scene = "!include scenes.yaml";
