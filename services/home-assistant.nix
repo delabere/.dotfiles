@@ -130,6 +130,51 @@ in
             attributes.last_day_slots = houseCalc + "{{ r.slots }}";
           }];
         }
+        {
+          # Hourly internet speed test (never at start-up). Fire event "speedtest_run" to test now.
+          trigger = [
+            { trigger = "time_pattern"; minutes = 17; }
+            { trigger = "event"; event_type = "speedtest_run"; }
+          ];
+          action = [
+            { action = "shell_command.speedtest"; response_variable = "r"; }
+            { variables.ok = "{{ r.returncode == 0 and (r.stdout | default('')) | regex_match('^\\s*\\{') }}"; }
+            { variables.res = "{{ (r.stdout | from_json) if ok else {} }}"; }
+          ];
+          sensor = [
+            {
+              name = "SpeedTest Download";
+              unique_id = "ookla_speedtest_download";
+              unit_of_measurement = "Mbit/s";
+              device_class = "data_rate";
+              state_class = "measurement";
+              icon = "mdi:download";
+              state = "{{ (res.download.bandwidth * 8 / 1000000) | round(2) if ok else this.state }}";
+              attributes.server = "{{ (res.server.name ~ ', ' ~ res.server.location) if ok else this.attributes.server | default(none) }}";
+              attributes.isp = "{{ res.isp if ok else this.attributes.isp | default(none) }}";
+              attributes.result_url = "{{ res.result.url if ok else this.attributes.result_url | default(none) }}";
+              attributes.last_error = "{{ none if ok else (r.stderr | default('') | truncate(200)) }}";
+            }
+            {
+              name = "SpeedTest Upload";
+              unique_id = "ookla_speedtest_upload";
+              unit_of_measurement = "Mbit/s";
+              device_class = "data_rate";
+              state_class = "measurement";
+              icon = "mdi:upload";
+              state = "{{ (res.upload.bandwidth * 8 / 1000000) | round(2) if ok else this.state }}";
+            }
+            {
+              name = "SpeedTest Ping";
+              unique_id = "ookla_speedtest_ping";
+              unit_of_measurement = "ms";
+              device_class = "duration";
+              state_class = "measurement";
+              icon = "mdi:timer-outline";
+              state = "{{ res.ping.latency | round(1) if ok else this.state }}";
+            }
+          ];
+        }
       ];
       utility_meter = {
         underfloor_pre_heat_saving_month = { source = "sensor.underfloor_pre_heat_saving"; cycle = "monthly"; };
@@ -147,12 +192,14 @@ in
       input_text = "!include nix/input_text.yaml";
       input_datetime = "!include nix/input_datetime.yaml";
       "template helpers" = "!include nix/templates.yaml";
+      # Ookla's official CLI. HA's speedtestdotnet integration (speedtest-cli) read under half the
+      # real speed (113 vs 273 Mbit/s side by side) and also tested at every HA start-up.
+      shell_command.speedtest = "${pkgs.ookla-speedtest}/bin/speedtest --accept-license --accept-gdpr --format=json";
     };
     extraComponents = [
       "shelly"
       "tuya"
       "ecovacs"
-      "speedtestdotnet"
       "met"
       "tesla_fleet"
       "bthome"

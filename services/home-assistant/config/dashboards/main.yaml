@@ -580,6 +580,8 @@ views:
       entity: sensor.speedtest_download
       name: Download
       needle: true
+      min: 0
+      max: 350
       severity:
         green: 150
         yellow: 50
