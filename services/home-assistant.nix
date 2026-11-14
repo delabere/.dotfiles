@@ -50,6 +50,33 @@
             attributes.planned = "{% set ns = namespace(out=[]) %}{% for x in state_attr('binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching', 'planned_dispatches') or [] %}{% set ns.out = ns.out + [{'start': as_datetime(x.start | string).isoformat(), 'end': as_datetime(x.end | string).isoformat(), 'kwh': (x.charge_in_kwh | float(0)) | abs | round(2)}] %}{% endfor %}{{ ns.out }}";
           }];
         }
+        {
+          # Ready-by forecast shared by the Car page and the hard-deadline override
+          trigger = [
+            { trigger = "time_pattern"; minutes = "/5"; }
+            { trigger = "homeassistant"; event = "start"; }
+            {
+              trigger = "state";
+              entity_id = [
+                "sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state_of_charge"
+                "sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_cap_hours"
+                "binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching"
+                "number.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_target"
+                "input_boolean.smart_car_charge"
+                "input_boolean.car_must_be_ready"
+                "input_datetime.car_must_be_ready_by"
+              ];
+            }
+          ];
+          sensor = [{
+            name = "Car charge forecast";
+            unique_id = "car_charge_forecast";
+            icon = "mdi:battery-clock";
+            device_class = "timestamp";
+            state = "{{ now().isoformat() }}";
+            attributes.forecast = builtins.readFile ./home-assistant/car-charge-forecast.jinja;
+          }];
+        }
       ];
       automation = "!include automations.yaml";
       script = "!include scripts.yaml";

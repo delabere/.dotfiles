@@ -1,0 +1,67 @@
+{#- Car charge forecast, half-hour steps over the next 84 hours.
+    guaranteed: Octopus slots already planned + Smart car charge night bumps (23:30-05:30)
+    expected:   guaranteed + daytime slots Smart car charge pushes Octopus into (12:00-21:00),
+                limited by what's left of the 6 h allowance in each noon-to-noon period
+    deadline:   input_datetime.car_must_be_ready_by when input_boolean.car_must_be_ready is on
+    bump_now:   short of the deadline (guaranteed, 30 min margin) AND the hours left that aren't already
+                covered (planned slots / night bumps) are down to the shortfall + 1 h, i.e. the last safe
+                moment to start a peak bump, leaving Octopus time to schedule cheap slots first -#}
+{%- set I = 'octopus_energy_00000000_0002_4000_8020_000000076b06_' -%}
+{%- set D = 'binary_sensor.' ~ I ~ 'intelligent_dispatching' -%}
+{%- set soc0 = states('sensor.' ~ I ~ 'intelligent_state_of_charge') | float(0) -%}
+{%- set goal = states('number.' ~ I ~ 'intelligent_charge_target') | float(80) -%}
+{%- set used = states('sensor.' ~ I ~ 'intelligent_charge_cap_hours') | float(0) -%}
+{%- set smart = is_state('input_boolean.smart_car_charge', 'on') -%}
+{%- set batt = 82 -%}{#- 2021 Model 3 LR: ~78 kWh usable, ~82 kWh from the wall incl. charging losses (measured) -#}
+{%- set c = namespace(k=0, h=0) -%}
+{%- for x in (state_attr(D, 'completed_dispatches') or [])[-8:] -%}
+  {%- set d = (as_datetime(x.end | string) - as_datetime(x.start | string)).total_seconds() / 3600 -%}
+  {%- if d > 0 -%}{%- set c.k = c.k + (x.charge_in_kwh | float(0)) | abs -%}{%- set c.h = c.h + d -%}{%- endif -%}
+{%- endfor -%}
+{%- set kw = (c.k / c.h) if c.h > 0 else 2.4 -%}
+{%- set pct = kw / batt * 100 -%}
+{%- set planned = state_attr(D, 'planned_dispatches') or [] -%}
+{%- set dl_on = is_state('input_boolean.car_must_be_ready', 'on') -%}
+{%- set dl_raw = states('input_datetime.car_must_be_ready_by') -%}
+{%- set deadline = (as_datetime(dl_raw) | as_local) if dl_on and dl_raw not in ['unknown', 'unavailable'] else none -%}
+{%- set deadline = deadline if deadline is not none and deadline > now() else none -%}
+{%- set margin_deadline = (deadline - timedelta(minutes=30)) if deadline is not none else none -%}
+{%- set start = now().replace(second=0, microsecond=0) -%}
+{%- set noon = start.replace(hour=12, minute=0) -%}
+{%- set noon = noon + timedelta(days=1) if noon <= start else noon -%}
+{%- set ns = namespace(g=soc0, e=soc0, g_at=none, e_at=none, allow=[6 - used, 0] | max, noon=noon, g_dl=none, e_dl=none, g_hours=0, e_hours=0, free=0) -%}
+{%- if soc0 >= goal -%}{%- set ns.g_at = start -%}{%- set ns.e_at = start -%}{%- endif -%}
+{%- for i in range(0, 168) -%}
+  {%- set t = start + timedelta(minutes=30 * i) -%}
+  {%- if t >= ns.noon -%}{%- set ns.allow = 6 -%}{%- set ns.noon = ns.noon + timedelta(days=1) -%}{%- endif -%}
+  {%- if margin_deadline is not none and ns.g_dl is none and t >= margin_deadline -%}{%- set ns.g_dl = ns.g -%}{%- set ns.e_dl = ns.e -%}{%- endif -%}
+  {%- set hm = t.strftime('%H:%M') -%}
+  {%- set night = smart and (hm >= '23:30' or hm < '05:30') -%}
+  {%- set p = namespace(on=false) -%}
+  {%- for x in planned -%}{%- if as_datetime(x.start | string) <= t < as_datetime(x.end | string) -%}{%- set p.on = true -%}{%- endif -%}{%- endfor -%}
+  {%- set day = smart and not p.on and not night and 12 <= t.hour < 21 and ns.allow > 0 -%}
+  {%- if margin_deadline is not none and t < margin_deadline and not p.on and not night -%}{%- set ns.free = ns.free + 0.5 -%}{%- endif -%}
+  {%- if p.on and not night -%}{%- set ns.allow = ns.allow - 0.5 -%}{%- endif -%}
+  {%- if day -%}{%- set ns.allow = ns.allow - 0.5 -%}{%- endif -%}
+  {%- if (p.on or night) and ns.g < goal -%}{%- set ns.g = [ns.g + 0.5 * pct, 100] | min -%}{%- set ns.g_hours = ns.g_hours + 0.5 -%}{%- if ns.g >= goal and ns.g_at is none -%}{%- set ns.g_at = t + timedelta(minutes=30) -%}{%- endif -%}{%- endif -%}
+  {%- if (p.on or night or day) and ns.e < goal -%}{%- set ns.e = [ns.e + 0.5 * pct, 100] | min -%}{%- set ns.e_hours = ns.e_hours + 0.5 -%}{%- if ns.e >= goal and ns.e_at is none -%}{%- set ns.e_at = t + timedelta(minutes=30) -%}{%- endif -%}{%- endif -%}
+{%- endfor -%}
+{%- if margin_deadline is not none and ns.g_dl is none -%}{%- set ns.g_dl = ns.g -%}{%- set ns.e_dl = ns.e -%}{%- endif -%}
+{%- set short_pct = ([goal - ns.g_dl, 0] | max) if deadline is not none else 0 -%}
+{{ {
+  'battery': soc0 | round(1),
+  'target': goal | round(0),
+  'rate_kw': kw | round(2),
+  'pct_per_hour': pct | round(2),
+  'smart_car_charge': smart,
+  'guaranteed_ready': ns.g_at.isoformat() if ns.g_at else none,
+  'expected_ready': ns.e_at.isoformat() if ns.e_at else none,
+  'deadline': deadline.isoformat() if deadline else none,
+  'battery_at_deadline_guaranteed': (ns.g_dl | round(0)) if deadline else none,
+  'battery_at_deadline_expected': (ns.e_dl | round(0)) if deadline else none,
+  'on_track': (short_pct <= 0) if deadline else none,
+  'short_hours': (short_pct / pct) | round(2),
+  'short_cost_at_peak': (short_pct / pct * kw * 0.3612) | round(2),
+  'free_hours_before_deadline': ns.free if deadline else none,
+  'bump_now': (deadline is not none and short_pct > 0 and ns.free <= (short_pct / pct) + 1)
+} }}
