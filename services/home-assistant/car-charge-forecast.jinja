@@ -1,6 +1,7 @@
 {#- Car charge forecast, half-hour steps over the next 84 hours.
     guaranteed: Octopus slots already planned + Smart car charge night bumps (23:30-05:30)
-    expected:   guaranteed + daytime slots Smart car charge pushes Octopus into (12:00-21:00),
+    expected:   guaranteed + daytime slots Smart car charge pushes Octopus into (Warmest house: the
+                coldest-hour blocks from sensor.car_charge_cold_hours; Fastest charge: 12:00-21:00),
                 limited by what's left of the 6 h allowance in each noon-to-noon period
     deadline:   input_datetime.car_must_be_ready_by when input_boolean.car_must_be_ready is on
     bump_now:   short of the deadline (guaranteed, 30 min margin) AND the hours left that aren't already
@@ -17,6 +18,13 @@
 {%- set goal = states('number.' ~ I ~ 'intelligent_charge_target') | float(80) -%}
 {%- set used = states('sensor.' ~ I ~ 'intelligent_charge_cap_hours') | float(0) -%}
 {%- set smart = is_state('input_boolean.smart_car_charge', 'on') -%}
+{%- set warm = not is_state('input_select.smart_car_charge_mode', 'Fastest charge') -%}
+{#- Warmest-house: today's coldest-hour blocks; later days assume the same clock hours -#}
+{%- set cr = namespace(h=[]) -%}
+{%- for r in (state_attr('sensor.car_charge_cold_hours', 'runs') or []) -%}
+  {%- set rs = as_datetime(r[0]) | as_local -%}{%- set re = as_datetime(r[1]) | as_local -%}
+  {%- for k in range(0, ((re - rs).total_seconds() / 1800) | int) -%}{%- set cr.h = cr.h + [(rs + timedelta(minutes=30 * k)).strftime('%H:%M')] -%}{%- endfor -%}
+{%- endfor -%}
 {%- set batt = 82 -%}{#- 2021 Model 3 LR: ~78 kWh usable, ~82 kWh from the wall incl. charging losses (measured) -#}
 {%- set c = namespace(k=0, h=0) -%}
 {%- for x in (state_attr(D, 'completed_dispatches') or [])[-8:] -%}
@@ -44,7 +52,7 @@
   {%- set night = smart and (hm >= '23:30' or hm < '05:30') -%}
   {%- set p = namespace(on=false) -%}
   {%- for x in planned -%}{%- if as_datetime(x.start | string) <= t < as_datetime(x.end | string) -%}{%- set p.on = true -%}{%- endif -%}{%- endfor -%}
-  {%- set day = smart and not p.on and not night and 12 <= t.hour < 21 and ns.allow > 0 -%}
+  {%- set day = smart and not p.on and not night and ((hm in cr.h) if warm else (12 <= t.hour < 21)) and ns.allow > 0 -%}
   {%- if margin_deadline is not none and t < margin_deadline and not p.on and not night -%}{%- set ns.free = ns.free + 0.5 -%}{%- set ns.free_idx = ns.free_idx + [i] -%}{%- endif -%}
   {%- if p.on and not night -%}{%- set ns.allow = ns.allow - 0.5 -%}{%- endif -%}
   {%- if day -%}{%- set ns.allow = ns.allow - 0.5 -%}{%- endif -%}
@@ -65,7 +73,7 @@
   {%- set night = smart and (hm >= '23:30' or hm < '05:30') -%}
   {%- set p = namespace(on=false) -%}
   {%- for x in planned -%}{%- if as_datetime(x.start | string) <= t < as_datetime(x.end | string) -%}{%- set p.on = true -%}{%- endif -%}{%- endfor -%}
-  {%- set day = smart and not p.on and not night and 12 <= t.hour < 21 and a.allow > 0 -%}
+  {%- set day = smart and not p.on and not night and ((hm in cr.h) if warm else (12 <= t.hour < 21)) and a.allow > 0 -%}
   {%- if (p.on and not night) or day -%}{%- set a.allow = a.allow - 0.5 -%}{%- endif -%}
   {%- set charging = (p.on or night or day or i in bump_idx or manual_boost) and a.v < goal -%}
   {%- if i == 0 -%}{%- set a.pts = [[as_timestamp(now()) | int, a.v | round(1)]] -%}{%- elif charging != a.prev -%}{%- set a.pts = a.pts + [[as_timestamp(t) | int, a.v | round(1)]] -%}{%- endif -%}
@@ -79,6 +87,7 @@
   'rate_kw': kw | round(2),
   'pct_per_hour': pct | round(2),
   'smart_car_charge': smart,
+  'mode': states('input_select.smart_car_charge_mode'),
   'guaranteed_ready': ns.g_at.isoformat() if ns.g_at else none,
   'expected_ready': ns.e_at.isoformat() if ns.e_at else none,
   'deadline': deadline.isoformat() if deadline else none,

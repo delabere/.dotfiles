@@ -625,7 +625,16 @@ views:
       icon_tap_action:
         action: toggle
       grid_options:
-        columns: full
+        columns: 6
+    - type: tile
+      entity: input_select.smart_car_charge_mode
+      name: Mode
+      icon: mdi:tune-variant
+      features:
+      - type: select-options
+      features_position: bottom
+      grid_options:
+        columns: 6
     - type: markdown
       content: |-
         {%- set D='binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching' -%}
@@ -673,7 +682,10 @@ views:
         {%- set f = state_attr('sensor.car_charge_forecast','forecast') or {} %}
         {%- macro w(iso) -%}{%- if iso -%}{%- set t = as_datetime(iso) | as_local -%}{{ t.strftime('%a %H:%M') if t.date() != now().date() else 'today ' ~ t.strftime('%H:%M') }}{%- else -%}not within 3 days{%- endif -%}{%- endmacro %}
         {%- if is_state('input_boolean.smart_car_charge','on') %}
-        | With Smart car charge, {{ goal | int }}% by | **≈{{ w(f.get('expected_ready')) }}** · guaranteed {{ w(f.get('guaranteed_ready')) }} |
+        | With Smart car charge ({{ states('input_select.smart_car_charge_mode') | lower }}), {{ goal | int }}% by | **≈{{ w(f.get('expected_ready')) }}** · guaranteed {{ w(f.get('guaranteed_ready')) }} |
+        {%- if is_state('input_select.smart_car_charge_mode','Warmest house') %}
+        | Cheap hours aimed at (coldest) | {{ state_attr('sensor.car_charge_cold_hours','summary') or '…' }} |
+        {%- endif %}
         {%- endif %}
         {%- if f.get('deadline') %}
         | Must be ready by {{ w(f.get('deadline')) }} | {% if f.get('on_track') %}✅ **on track** (≈{{ f.get('battery_at_deadline_guaranteed') | int }}% guaranteed){% elif is_state('input_boolean.car_deadline_bumping','on') %}⚡ **bump charging now** to make it{% else %}⚠️ **short {{ f.get('short_hours') }} h** · will bump at peak if Octopus doesn't help (≈£{{ '%.2f' | format(f.get('short_cost_at_peak')) }}){% endif %} |

@@ -1,0 +1,27 @@
+{#- Warmest-house mode: the coldest hours (Met hourly forecast) between 12:00 and 23:00 to spend the
+    rest of the 6 h cheap-charging allowance in. When Octopus charges the car the whole house is on
+    the cheap rate, so putting those hours where it's coldest helps the underfloor heating most.
+    Needs `fc` = weather.get_forecasts response. Sets c.runs = [[start_iso, end_iso], ...]. -#}
+{%- set CAP = 'sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_cap_hours' -%}
+{%- set nowt = now() -%}
+{%- set before_reset = nowt.hour < 12 -%}
+{%- set left = 6 if before_reset else ([6 - (states(CAP) | float(0)), 0] | max) -%}
+{%- set first = nowt.replace(hour=12, minute=0, second=0, microsecond=0) if before_reset else nowt.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1) -%}
+{%- set c = namespace(cands=[], runs=[], hours=[]) -%}
+{%- for f in (fc['weather.forecast_home'].forecast if fc is defined and fc else []) -%}
+  {%- set t = as_datetime(f.datetime) | as_local -%}
+  {%- if t.date() == nowt.date() and t >= first and 12 <= t.hour <= 22 -%}
+    {%- set c.cands = c.cands + [{'t': t, 'temp': f.temperature | float(99)}] -%}
+  {%- endif -%}
+{%- endfor -%}
+{%- set n = [left | round(0, 'ceil') | int, c.cands | count] | min -%}
+{#- coldest first; on equal temperature prefer later (evening) hours -#}
+{%- set picked = (c.cands | sort(attribute='t', reverse=true) | sort(attribute='temp'))[:n] | sort(attribute='t') -%}
+{%- for p in picked -%}
+  {%- set c.hours = c.hours + [p.t] -%}
+  {%- if c.runs and (as_datetime(c.runs[-1][1])) == p.t -%}
+    {%- set c.runs = c.runs[:-1] + [[c.runs[-1][0], (p.t + timedelta(hours=1)).isoformat()]] -%}
+  {%- else -%}
+    {%- set c.runs = c.runs + [[p.t.isoformat(), (p.t + timedelta(hours=1)).isoformat()]] -%}
+  {%- endif -%}
+{%- endfor -%}

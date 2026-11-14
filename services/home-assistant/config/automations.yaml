@@ -365,7 +365,7 @@
     minutes: 0
     id: roll
   - trigger: time
-    at: '22:00:00'
+    at: '23:00:00'
     id: restore
   - trigger: state
     entity_id: input_boolean.smart_car_charge
@@ -408,7 +408,7 @@
       - condition: template
         value_template: '{{ enabled and plugged and needs_charge and day_phase and cap_used < daily_cap }}'
       - variables:
-          new_rb: '{{ (now() + timedelta(hours=lead_hours)).strftime(''%H:00'') }}'
+          new_rb: '{%- if mode == ''Fastest charge'' -%}{{ (now() + timedelta(hours=lead_hours)).strftime(''%H:00'') }}{%- else -%}{%- set ns = namespace(rb=normal_rb) -%}{%- for r in cold_runs -%}{%- if as_datetime(r[0]) <= now() < as_datetime(r[1]) -%}{%- set ns.rb = (as_datetime(r[1]) | as_local).strftime(''%H:%M'') -%}{%- endif -%}{%- endfor -%}{{ ns.rb }}{%- endif -%}'
       - if:
         - condition: template
           value_template: '{{ states(''select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time'') != new_rb }}'
@@ -468,7 +468,7 @@
       - condition: template
         value_template: '{{ enabled and plugged and needs_charge and day_phase and cap_used < daily_cap }}'
       - variables:
-          new_rb: '{{ (now() + timedelta(hours=lead_hours)).strftime(''%H:00'') }}'
+          new_rb: '{%- if mode == ''Fastest charge'' -%}{{ (now() + timedelta(hours=lead_hours)).strftime(''%H:00'') }}{%- else -%}{%- set ns = namespace(rb=normal_rb) -%}{%- for r in cold_runs -%}{%- if as_datetime(r[0]) <= now() < as_datetime(r[1]) -%}{%- set ns.rb = (as_datetime(r[1]) | as_local).strftime(''%H:%M'') -%}{%- endif -%}{%- endfor -%}{{ ns.rb }}{%- endif -%}'
       - if:
         - condition: template
           value_template: '{{ states(''select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time'') != new_rb }}'
@@ -599,7 +599,7 @@
       - condition: template
         value_template: '{{ enabled and plugged and needs_charge and day_phase and cap_used < daily_cap }}'
       - variables:
-          new_rb: '{{ (now() + timedelta(hours=lead_hours)).strftime(''%H:00'') }}'
+          new_rb: '{%- if mode == ''Fastest charge'' -%}{{ (now() + timedelta(hours=lead_hours)).strftime(''%H:00'') }}{%- else -%}{%- set ns = namespace(rb=normal_rb) -%}{%- for r in cold_runs -%}{%- if as_datetime(r[0]) <= now() < as_datetime(r[1]) -%}{%- set ns.rb = (as_datetime(r[1]) | as_local).strftime(''%H:%M'') -%}{%- endif -%}{%- endfor -%}{{ ns.rb }}{%- endif -%}'
       - if:
         - condition: template
           value_template: '{{ states(''select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time'') != new_rb }}'
@@ -680,6 +680,8 @@
         data:
           message: '{{ now().strftime(''%Y-%m-%d %H:%M'') }},switched off,ready-by restored to {{ normal_rb }},{{ states(''select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time'') }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_cap_hours'') }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state_of_charge'') }},{{ states(''number.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_target'') }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state'') }},{{ states(''switch.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_bump_charge'') }}'
   variables:
+    mode: '{{ states(''input_select.smart_car_charge_mode'') }}'
+    cold_runs: '{{ state_attr(''sensor.car_charge_cold_hours'', ''runs'') or [] }}'
     daily_cap: 6
     lead_hours: 2
     day_start_hour: 12
@@ -688,7 +690,7 @@
     plugged: '{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state'') in [''SMART_CONTROL_IN_PROGRESS'',''SMART_CONTROL_CAPABLE'',''BOOSTING''] }}'
     needs_charge: '{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state_of_charge'') | float(100) < states(''number.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_target'') | float(80) }}'
     cap_used: '{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_cap_hours'') | float(0) }}'
-    day_phase: '{{ day_start_hour <= now().hour <= last_roll_hour }}'
+    day_phase: '{{ day_start_hour <= now().hour <= (last_roll_hour if mode == ''Fastest charge'' else 22) }}'
     normal_rb: '{{ states(''input_text.smart_car_charge_normal_ready_by'') if states(''input_text.smart_car_charge_normal_ready_by'') | regex_match(''^[0-2][0-9]:[03]0$'') else ''10:00'' }}'
     off_peak: '{{ is_state(''binary_sensor.octopus_energy_electricity_23j0307021_1200041244369_off_peak'',''on'') }}'
     smart_slot_now: '{{ is_state(''binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching'',''on'') }}'

@@ -1,0 +1,7 @@
+# Managed in the dotfiles repo (services/home-assistant/config). Edit here, then build-brain.
+smart_car_charge_mode:
+  name: Smart car charge mode
+  icon: mdi:tune-variant
+  options:
+    - Warmest house
+    - Fastest charge

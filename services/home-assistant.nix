@@ -3,6 +3,7 @@ let
   houseCalc = builtins.readFile ./home-assistant/house-car-slot-saving.calc.jinja;
   ufhCalc = builtins.readFile ./home-assistant/ufh-preheat-saving.calc.jinja;
   prevOr0 = "(this.state | float(0) if this.state not in ['unknown', 'unavailable'] else 0)";
+  coldCalc = builtins.readFile ./home-assistant/car-cold-hours.jinja;
 in
 {
 
@@ -81,6 +82,8 @@ in
                 "input_boolean.smart_car_charge"
                 "input_boolean.car_must_be_ready"
                 "input_datetime.car_must_be_ready_by"
+                "input_select.smart_car_charge_mode"
+                "sensor.car_charge_cold_hours"
               ];
             }
           ];
@@ -175,6 +178,29 @@ in
             }
           ];
         }
+        {
+          # Warmest-house mode: coldest hours to spend the cheap-charging allowance in.
+          # Worked out at 11:55 (for the noon reset), hourly at :55, and when the mode changes.
+          trigger = [
+            { trigger = "time_pattern"; minutes = 55; }
+            { trigger = "homeassistant"; event = "start"; }
+            { trigger = "state"; entity_id = "input_select.smart_car_charge_mode"; }
+          ];
+          action = [{
+            action = "weather.get_forecasts";
+            target.entity_id = "weather.forecast_home";
+            data.type = "hourly";
+            response_variable = "fc";
+          }];
+          sensor = [{
+            name = "Car charge cold hours";
+            unique_id = "car_charge_cold_hours";
+            icon = "mdi:snowflake-thermometer";
+            state = coldCalc + "{{ c.hours | count }}";
+            attributes.runs = coldCalc + "{{ c.runs }}";
+            attributes.summary = coldCalc + "{% set ns = namespace(o=[]) %}{% for r in c.runs %}{% set ns.o = ns.o + [(as_datetime(r[0]) | as_local).strftime('%H:%M') ~ '–' ~ (as_datetime(r[1]) | as_local).strftime('%H:%M')] %}{% endfor %}{{ ns.o | join(', ') if ns.o else 'none left today' }}";
+          }];
+        }
       ];
       utility_meter = {
         underfloor_pre_heat_saving_month = { source = "sensor.underfloor_pre_heat_saving"; cycle = "monthly"; };
@@ -191,6 +217,7 @@ in
       input_boolean = "!include nix/input_boolean.yaml";
       input_text = "!include nix/input_text.yaml";
       input_datetime = "!include nix/input_datetime.yaml";
+      input_select = "!include nix/input_select.yaml";
       "template helpers" = "!include nix/templates.yaml";
       # The forecast sensor carries a ~100-point trajectory that changes every 5 min; only its
       # current value matters, so keep it out of the history database.
