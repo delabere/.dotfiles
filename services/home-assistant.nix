@@ -192,6 +192,9 @@ in
       input_text = "!include nix/input_text.yaml";
       input_datetime = "!include nix/input_datetime.yaml";
       "template helpers" = "!include nix/templates.yaml";
+      # The forecast sensor carries a ~100-point trajectory that changes every 5 min; only its
+      # current value matters, so keep it out of the history database.
+      recorder.exclude.entities = [ "sensor.car_charge_forecast" ];
       # Ookla's official CLI. HA's speedtestdotnet integration (speedtest-cli) read under half the
       # real speed (113 vs 273 Mbit/s side by side) and also tested at every HA start-up.
       shell_command.speedtest = "${pkgs.ookla-speedtest}/bin/speedtest --accept-license --accept-gdpr --format=json";

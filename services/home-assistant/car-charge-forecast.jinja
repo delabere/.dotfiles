@@ -5,8 +5,13 @@
     deadline:   input_datetime.car_must_be_ready_by when input_boolean.car_must_be_ready is on
     bump_now:   short of the deadline (guaranteed, 30 min margin) AND the hours left that aren't already
                 covered (planned slots / night bumps) are down to the shortfall + 1 h, i.e. the last safe
-                moment to start a peak bump, leaving Octopus time to schedule cheap slots first -#}
+                moment to start a peak bump, leaving Octopus time to schedule cheap slots first
+    trajectory: what we think will actually happen, as [unix_seconds, battery %] points for the Car page's
+                dotted line: expected (or planned-only when Smart car charge is off) + the peak bump the
+                must-be-ready override would add (now if bump_now, else in the last free slots before the
+                deadline) + any bump already running that isn't one of ours -#}
 {%- set I = 'octopus_energy_00000000_0002_4000_8020_000000076b06_' -%}
+{%- set manual_boost = is_state('sensor.' ~ I ~ 'intelligent_state', 'BOOSTING') and is_state('input_boolean.smart_car_charge_bumping', 'off') and is_state('input_boolean.car_deadline_bumping', 'off') -%}
 {%- set D = 'binary_sensor.' ~ I ~ 'intelligent_dispatching' -%}
 {%- set soc0 = states('sensor.' ~ I ~ 'intelligent_state_of_charge') | float(0) -%}
 {%- set goal = states('number.' ~ I ~ 'intelligent_charge_target') | float(80) -%}
@@ -26,10 +31,10 @@
 {%- set deadline = (as_datetime(dl_raw) | as_local) if dl_on and dl_raw not in ['unknown', 'unavailable'] else none -%}
 {%- set deadline = deadline if deadline is not none and deadline > now() else none -%}
 {%- set margin_deadline = (deadline - timedelta(minutes=30)) if deadline is not none else none -%}
-{%- set start = now().replace(second=0, microsecond=0) -%}
+{%- set start = now().replace(minute=(0 if now().minute < 30 else 30), second=0, microsecond=0) -%}{#- half-hour aligned, like Octopus slots -#}
 {%- set noon = start.replace(hour=12, minute=0) -%}
 {%- set noon = noon + timedelta(days=1) if noon <= start else noon -%}
-{%- set ns = namespace(g=soc0, e=soc0, g_at=none, e_at=none, allow=[6 - used, 0] | max, noon=noon, g_dl=none, e_dl=none, g_hours=0, e_hours=0, free=0) -%}
+{%- set ns = namespace(g=soc0, e=soc0, g_at=none, e_at=none, allow=[6 - used, 0] | max, noon=noon, g_dl=none, e_dl=none, g_hours=0, e_hours=0, free=0, free_idx=[]) -%}
 {%- if soc0 >= goal -%}{%- set ns.g_at = start -%}{%- set ns.e_at = start -%}{%- endif -%}
 {%- for i in range(0, 168) -%}
   {%- set t = start + timedelta(minutes=30 * i) -%}
@@ -40,14 +45,34 @@
   {%- set p = namespace(on=false) -%}
   {%- for x in planned -%}{%- if as_datetime(x.start | string) <= t < as_datetime(x.end | string) -%}{%- set p.on = true -%}{%- endif -%}{%- endfor -%}
   {%- set day = smart and not p.on and not night and 12 <= t.hour < 21 and ns.allow > 0 -%}
-  {%- if margin_deadline is not none and t < margin_deadline and not p.on and not night -%}{%- set ns.free = ns.free + 0.5 -%}{%- endif -%}
+  {%- if margin_deadline is not none and t < margin_deadline and not p.on and not night -%}{%- set ns.free = ns.free + 0.5 -%}{%- set ns.free_idx = ns.free_idx + [i] -%}{%- endif -%}
   {%- if p.on and not night -%}{%- set ns.allow = ns.allow - 0.5 -%}{%- endif -%}
   {%- if day -%}{%- set ns.allow = ns.allow - 0.5 -%}{%- endif -%}
-  {%- if (p.on or night) and ns.g < goal -%}{%- set ns.g = [ns.g + 0.5 * pct, 100] | min -%}{%- set ns.g_hours = ns.g_hours + 0.5 -%}{%- if ns.g >= goal and ns.g_at is none -%}{%- set ns.g_at = t + timedelta(minutes=30) -%}{%- endif -%}{%- endif -%}
-  {%- if (p.on or night or day) and ns.e < goal -%}{%- set ns.e = [ns.e + 0.5 * pct, 100] | min -%}{%- set ns.e_hours = ns.e_hours + 0.5 -%}{%- if ns.e >= goal and ns.e_at is none -%}{%- set ns.e_at = t + timedelta(minutes=30) -%}{%- endif -%}{%- endif -%}
+  {%- if (p.on or night) and ns.g < goal -%}{%- set ns.g = [ns.g + 0.5 * pct, goal] | min -%}{%- set ns.g_hours = ns.g_hours + 0.5 -%}{%- if ns.g >= goal and ns.g_at is none -%}{%- set ns.g_at = t + timedelta(minutes=30) -%}{%- endif -%}{%- endif -%}
+  {%- if (p.on or night or day) and ns.e < goal -%}{%- set ns.e = [ns.e + 0.5 * pct, goal] | min -%}{%- set ns.e_hours = ns.e_hours + 0.5 -%}{%- if ns.e >= goal and ns.e_at is none -%}{%- set ns.e_at = t + timedelta(minutes=30) -%}{%- endif -%}{%- endif -%}
 {%- endfor -%}
 {%- if margin_deadline is not none and ns.g_dl is none -%}{%- set ns.g_dl = ns.g -%}{%- set ns.e_dl = ns.e -%}{%- endif -%}
 {%- set short_pct = ([goal - ns.g_dl, 0] | max) if deadline is not none else 0 -%}
+{%- set bump_now = deadline is not none and short_pct > 0 and ns.free <= (short_pct / pct) + 1 -%}
+{#- Second pass: what we think will actually happen -#}
+{%- set n_bump = ((short_pct / pct * 2) | round(0, 'ceil') | int) if short_pct > 0 else 0 -%}
+{%- set bump_idx = (ns.free_idx[:n_bump] if bump_now else ns.free_idx[-n_bump:]) if n_bump > 0 else [] -%}
+{%- set a = namespace(v=soc0, allow=[6 - used, 0] | max, noon=noon, prev=none, at=(start if soc0 >= goal else none), pts=[]) -%}
+{%- for i in range(0, 168) -%}
+  {%- set t = start + timedelta(minutes=30 * i) -%}
+  {%- if t >= a.noon -%}{%- set a.allow = 6 -%}{%- set a.noon = a.noon + timedelta(days=1) -%}{%- endif -%}
+  {%- set hm = t.strftime('%H:%M') -%}
+  {%- set night = smart and (hm >= '23:30' or hm < '05:30') -%}
+  {%- set p = namespace(on=false) -%}
+  {%- for x in planned -%}{%- if as_datetime(x.start | string) <= t < as_datetime(x.end | string) -%}{%- set p.on = true -%}{%- endif -%}{%- endfor -%}
+  {%- set day = smart and not p.on and not night and 12 <= t.hour < 21 and a.allow > 0 -%}
+  {%- if (p.on and not night) or day -%}{%- set a.allow = a.allow - 0.5 -%}{%- endif -%}
+  {%- set charging = (p.on or night or day or i in bump_idx or manual_boost) and a.v < goal -%}
+  {%- if i == 0 -%}{%- set a.pts = [[as_timestamp(now()) | int, a.v | round(1)]] -%}{%- elif charging != a.prev -%}{%- set a.pts = a.pts + [[as_timestamp(t) | int, a.v | round(1)]] -%}{%- endif -%}
+  {%- set a.prev = charging -%}
+  {%- if charging -%}{%- set a.v = [a.v + 0.5 * pct, goal] | min -%}{#- the car stops at its limit, which follows the Octopus target -#}{%- if a.v >= goal and a.at is none -%}{%- set a.at = t + timedelta(minutes=30) -%}{%- endif -%}{%- endif -%}
+{%- endfor -%}
+{%- set a.pts = a.pts + [[as_timestamp(start + timedelta(minutes=30 * 168)) | int, a.v | round(1)]] -%}
 {{ {
   'battery': soc0 | round(1),
   'target': goal | round(0),
@@ -63,5 +88,7 @@
   'short_hours': (short_pct / pct) | round(2),
   'short_cost_at_peak': (short_pct / pct * kw * 0.3612) | round(2),
   'free_hours_before_deadline': ns.free if deadline else none,
-  'bump_now': (deadline is not none and short_pct > 0 and ns.free <= (short_pct / pct) + 1)
+  'bump_now': bump_now,
+  'ready_at': a.at.isoformat() if a.at else none,
+  'trajectory': a.pts
 } }}

@@ -1,7 +1,7 @@
 { config, pkgs, lib, ... }:
-# Nightly restic backups of brain's service state.
-#   local:   /mnt/external/restic/brain   (everything, incl. rebuildable media metadata)
-#   offsite: Google Drive via rclone      (everything except Plex/Tdarr/Jellyfin library data)
+# Nightly restic backups of brain's service state (not Plex, Tdarr, Jellyfin or Terminus).
+#   local:   /mnt/external/restic/brain
+#   offsite: Google Drive via rclone
 # Restore steps: docs/restore-brain.md
 let
   prepareDir = "/var/backup/prepare";
@@ -13,11 +13,8 @@ let
     # Home Assistant recorder (SQLite): online, consistent copy
     ${pkgs.sqlite}/bin/sqlite3 /data/.state/home-assistant/home-assistant_v2.db \
       ".backup '${prepareDir}/home-assistant_v2.db'"
-    # Terminus Postgres (container)
-    if ${pkgs.docker}/bin/docker inspect terminus-database >/dev/null 2>&1; then
-      ${pkgs.docker}/bin/docker exec terminus-database \
-        pg_dump -U terminus terminus_production > ${prepareDir}/terminus_production.sql
-    fi
+    # Terminus is deliberately not backed up; remove any dump left by earlier runs
+    rm -f ${prepareDir}/terminus_production.sql
   '';
 
   vols = "/var/lib/docker/volumes";
@@ -32,16 +29,16 @@ let
       "/data/.state/home-assistant/home-assistant_v2.db"
       "/data/.state/home-assistant/home-assistant_v2.db-wal"
       "/data/.state/home-assistant/home-assistant_v2.db-shm"
-      "${vols}/terminus_database-data"
+      # Terminus (TRMNL server): not backed up at all
+      "${vols}/terminus_*"
       # sockets and IPC, meaningless after restore
       "${vols}/*-ipc"
       "${vols}/*-socket"
-      # caches and logs
-      "/data/.state/nixarr/jellyfin/cache"
-      "/data/.state/nixarr/jellyfin/log"
-      "/data/.state/plex/Plex Media Server/Cache"
-      "/data/.state/plex/Plex Media Server/Logs"
-      "/data/.state/plex/Plex Media Server/Crash Reports"
+      # media servers: libraries can be rebuilt by rescanning, not worth backing up
+      "/data/.state/plex"
+      "/data/.state/tdarr"
+      "/data/.state/nixarr/jellyfin"
+      # logs
       "*.log"
     ];
   };
@@ -75,13 +72,6 @@ in
       extraBackupArgs = common.extraBackupArgs ++ [ "--pack-size=64" ];
       extraOptions = [ "rclone.args='serve restic --stdio --tpslimit 4 --tpslimit-burst 4'" ];
       paths = essentialPaths;
-      exclude = common.exclude ++ [
-        # rebuildable media-server libraries stay local only
-        "/data/.state/plex"
-        "/data/.state/tdarr"
-        "/data/.state/nixarr/jellyfin/data"
-        "/data/.state/nixarr/jellyfin/repair-backups"
-      ];
       timerConfig = { OnCalendar = "04:30"; Persistent = true; RandomizedDelaySec = "10m"; };
       pruneOpts = [ "--keep-daily 7" "--keep-weekly 4" "--keep-monthly 6" ];
     };

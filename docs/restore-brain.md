@@ -10,7 +10,8 @@ pairings, history, service data) is in the nightly restic backups.
 | Services, packages, Home Assistant integrations, templates, sensors | `services/*.nix`, `machines/brain/` |
 | HA automations, scenes, helpers, template helpers, Main dashboard | `services/home-assistant/config/` (linked into HA as `nix/`) |
 | HA logins & pairings (Octopus, Tado, HomeKit, Shelly, phones…), history, logs | backups: `/data/.state/home-assistant` |
-| Vellum, Terminus, n8n, MinusPod, *arr configs, Tailscale identity | backups |
+| Vellum, n8n, MinusPod, *arr configs, Tailscale identity | backups |
+| Plex, Tdarr, Jellyfin, Terminus | **not backed up**: set up fresh and rescan libraries after a restore |
 | Secrets (Tailscale key, backup password, rclone config…) | `secrets/*.age` (agenix) |
 
 ## Backups
@@ -19,10 +20,9 @@ Defined in `services/backup.nix`.
 
 - **local**: `/mnt/external/restic/brain`, nightly ~03:30, keeps 14 daily / 8 weekly / 12 monthly
 - **offsite**: Google Drive `backups/brain-restic` (rclone remote `gdrive`), nightly ~04:30, keeps 7 / 4 / 6.
-  Excludes rebuildable Plex/Tdarr/Jellyfin library data.
 
 Before each run, `backup-prepare` writes consistent copies of live databases to
-`/var/backup/prepare` (HA recorder via `sqlite3 .backup`, Terminus via `pg_dump`); those copies
+`/var/backup/prepare` (the HA recorder via `sqlite3 .backup`); that copy
 are backed up instead of the live files.
 
 The backup password is `secrets/restic-password.age`. It can be decrypted on brain **and on the
@@ -66,8 +66,6 @@ journalctl -u restic-backups-local -e         # last run's log
    sudo cp /var/backup/prepare/home-assistant_v2.db /data/.state/home-assistant/
    sudo chown hass:hass /data/.state/home-assistant/home-assistant_v2.db
    sudo systemctl start docker
-   # Terminus: once terminus-database is up
-   sudo docker exec -i terminus-database psql -U terminus terminus_production < /var/backup/prepare/terminus_production.sql
    ```
 7. **Start Home Assistant**: `sudo systemctl start home-assistant`. Logins, pairings, dashboards
    and automations come back as they were.

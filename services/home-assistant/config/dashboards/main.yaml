@@ -784,7 +784,7 @@ views:
         show:
           in_header: true
           legend_value: false
-      - entity: sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state_of_charge
+      - entity: sensor.car_charge_forecast
         name: Forecast
         type: line
         curve: straight
@@ -792,30 +792,11 @@ views:
         stroke_width: 2
         stroke_dash: 4
         yaxis_id: soc
-        data_generator: |2-
-
-          const D='binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching', OP='binary_sensor.octopus_energy_electricity_23j0307021_1200041244369_off_peak', SNAP='sensor.car_charging_plan_snapshot';
-          const S=start.getTime(), E=end.getTime(), NOW=Date.now();
-          const ms=s=>new Date(s).getTime();
-          const iv=arr=>(Array.isArray(arr)?arr:[]).map(x=>[ms(x.start),ms(x.end),Math.abs(x.charge_in_kwh ?? x.kwh ?? 0)]).filter(x=>!isNaN(x[0])&&!isNaN(x[1]));
-          const ov=(a,list)=>list.some(b=>b[0]<a[1]&&b[1]>a[0]);
-          const steps=(ranges,v)=>{ const pts=[[S,0]]; ranges.slice().sort((a,b)=>a[0]-b[0]).forEach(([a,b])=>{ if(b<S||a>E) return; pts.push([Math.max(a,S),v]); pts.push([Math.min(b,E),0]); }); pts.push([E,0]); return pts.sort((a,b)=>a[0]-b[0]); };
-          const A=hass.states[D]?.attributes||{};
-          const completed=iv(A.completed_dispatches), live=iv(A.planned_dispatches), frozen=iv(hass.states[SNAP]?.attributes?.planned);
-          const dropped=frozen.filter(f=>f[1]<=NOW && !ov(f,completed));
-          const kept=frozen.filter(f=>!dropped.includes(f)).concat(live.filter(l=>l[1]>NOW && !ov(l,frozen)));
-          const charged=frozen.length?completed.filter(c=>ov(c,frozen)):completed;
-          const added=frozen.length?completed.filter(c=>!ov(c,frozen)):[];
-          const upcoming=live.filter(l=>l[1]>NOW).map(l=>[Math.max(l[0],NOW),l[1]]);
-
-          const soc=parseFloat(hass.states['sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state_of_charge']?.state); if(isNaN(soc)) return [];
-          const batt=82 /* 2021 Model 3 LR: ~78 kWh usable, ~82 kWh from the wall incl. charging losses (measured) */;
-          const recent=completed.slice(-8); const kwh=recent.reduce((s,c)=>s+c[2],0), hrs=recent.reduce((s,c)=>s+(c[1]-c[0])/3.6e6,0);
-          const kw=hrs>0?kwh/hrs:2.4, pct=kw/batt*100;
-          const pts=[[NOW,soc]]; let v=soc;
-          for(const [a,b] of upcoming.sort((x,y)=>x[0]-y[0])){ pts.push([a,v]); v=Math.min(100,v+(b-a)/3.6e6*pct); pts.push([b,v]); }
-          if(pts.length===1) pts.push([E,soc]); else pts.push([E,v]);
-          return pts;
+        data_generator: |-
+          // Plotted straight from sensor.car_charge_forecast's trajectory: what we expect will
+          // actually happen (Smart car charge if on, plus any must-be-ready bump).
+          const f = hass.states['sensor.car_charge_forecast']?.attributes?.forecast;
+          return (f?.trajectory || []).map(p => [p[0] * 1000, p[1]]);
         show:
           in_header: false
           legend_value: false
