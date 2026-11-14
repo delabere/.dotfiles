@@ -67,6 +67,10 @@
       "cast"
       "samsungtv"
       "dlna_dmr"
+      # Tado cloud, only for Tado's own Home/Away (thermostats are on HomeKit).
+      # Polling is switched off in HA; an automation asks twice a night to
+      # stay inside Tado's daily API allowance.
+      "tado"
     ];
 
     # Pinned by nixpkgs rather than HACS: the hand-installed 13.x broke when
