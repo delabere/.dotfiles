@@ -12,6 +12,8 @@
       homeassistant = {
         external_url = "https://ha.delabere.com";
         internal_url = "http://brain:8123";
+        # The File integration appends the Tado-vs-phones presence log here.
+        allowlist_external_dirs = [ "/data/.state/home-assistant/logs" ];
       };
       # http: is no longer read from YAML (HA 2026.x migrated it into
       # .storage/http). Reverse-proxy settings for Caddy (trust 127.0.0.1/::1,
@@ -71,6 +73,7 @@
       # Polling is switched off in HA; an automation asks twice a night to
       # stay inside Tado's daily API allowance.
       "tado"
+      "file"
     ];
 
     # Pinned by nixpkgs rather than HACS: the hand-installed 13.x broke when
@@ -79,10 +82,17 @@
       octopus_energy
     ];
 
+
     customLovelaceModules = with pkgs.home-assistant-custom-lovelace-modules; [
       mini-graph-card
       # Downstairs heating chart: temperature with gas/underfloor bands
       apexcharts-card
     ];
   };
+
+  # Writable folder for the Tado-vs-phones presence log
+  # (allowlisted via homeassistant.allowlist_external_dirs above).
+  systemd.tmpfiles.rules = [
+    "d /data/.state/home-assistant/logs 0750 hass hass -"
+  ];
 }
