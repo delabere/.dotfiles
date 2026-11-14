@@ -583,8 +583,8 @@ views:
       min: 0
       max: 350
       severity:
-        green: 150
-        yellow: 50
+        green: 200
+        yellow: 100
         red: 0
       grid_options:
         columns: full
