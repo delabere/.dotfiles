@@ -1,0 +1,28 @@
+{#- Yesterday's whole-house saving from half-hours that were billed cheap only because Octopus was
+    charging the car (cheap half-hours outside the 23:30-05:30 home window). Uses Octopus's own
+    half-hourly billing (rate + consumption), minus the car's own charging in each half-hour.
+    Sets r.day, r.saving (GBP), r.kwh, r.slots. -#}
+{%- set COST = 'sensor.octopus_energy_electricity_23j0307021_1200041244369_previous_accumulative_cost' -%}
+{%- set D = 'binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching' -%}
+{%- set ch = state_attr(COST, 'charges') or [] -%}
+{%- set disp = state_attr(D, 'completed_dispatches') or [] -%}
+{%- set r = namespace(day=none, saving=0, kwh=0, slots=0) -%}
+{%- if ch | count > 0 -%}
+  {%- set r.day = ((as_datetime(ch[0].start | string) | as_local).date()) | string -%}
+  {%- set peak = ch | map(attribute='rate') | max -%}
+  {%- for c in ch -%}
+    {%- set cs = as_datetime(c.start | string) -%}{%- set ce = as_datetime(c.end | string) -%}
+    {%- set hm = (cs | as_local).strftime('%H:%M') -%}
+    {%- if c.rate < peak and not (hm >= '23:30' or hm < '05:30') -%}
+      {%- set car = namespace(k=0) -%}
+      {%- for d in disp -%}
+        {%- set ds = as_datetime(d.start | string) -%}{%- set de = as_datetime(d.end | string) -%}
+        {%- set ov = ([ce, de] | min - [cs, ds] | max).total_seconds() -%}
+        {%- set dur = (de - ds).total_seconds() -%}
+        {%- if ov > 0 and dur > 0 -%}{%- set car.k = car.k + ((d.charge_in_kwh | float(0)) | abs) * ov / dur -%}{%- endif -%}
+      {%- endfor -%}
+      {%- set house = [(c.consumption | float(0)) - car.k, 0] | max -%}
+      {%- set r.kwh = r.kwh + house -%}{%- set r.saving = r.saving + house * (peak - c.rate) -%}{%- set r.slots = r.slots + 1 -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}

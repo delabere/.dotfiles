@@ -1,4 +1,10 @@
-{ config, pkgs, ... }: {
+{ config, pkgs, ... }:
+let
+  houseCalc = builtins.readFile ./home-assistant/house-car-slot-saving.calc.jinja;
+  ufhCalc = builtins.readFile ./home-assistant/ufh-preheat-saving.calc.jinja;
+  prevOr0 = "(this.state | float(0) if this.state not in ['unknown', 'unavailable'] else 0)";
+in
+{
 
   services.home-assistant = {
     enable = true;
@@ -77,7 +83,48 @@
             attributes.forecast = builtins.readFile ./home-assistant/car-charge-forecast.jinja;
           }];
         }
+        {
+          # Saving vs peak for underfloor heating used in the nightly cheap window
+          trigger = [
+            { trigger = "state"; entity_id = "sensor.shellyplus1pm_e465b8930098_switch_0_energy"; }
+            { trigger = "homeassistant"; event = "start"; }
+          ];
+          sensor = [{
+            name = "Underfloor pre-heat saving";
+            unique_id = "underfloor_preheat_saving";
+            icon = "mdi:heating-coil";
+            unit_of_measurement = "GBP";
+            device_class = "monetary";
+            state_class = "total";
+            state = ufhCalc + "{{ (${prevOr0} + u.saving) | round(4) }}";
+            attributes.kwh = ufhCalc + "{{ ((this.attributes.kwh | default(0) | float(0)) + u.kwh) | round(3) }}";
+          }];
+        }
+        {
+          # Saving vs peak for the rest of the house in half-hours made cheap by car charging (a day late)
+          trigger = [
+            { trigger = "state"; entity_id = "sensor.octopus_energy_electricity_23j0307021_1200041244369_previous_accumulative_cost"; }
+            { trigger = "homeassistant"; event = "start"; }
+          ];
+          sensor = [{
+            name = "House saving in car-charging slots";
+            unique_id = "house_saving_car_slots";
+            icon = "mdi:home-lightning-bolt";
+            unit_of_measurement = "GBP";
+            device_class = "monetary";
+            state_class = "total";
+            state = houseCalc + "{{ (${prevOr0} + (r.saving if r.day is not none and r.day != this.attributes.last_day | default('') else 0)) | round(4) }}";
+            attributes.last_day = houseCalc + "{{ r.day }}";
+            attributes.last_day_saving = houseCalc + "{{ r.saving | round(2) }}";
+            attributes.last_day_kwh = houseCalc + "{{ r.kwh | round(2) }}";
+            attributes.last_day_slots = houseCalc + "{{ r.slots }}";
+          }];
+        }
       ];
+      utility_meter = {
+        underfloor_pre_heat_saving_month = { source = "sensor.underfloor_pre_heat_saving"; cycle = "monthly"; };
+        house_car_slot_saving_month = { source = "sensor.house_saving_in_car_charging_slots"; cycle = "monthly"; };
+      };
       automation = "!include automations.yaml";
       script = "!include scripts.yaml";
       scene = "!include scenes.yaml";

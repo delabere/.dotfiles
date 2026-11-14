@@ -1,0 +1,14 @@
+{#- Underfloor heating energy used in the nightly cheap window (23:30-05:30), valued at the
+    difference from today's peak rate. Runs on each Shelly energy update. Sets u.kwh, u.saving. -#}
+{%- set RATE = 'sensor.octopus_energy_electricity_23j0307021_1200041244369_current_rate' -%}
+{%- set RATES = 'event.octopus_energy_electricity_23j0307021_1200041244369_current_day_rates' -%}
+{%- set u = namespace(kwh=0, saving=0) -%}
+{%- set a = trigger.from_state.state | float(-1) if trigger.from_state is defined and trigger.from_state is not none else -1 -%}
+{%- set b = trigger.to_state.state | float(-1) if trigger.to_state is defined and trigger.to_state is not none else -1 -%}
+{%- set delta = b - a -%}
+{%- set hm = now().strftime('%H:%M') -%}
+{%- set rate = states(RATE) | float(1) -%}
+{%- set peak = (state_attr(RATES, 'rates') or [{'value_inc_vat': 0.3612}]) | map(attribute='value_inc_vat') | max -%}
+{%- if a >= 0 and 0 < delta < 2 and (hm >= '23:30' or hm < '05:30') and rate < peak -%}
+  {%- set u.kwh = delta -%}{%- set u.saving = delta * (peak - rate) -%}
+{%- endif -%}
