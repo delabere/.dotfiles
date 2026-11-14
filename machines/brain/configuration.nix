@@ -23,6 +23,7 @@
       ./../../services/notes-git.nix
       ./../../services/terminus.nix
       ./../../services/vellum.nix
+      ./../../services/backup.nix
     ];
 
   services.vellum.instances = {

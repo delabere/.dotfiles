@@ -1,0 +1,6 @@
+# Managed in the dotfiles repo (services/home-assistant/config). Edit here, then build-brain.
+car_must_be_ready_by:
+  name: Car must be ready by
+  icon: mdi:calendar-clock
+  has_date: true
+  has_time: true

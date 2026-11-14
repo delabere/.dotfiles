@@ -1,0 +1,118 @@
+- id: '1678459499078'
+  name: Cosy
+  entities:
+    switch.shelly1_98cdac1f5772:
+      icon: mdi:lightbulb-fluorescent-tube-outline
+      friendly_name: Kitchen Counter Lights
+      state: 'on'
+    switch.living_room_lights:
+      icon: mdi:light-recessed
+      friendly_name: Living Room Lights
+      state: 'off'
+    switch.island_lights_switch_1:
+      device_class: outlet
+      friendly_name: Island Lights Switch 1
+      state: 'on'
+    switch.kitchen_lights:
+      icon: mdi:light-recessed
+      friendly_name: Kitchen Lights
+      state: 'off'
+    switch.wall_lamp_socket_1:
+      device_class: outlet
+      friendly_name: Wall Lamp Socket 1
+      state: 'on'
+    switch.christmas_tree_socket_1:
+      device_class: outlet
+      friendly_name: Christmas Tree Socket 1
+      state: 'on'
+    switch.candle_socket_1:
+      device_class: outlet
+      friendly_name: Candle Socket 1
+      state: 'on'
+  metadata: {}
+  icon: mdi:television-classic
+- id: '1678460107210'
+  name: Bright
+  entities:
+    switch.kitchen_lights:
+      icon: mdi:light-recessed
+      friendly_name: Kitchen Lights
+      state: 'on'
+    switch.living_room_lights:
+      icon: mdi:light-recessed
+      friendly_name: Living Room Lights
+      state: 'on'
+    switch.living_room_wall_lamp_socket_1:
+      device_class: outlet
+      friendly_name: Living Room Wall Lamp Socket 1
+      state: unavailable
+    switch.island_lights_switch_1:
+      device_class: outlet
+      friendly_name: Island Lights Switch 1
+      state: 'off'
+    switch.shelly1_98cdac1f5772:
+      icon: mdi:lightbulb-fluorescent-tube-outline
+      friendly_name: Kitchen Counter Lights
+      state: 'on'
+    switch.wall_lamp_socket_1:
+      device_class: outlet
+      friendly_name: Wall Lamp Socket 1
+      state: 'off'
+  icon: mdi:brightness-7
+  metadata: {}
+- id: '1678460256595'
+  name: Dark
+  entities:
+    switch.shelly1_98cdac1f5772:
+      icon: mdi:lightbulb-fluorescent-tube-outline
+      friendly_name: Kitchen Counter Lights
+      state: 'off'
+    switch.island_lights_switch_1:
+      device_class: outlet
+      friendly_name: Island Lights Switch 1
+      state: 'off'
+    switch.living_room_lights:
+      icon: mdi:light-recessed
+      friendly_name: Living Room Lights
+      state: 'off'
+    switch.kitchen_lights:
+      icon: mdi:light-recessed
+      friendly_name: Kitchen Lights
+      state: 'off'
+    switch.wall_lamp_socket_1:
+      device_class: outlet
+      friendly_name: Wall Lamp Socket 1
+      state: 'off'
+    switch.christmas_tree_socket_1:
+      device_class: outlet
+      friendly_name: Christmas Tree Socket 1
+      state: unavailable
+    switch.candle_socket_1:
+      device_class: outlet
+      friendly_name: Candle Socket 1
+      state: unavailable
+    switch.shelly1_c45bbe6a6f8d:
+      friendly_name: Jardin Lume
+      state: 'off'
+  icon: mdi:moon-waning-crescent
+  metadata: {}
+- id: '1699100317401'
+  name: Dark
+  entities:
+    switch.living_room_lights:
+      icon: mdi:light-recessed
+      friendly_name: Living Room Lights
+      state: 'off'
+    switch.garden_lights:
+      friendly_name: Garden Lights
+      state: 'off'
+    switch.island_lights_switch_1:
+      device_class: outlet
+      friendly_name: Island Lights Switch 1
+      state: 'off'
+    switch.kitchen_lights:
+      icon: mdi:light-recessed
+      friendly_name: Kitchen Lights
+      state: 'off'
+  icon: mdi:moon-new
+  metadata: {}

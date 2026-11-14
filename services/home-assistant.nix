@@ -25,7 +25,17 @@ in
       # .storage/http). Reverse-proxy settings for Caddy (trust 127.0.0.1/::1,
       # use X-Forwarded-For) and the ban threshold live there now: Settings >
       # System > Network.
-      lovelace.resource_mode = "yaml";
+      lovelace = {
+        resource_mode = "yaml";
+        dashboards.dashboard-lights = {
+          mode = "yaml";
+          title = "Main";
+          icon = "mdi:home";
+          show_in_sidebar = true;
+          require_admin = false;
+          filename = "nix/dashboards/main.yaml";
+        };
+      };
 
       # Octopus re-plans the car's charging slots about every 30 minutes, so
       # "what was planned" has to be pinned to a moment: 21:00 each night, and
@@ -125,9 +135,18 @@ in
         underfloor_pre_heat_saving_month = { source = "sensor.underfloor_pre_heat_saving"; cycle = "monthly"; };
         house_car_slot_saving_month = { source = "sensor.house_saving_in_car_charging_slots"; cycle = "monthly"; };
       };
-      automation = "!include automations.yaml";
+      # Config as code: services/home-assistant/config is linked into HA's config dir as nix/
+      # (see systemd.tmpfiles below). The plain automations.yaml / scenes.yaml stay loaded as a
+      # "UI area" for things made in the app, which can be moved into the repo later.
+      "automation nix" = "!include nix/automations.yaml";
+      "automation ui" = "!include automations.yaml";
+      "scene nix" = "!include nix/scenes.yaml";
+      "scene ui" = "!include scenes.yaml";
       script = "!include scripts.yaml";
-      scene = "!include scenes.yaml";
+      input_boolean = "!include nix/input_boolean.yaml";
+      input_text = "!include nix/input_text.yaml";
+      input_datetime = "!include nix/input_datetime.yaml";
+      "template helpers" = "!include nix/templates.yaml";
     };
     extraComponents = [
       "shelly"
@@ -168,5 +187,7 @@ in
   # (allowlisted via homeassistant.allowlist_external_dirs above).
   systemd.tmpfiles.rules = [
     "d /data/.state/home-assistant/logs 0750 hass hass -"
+    # repo-managed HA config (automations, scenes, helpers, templates, dashboards)
+    "L+ /data/.state/home-assistant/nix - - - - ${./home-assistant/config}"
   ];
 }

@@ -1,0 +1,1206 @@
+# Managed in the dotfiles repo (services/home-assistant/config). Edit here, then build-brain.
+# Main dashboard (sidebar: Main). YAML mode: edit here, not in the UI.
+views:
+- title: Home
+  path: home
+  type: sections
+  max_columns: 4
+  badges:
+  - type: entity
+    entity: weather.forecast_home
+    show_name: false
+    show_state: true
+  - type: entity
+    entity: person.jack
+    show_name: true
+    show_state: true
+    show_icon: true
+  - type: entity
+    entity: person.laire
+    show_name: true
+    show_state: true
+    show_icon: true
+  - type: entity
+    entity: sensor.electricity_price
+    name: Electricity
+    show_name: true
+    icon: mdi:flash
+  - type: entity
+    entity: binary_sensor.octopus_energy_electricity_23j0307021_1200041244369_off_peak
+    name: Off-peak
+    show_name: true
+    icon: mdi:sleep
+  - type: entity
+    entity: sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state
+    name: Peak-rate bump
+    icon: mdi:alert-circle
+    color: red
+    show_name: true
+    show_state: false
+    show_icon: true
+    tap_action:
+      action: navigate
+      navigation_path: /dashboard-lights/car
+    visibility:
+    - condition: state
+      entity: sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state
+      state: BOOSTING
+    - condition: state
+      entity: binary_sensor.octopus_energy_electricity_23j0307021_1200041244369_off_peak
+      state: 'off'
+  sections:
+  - type: grid
+    cards:
+    - type: heading
+      heading: Lights
+      icon: mdi:lightbulb-group
+    - type: tile
+      entity: scene.new_scene
+      name: Cosy
+      icon: mdi:sofa
+      tap_action:
+        action: perform-action
+        perform_action: scene.turn_on
+        target:
+          entity_id: scene.new_scene
+      icon_tap_action:
+        action: perform-action
+        perform_action: scene.turn_on
+        target:
+          entity_id: scene.new_scene
+      grid_options:
+        columns: 4
+      hide_state: true
+    - type: tile
+      entity: scene.bright
+      name: Bright
+      icon: mdi:white-balance-sunny
+      tap_action:
+        action: perform-action
+        perform_action: scene.turn_on
+        target:
+          entity_id: scene.bright
+      icon_tap_action:
+        action: perform-action
+        perform_action: scene.turn_on
+        target:
+          entity_id: scene.bright
+      grid_options:
+        columns: 4
+      hide_state: true
+    - type: tile
+      entity: scene.dark
+      name: Dark
+      icon: mdi:weather-night
+      tap_action:
+        action: perform-action
+        perform_action: scene.turn_on
+        target:
+          entity_id: scene.dark
+      icon_tap_action:
+        action: perform-action
+        perform_action: scene.turn_on
+        target:
+          entity_id: scene.dark
+      grid_options:
+        columns: 4
+      hide_state: true
+    - type: tile
+      entity: switch.living_room_lights
+      name: Living room
+      icon: mdi:ceiling-light
+      tap_action:
+        action: toggle
+      icon_tap_action:
+        action: toggle
+    - type: tile
+      entity: switch.island_lights_switch_1
+      name: Island
+      icon: mdi:ceiling-light-multiple
+      tap_action:
+        action: toggle
+      icon_tap_action:
+        action: toggle
+    - type: tile
+      entity: switch.kitchen_lights
+      name: Kitchen
+      icon: mdi:ceiling-light
+      tap_action:
+        action: toggle
+      icon_tap_action:
+        action: toggle
+    - type: tile
+      entity: switch.shelly1_98cdac1f5772
+      name: Kitchen counter
+      icon: mdi:led-strip
+      tap_action:
+        action: toggle
+      icon_tap_action:
+        action: toggle
+    - type: tile
+      entity: switch.wall_lamp_socket_1
+      name: Wall lamp
+      icon: mdi:wall-sconce
+      tap_action:
+        action: toggle
+      icon_tap_action:
+        action: toggle
+    - type: tile
+      entity: switch.shelly1_c45bbe6a6f8d
+      name: Garden
+      icon: mdi:outdoor-lamp
+      tap_action:
+        action: toggle
+      icon_tap_action:
+        action: toggle
+  - type: grid
+    cards:
+    - type: heading
+      heading: Heating
+      icon: mdi:radiator
+    - type: thermostat
+      entity: climate.tado_smart_thermostat_ru2093884160
+      name: Downstairs
+      features:
+      - type: climate-hvac-modes
+        hvac_modes:
+        - 'off'
+        - heat
+    - type: custom:apexcharts-card
+      header:
+        show: true
+        title: Downstairs heating
+        show_states: true
+        colorize_states: false
+      graph_span: 24h
+      update_interval: 5min
+      apex_config:
+        chart:
+          height: 280
+        legend:
+          show: true
+          position: bottom
+        tooltip:
+          x:
+            format: HH:mm
+        grid:
+          borderColor: rgba(127,127,127,0.2)
+        xaxis:
+          labels:
+            datetimeFormatter:
+              hour: HH:mm
+      yaxis:
+      - min: '|-1|'
+        max: '|+0.5|'
+        decimals: 0
+        apex_config:
+          tickAmount: 4
+        id: temp
+      - id: strip
+        show: false
+        min: 0
+        max: 12
+      series:
+      - entity: sensor.tado_smart_thermostat_ru2093884160_current_temperature
+        name: 'Off'
+        type: area
+        curve: straight
+        color: '#3b4048'
+        opacity: 0.9
+        stroke_width: 2
+        data_generator: |2-
+
+          const T='sensor.tado_smart_thermostat_ru2093884160_current_temperature', C='climate.tado_smart_thermostat_ru2093884160', S='switch.shellyplus1pm_e465b8930098_switch_0';
+          const cache = (window.__heatHist = window.__heatHist || {});
+          const key = Math.floor(start.getTime()/60000) + ':' + Math.floor(end.getTime()/60000);
+          if (!cache[key]) { for (const k of Object.keys(cache)) delete cache[k]; cache[key] = hass.callWS({type:'history/history_during_period', start_time:start.toISOString(), end_time:end.toISOString(), entity_ids:[T,C,S], minimal_response:false, no_attributes:false, significant_changes_only:false}); }
+          const hist = await cache[key];
+          const ts = x => ((x.lu ?? x.lc) * 1000);
+          const steps = (arr, f) => (arr||[]).map(x => [ts(x), f(x)]).sort((a,b)=>a[0]-b[0]);
+          const temp = steps(hist[T], x => parseFloat(x.s)).filter(p => !isNaN(p[1]));
+          const gas = steps(hist[C], x => x.s === 'heat' && (x.a||{}).hvac_action === 'heating');
+          const ufh = steps(hist[S], x => x.s === 'on');
+          const at = (arr, t, i) => { while (i.v + 1 < arr.length && arr[i.v+1][0] <= t) i.v++; return arr.length && arr[i.v][0] <= t ? arr[i.v][1] : null; };
+          const out = []; const it={v:0}, ig={v:0}, iu={v:0};
+          const stop = Math.min(end.getTime(), Date.now());
+          for (let t = start.getTime(); t <= stop; t += 5*60000) {
+            const v = at(temp, t, it); if (v === null) continue;
+            const g = !!at(gas, t, ig), u = !!at(ufh, t, iu);
+            const show = "base" === 'base' || ("base" === 'gas' && g && !u) || ("base" === 'ufh' && u && !g) || ("base" === 'both' && g && u);
+            out.push([t, show ? v : null]);
+          }
+          return out;
+        show:
+          in_header: false
+          legend_value: false
+        yaxis_id: temp
+      - entity: sensor.tado_smart_thermostat_ru2093884160_current_temperature
+        name: Gas
+        type: area
+        curve: straight
+        color: '#ff9f43'
+        opacity: 0.85
+        stroke_width: 0
+        data_generator: |2-
+
+          const T='sensor.tado_smart_thermostat_ru2093884160_current_temperature', C='climate.tado_smart_thermostat_ru2093884160', S='switch.shellyplus1pm_e465b8930098_switch_0';
+          const cache = (window.__heatHist = window.__heatHist || {});
+          const key = Math.floor(start.getTime()/60000) + ':' + Math.floor(end.getTime()/60000);
+          if (!cache[key]) { for (const k of Object.keys(cache)) delete cache[k]; cache[key] = hass.callWS({type:'history/history_during_period', start_time:start.toISOString(), end_time:end.toISOString(), entity_ids:[T,C,S], minimal_response:false, no_attributes:false, significant_changes_only:false}); }
+          const hist = await cache[key];
+          const ts = x => ((x.lu ?? x.lc) * 1000);
+          const steps = (arr, f) => (arr||[]).map(x => [ts(x), f(x)]).sort((a,b)=>a[0]-b[0]);
+          const temp = steps(hist[T], x => parseFloat(x.s)).filter(p => !isNaN(p[1]));
+          const gas = steps(hist[C], x => x.s === 'heat' && (x.a||{}).hvac_action === 'heating');
+          const ufh = steps(hist[S], x => x.s === 'on');
+          const at = (arr, t, i) => { while (i.v + 1 < arr.length && arr[i.v+1][0] <= t) i.v++; return arr.length && arr[i.v][0] <= t ? arr[i.v][1] : null; };
+          const out = []; const it={v:0}, ig={v:0}, iu={v:0};
+          const stop = Math.min(end.getTime(), Date.now());
+          for (let t = start.getTime(); t <= stop; t += 5*60000) {
+            const v = at(temp, t, it); if (v === null) continue;
+            const g = !!at(gas, t, ig), u = !!at(ufh, t, iu);
+            const show = "gas" === 'base' || ("gas" === 'gas' && g && !u) || ("gas" === 'ufh' && u && !g) || ("gas" === 'both' && g && u);
+            out.push([t, show ? v : null]);
+          }
+          return out;
+        show:
+          in_header: false
+          legend_value: false
+        yaxis_id: temp
+      - entity: sensor.tado_smart_thermostat_ru2093884160_current_temperature
+        name: Underfloor
+        type: area
+        curve: straight
+        color: '#4da3ff'
+        opacity: 0.85
+        stroke_width: 0
+        data_generator: |2-
+
+          const T='sensor.tado_smart_thermostat_ru2093884160_current_temperature', C='climate.tado_smart_thermostat_ru2093884160', S='switch.shellyplus1pm_e465b8930098_switch_0';
+          const cache = (window.__heatHist = window.__heatHist || {});
+          const key = Math.floor(start.getTime()/60000) + ':' + Math.floor(end.getTime()/60000);
+          if (!cache[key]) { for (const k of Object.keys(cache)) delete cache[k]; cache[key] = hass.callWS({type:'history/history_during_period', start_time:start.toISOString(), end_time:end.toISOString(), entity_ids:[T,C,S], minimal_response:false, no_attributes:false, significant_changes_only:false}); }
+          const hist = await cache[key];
+          const ts = x => ((x.lu ?? x.lc) * 1000);
+          const steps = (arr, f) => (arr||[]).map(x => [ts(x), f(x)]).sort((a,b)=>a[0]-b[0]);
+          const temp = steps(hist[T], x => parseFloat(x.s)).filter(p => !isNaN(p[1]));
+          const gas = steps(hist[C], x => x.s === 'heat' && (x.a||{}).hvac_action === 'heating');
+          const ufh = steps(hist[S], x => x.s === 'on');
+          const at = (arr, t, i) => { while (i.v + 1 < arr.length && arr[i.v+1][0] <= t) i.v++; return arr.length && arr[i.v][0] <= t ? arr[i.v][1] : null; };
+          const out = []; const it={v:0}, ig={v:0}, iu={v:0};
+          const stop = Math.min(end.getTime(), Date.now());
+          for (let t = start.getTime(); t <= stop; t += 5*60000) {
+            const v = at(temp, t, it); if (v === null) continue;
+            const g = !!at(gas, t, ig), u = !!at(ufh, t, iu);
+            const show = "ufh" === 'base' || ("ufh" === 'gas' && g && !u) || ("ufh" === 'ufh' && u && !g) || ("ufh" === 'both' && g && u);
+            out.push([t, show ? v : null]);
+          }
+          return out;
+        show:
+          in_header: false
+          legend_value: false
+        yaxis_id: temp
+      - entity: sensor.tado_smart_thermostat_ru2093884160_current_temperature
+        name: Both
+        type: area
+        curve: straight
+        color: '#b07cff'
+        opacity: 0.9
+        stroke_width: 0
+        data_generator: |2-
+
+          const T='sensor.tado_smart_thermostat_ru2093884160_current_temperature', C='climate.tado_smart_thermostat_ru2093884160', S='switch.shellyplus1pm_e465b8930098_switch_0';
+          const cache = (window.__heatHist = window.__heatHist || {});
+          const key = Math.floor(start.getTime()/60000) + ':' + Math.floor(end.getTime()/60000);
+          if (!cache[key]) { for (const k of Object.keys(cache)) delete cache[k]; cache[key] = hass.callWS({type:'history/history_during_period', start_time:start.toISOString(), end_time:end.toISOString(), entity_ids:[T,C,S], minimal_response:false, no_attributes:false, significant_changes_only:false}); }
+          const hist = await cache[key];
+          const ts = x => ((x.lu ?? x.lc) * 1000);
+          const steps = (arr, f) => (arr||[]).map(x => [ts(x), f(x)]).sort((a,b)=>a[0]-b[0]);
+          const temp = steps(hist[T], x => parseFloat(x.s)).filter(p => !isNaN(p[1]));
+          const gas = steps(hist[C], x => x.s === 'heat' && (x.a||{}).hvac_action === 'heating');
+          const ufh = steps(hist[S], x => x.s === 'on');
+          const at = (arr, t, i) => { while (i.v + 1 < arr.length && arr[i.v+1][0] <= t) i.v++; return arr.length && arr[i.v][0] <= t ? arr[i.v][1] : null; };
+          const out = []; const it={v:0}, ig={v:0}, iu={v:0};
+          const stop = Math.min(end.getTime(), Date.now());
+          for (let t = start.getTime(); t <= stop; t += 5*60000) {
+            const v = at(temp, t, it); if (v === null) continue;
+            const g = !!at(gas, t, ig), u = !!at(ufh, t, iu);
+            const show = "both" === 'base' || ("both" === 'gas' && g && !u) || ("both" === 'ufh' && u && !g) || ("both" === 'both' && g && u);
+            out.push([t, show ? v : null]);
+          }
+          return out;
+        show:
+          in_header: false
+          legend_value: false
+        yaxis_id: temp
+      - entity: sensor.tado_smart_thermostat_ru2093884160_current_temperature
+        name: Downstairs
+        type: line
+        curve: straight
+        color: '#e6e6e6'
+        stroke_width: 2
+        data_generator: |2-
+
+          const T='sensor.tado_smart_thermostat_ru2093884160_current_temperature', C='climate.tado_smart_thermostat_ru2093884160', S='switch.shellyplus1pm_e465b8930098_switch_0';
+          const cache = (window.__heatHist = window.__heatHist || {});
+          const key = Math.floor(start.getTime()/60000) + ':' + Math.floor(end.getTime()/60000);
+          if (!cache[key]) { for (const k of Object.keys(cache)) delete cache[k]; cache[key] = hass.callWS({type:'history/history_during_period', start_time:start.toISOString(), end_time:end.toISOString(), entity_ids:[T,C,S], minimal_response:false, no_attributes:false, significant_changes_only:false}); }
+          const hist = await cache[key];
+          const ts = x => ((x.lu ?? x.lc) * 1000);
+          const steps = (arr, f) => (arr||[]).map(x => [ts(x), f(x)]).sort((a,b)=>a[0]-b[0]);
+          const temp = steps(hist[T], x => parseFloat(x.s)).filter(p => !isNaN(p[1]));
+          const gas = steps(hist[C], x => x.s === 'heat' && (x.a||{}).hvac_action === 'heating');
+          const ufh = steps(hist[S], x => x.s === 'on');
+          const at = (arr, t, i) => { while (i.v + 1 < arr.length && arr[i.v+1][0] <= t) i.v++; return arr.length && arr[i.v][0] <= t ? arr[i.v][1] : null; };
+          const out = []; const it={v:0}, ig={v:0}, iu={v:0};
+          const stop = Math.min(end.getTime(), Date.now());
+          for (let t = start.getTime(); t <= stop; t += 5*60000) {
+            const v = at(temp, t, it); if (v === null) continue;
+            const g = !!at(gas, t, ig), u = !!at(ufh, t, iu);
+            const show = "base" === 'base' || ("base" === 'gas' && g && !u) || ("base" === 'ufh' && u && !g) || ("base" === 'both' && g && u);
+            out.push([t, show ? v : null]);
+          }
+          return out;
+        show:
+          in_header: true
+          legend_value: false
+          in_legend: false
+        yaxis_id: temp
+      - entity: climate.tado_smart_thermostat_ru2093884160
+        attribute: temperature
+        name: Setpoint
+        type: line
+        curve: stepline
+        color: '#9aa0a6'
+        stroke_width: 1
+        stroke_dash: 4
+        show:
+          in_header: true
+          legend_value: false
+        yaxis_id: temp
+      - entity: binary_sensor.octopus_energy_electricity_23j0307021_1200041244369_off_peak
+        name: gap
+        type: area
+        curve: stepline
+        color: '#1c1c1c'
+        opacity: 1
+        stroke_width: 0
+        yaxis_id: strip
+        data_generator: return [[start.getTime(),1.5],[end.getTime(),1.5]];
+        show:
+          in_header: false
+          in_legend: false
+          legend_value: false
+      - entity: binary_sensor.octopus_energy_electricity_23j0307021_1200041244369_off_peak
+        name: Peak 36p
+        type: area
+        curve: stepline
+        color: '#4a4f57'
+        opacity: 1
+        stroke_width: 0
+        yaxis_id: strip
+        data_generator: return [[start.getTime(),1],[end.getTime(),1]];
+        show:
+          in_header: false
+          legend_value: false
+      - entity: binary_sensor.octopus_energy_electricity_23j0307021_1200041244369_off_peak
+        name: Off-peak 6.6p
+        type: area
+        curve: stepline
+        color: '#3fcf86'
+        opacity: 1
+        stroke_width: 0
+        yaxis_id: strip
+        transform: 'return x === ''on'' ? 1 : 0;'
+        show:
+          in_header: false
+          legend_value: false
+      grid_options:
+        columns: full
+    - type: tile
+      entity: input_boolean.smart_underfloor_heating
+      name: Smart underfloor
+      icon: mdi:heating-coil
+      tap_action:
+        action: toggle
+      icon_tap_action:
+        action: toggle
+    - type: tile
+      entity: sensor.shellyplus1pm_e465b8930098_switch_0_power
+      name: Underfloor now
+      icon: mdi:heat-wave
+    - type: tile
+      entity: climate.tado_smart_radiator_thermostat_va0592848128
+      name: Office
+      features:
+      - type: target-temperature
+      features_position: bottom
+    - type: tile
+      entity: climate.tado_smart_radiator_thermostat_va1666131200
+      name: Bedroom
+      features:
+      - type: target-temperature
+      features_position: bottom
+    - type: custom:mini-graph-card
+      name: House temps (24h)
+      hours_to_show: 24
+      points_per_hour: 2
+      line_width: 2
+      show:
+        fill: false
+      entities:
+      - entity: sensor.tado_smart_thermostat_ru2093884160_current_temperature
+        name: Downstairs
+      - entity: sensor.tado_smart_radiator_thermostat_va0592848128_current_temperature
+        name: Office
+      - entity: sensor.tado_smart_radiator_thermostat_va1666131200_current_temperature
+        name: Bedroom
+      grid_options:
+        columns: full
+  - type: grid
+    cards:
+    - type: heading
+      heading: Energy & car
+      icon: mdi:lightning-bolt
+    - type: tile
+      entity: sensor.electricity_price
+      name: Electricity now
+      icon: mdi:flash
+    - type: tile
+      entity: sensor.next_electricity_price
+      name: Next rate
+      icon: mdi:flash-outline
+    - type: tile
+      entity: sensor.gas_price
+      name: Gas
+      icon: mdi:fire
+    - type: tile
+      entity: binary_sensor.octopus_energy_electricity_23j0307021_1200041244369_off_peak
+      name: Off-peak now
+      icon: mdi:sleep
+    - type: tile
+      entity: sensor.car_status
+      name: Car
+      icon: mdi:car-electric
+      tap_action:
+        action: navigate
+        navigation_path: /dashboard-lights/car
+      grid_options:
+        columns: full
+    - type: tile
+      entity: binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching
+      name: Car charging now
+      icon: mdi:ev-station
+    - type: tile
+      entity: switch.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_bump_charge
+      name: Bump charge
+      icon: mdi:lightning-bolt-circle
+      tap_action:
+        action: toggle
+      icon_tap_action:
+        action: toggle
+    - type: tile
+      entity: sensor.octopus_energy_electricity_23j0307021_1200041244369_previous_accumulative_cost
+      name: Electricity yesterday
+      icon: mdi:cash
+    - type: tile
+      entity: sensor.octopus_energy_gas_e6s12803792462_8884829305_previous_accumulative_cost
+      name: Gas yesterday
+      icon: mdi:cash
+    - type: heading
+      heading: Savings vs peak rate
+      heading_style: subtitle
+    - type: tile
+      entity: sensor.underfloor_pre_heat_saving_month
+      name: Underfloor pre-heat · this month
+      icon: mdi:heating-coil
+    - type: tile
+      entity: sensor.house_car_slot_saving_month
+      name: House in car slots · this month
+      icon: mdi:home-lightning-bolt
+    - type: tile
+      entity: sensor.house_saving_in_car_charging_slots
+      name: House in car slots · yesterday
+      icon: mdi:calendar-today
+      state_content: last_day_saving
+      grid_options:
+        columns: full
+  - type: grid
+    cards:
+    - type: heading
+      heading: Pepper
+      icon: mdi:robot-vacuum
+    - type: tile
+      entity: vacuum.pepper_3
+      name: Pepper
+      features:
+      - type: vacuum-commands
+        commands:
+        - start_pause
+        - stop
+        - return_home
+        - locate
+      features_position: bottom
+      grid_options:
+        columns: full
+    - type: tile
+      entity: sensor.pepper_battery
+      name: Battery
+    - type: tile
+      entity: image.pepper_map_2
+      name: Map
+      icon: mdi:map
+  - type: grid
+    cards:
+    - type: heading
+      heading: Outside & people
+      icon: mdi:weather-partly-cloudy
+    - type: weather-forecast
+      entity: weather.forecast_home
+      show_current: true
+      show_forecast: true
+      forecast_type: daily
+      grid_options:
+        columns: full
+    - type: map
+      entities:
+      - entity: person.jack
+      - entity: person.laire
+      theme_mode: auto
+      default_zoom: 13
+      grid_options:
+        columns: full
+        rows: 5
+  - type: grid
+    cards:
+    - type: heading
+      heading: Internet
+      icon: mdi:web
+    - type: gauge
+      entity: sensor.speedtest_download
+      name: Download
+      needle: true
+      severity:
+        green: 150
+        yellow: 50
+        red: 0
+      grid_options:
+        columns: full
+    - type: tile
+      entity: sensor.speedtest_upload
+      name: Upload
+      icon: mdi:upload
+    - type: tile
+      entity: sensor.speedtest_ping
+      name: Ping
+      icon: mdi:timer-outline
+    - type: sensor
+      entity: sensor.speedtest_download
+      name: Download (48h)
+      graph: line
+      detail: 1
+      hours_to_show: 48
+      grid_options:
+        columns: full
+- title: Car
+  path: car
+  subview: true
+  back_path: /dashboard-lights/home
+  type: sections
+  max_columns: 2
+  sections:
+  - type: grid
+    cards:
+    - type: heading
+      heading: Forecast
+      icon: mdi:crystal-ball
+    - type: tile
+      entity: input_boolean.smart_car_charge
+      name: Smart car charge
+      icon: mdi:car-electric
+      tap_action:
+        action: toggle
+      icon_tap_action:
+        action: toggle
+      grid_options:
+        columns: full
+    - type: markdown
+      content: |-
+        {%- set D='binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching' -%}
+        {%- set soc = states('sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state_of_charge') | float(0) -%}
+        {%- set batt = 82 -%}{#- 2021 Model 3 LR: ~78 kWh usable, ~82 kWh from the wall incl. charging losses (measured) -#}{%- set _ = 0 -%}
+        {%- set goal = states('number.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_target') | float(80) -%}
+        {%- set c = namespace(k=0, h=0) -%}
+        {%- for x in (state_attr(D,'completed_dispatches') or [])[-8:] -%}
+        {%- set d = (as_datetime(x.end|string) - as_datetime(x.start|string)).total_seconds() / 3600 -%}
+        {%- if d > 0 -%}{%- set c.k = c.k + (x.charge_in_kwh|float(0))|abs -%}{%- set c.h = c.h + d -%}{%- endif -%}
+        {%- endfor -%}
+        {%- set kw = (c.k / c.h) if c.h > 0 else 2.4 -%}
+        {%- set pct = kw / batt * 100 -%}
+        {%- set p = namespace(h=0, end=none, v=soc, ready=none) -%}
+        {%- for x in (state_attr(D,'planned_dispatches') or []) | sort(attribute='start') -%}
+        {%- set e = as_datetime(x.end|string) -%}
+        {%- if e > now() -%}
+        {%- set s = [as_datetime(x.start|string), now()] | max -%}
+        {%- set d = (e - s).total_seconds() / 3600 -%}
+        {%- if p.ready is none and p.v < goal and p.v + d * pct >= goal -%}{%- set p.ready = s + timedelta(hours=(goal - p.v) / pct) -%}{%- endif -%}
+        {%- set p.h = p.h + d -%}{%- set p.v = [p.v + d * pct, 100] | min -%}{%- set p.end = e -%}
+        {%- endif -%}
+        {%- endfor -%}
+        {%- set need = ([goal - soc, 0] | max) / pct -%}
+        {%- set rem = need - p.h -%}
+        {%- if p.ready is none and rem > 0 -%}
+        {%- set base = [now(), p.end or now()] | max -%}
+        {%- set b = base.replace(hour=23, minute=30, second=0, microsecond=0) -%}
+        {%- if b < base -%}{%- set b = b + timedelta(days=1) -%}{%- endif -%}
+        {%- set nights = (rem / 6) | round(0, 'ceil') | int -%}
+        {%- set p.ready = b + timedelta(days=nights - 1, hours=rem - 6 * (nights - 1)) -%}
+        {%- endif -%}
+        {%- macro dur(hrs) -%}{{ hrs | int }} h {{ ((hrs * 60) % 60) | round(0) | int }} min{%- endmacro -%}
+        {%- macro when(t) -%}{{ t.strftime('%a %H:%M') if t.date() != now().date() else 'today ' ~ t.strftime('%H:%M') }}{%- endmacro -%}
+        | Battery **{{ soc | round(0) | int }}%** | charging at **{{ kw | round(1) }} kW** · {{ pct | round(1) }}%/h |
+        |:--|--:|
+        | Current plan{{ ' ends ' ~ when(p.end) if p.end else '' }} | {{ ('**≈' ~ (p.v | round(0) | int) ~ '%**') if p.end else 'no slots planned' }} |
+        {% if soc >= goal -%}
+        | To reach {{ goal | int }}% | **already there** |
+        {%- else -%}
+        | Charging needed to reach {{ goal | int }}% | **{{ dur(need) }}** |
+        | Bump charge now, {{ goal | int }}% at | **{{ when(now() + timedelta(hours=need)) }}** · ≈£{{ '%.2f' | format(need * kw * 0.3612) }} at peak |
+        | Off-peak only, {{ goal | int }}% by | **≈{{ when(p.ready) }}** · ≈£{{ '%.2f' | format(need * kw * 0.066) }} |
+        {%- endif %}
+        {%- set f = state_attr('sensor.car_charge_forecast','forecast') or {} %}
+        {%- macro w(iso) -%}{%- if iso -%}{%- set t = as_datetime(iso) | as_local -%}{{ t.strftime('%a %H:%M') if t.date() != now().date() else 'today ' ~ t.strftime('%H:%M') }}{%- else -%}not within 3 days{%- endif -%}{%- endmacro %}
+        {%- if is_state('input_boolean.smart_car_charge','on') %}
+        | With Smart car charge, {{ goal | int }}% by | **≈{{ w(f.get('expected_ready')) }}** · guaranteed {{ w(f.get('guaranteed_ready')) }} |
+        {%- endif %}
+        {%- if f.get('deadline') %}
+        | Must be ready by {{ w(f.get('deadline')) }} | {% if f.get('on_track') %}✅ **on track** (≈{{ f.get('battery_at_deadline_guaranteed') | int }}% guaranteed){% elif is_state('input_boolean.car_deadline_bumping','on') %}⚡ **bump charging now** to make it{% else %}⚠️ **short {{ f.get('short_hours') }} h** · will bump at peak if Octopus doesn't help (≈£{{ '%.2f' | format(f.get('short_cost_at_peak')) }}){% endif %} |
+        {%- endif %}
+
+        <sub>Off-peak estimate uses the current plan, then full 23:30–05:30 windows. Rate is the average of the last 8 charging slots. Guaranteed counts planned Octopus slots and night bumps; ≈ also assumes Octopus fills the daytime hours Smart car charge pushes it into.</sub>
+      grid_options:
+        columns: full
+    - type: tile
+      entity: input_boolean.car_must_be_ready
+      name: Must be ready
+      icon: mdi:alarm-check
+      tap_action:
+        action: toggle
+      icon_tap_action:
+        action: toggle
+    - type: tile
+      entity: input_datetime.car_must_be_ready_by
+      name: Must be ready by
+      icon: mdi:calendar-clock
+      features:
+      - type: date-set
+      features_position: bottom
+    - type: tile
+      entity: binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching
+      name: Charging now
+      icon: mdi:ev-station
+    - type: tile
+      entity: switch.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_bump_charge
+      name: Bump charge
+      icon: mdi:lightning-bolt-circle
+      tap_action:
+        action: toggle
+      icon_tap_action:
+        action: toggle
+    - type: tile
+      entity: number.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_target
+      name: Charge target
+      icon: mdi:battery-charging-80
+      features:
+      - type: numeric-input
+        style: buttons
+      features_position: bottom
+    - type: tile
+      entity: select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time
+      name: Ready by
+      icon: mdi:clock-outline
+      features:
+      - type: select-options
+      features_position: bottom
+  - type: grid
+    cards:
+    - type: heading
+      heading: Car charging
+      icon: mdi:car-electric
+    - type: custom:apexcharts-card
+      header:
+        show: true
+        title: Charging
+        show_states: true
+        colorize_states: false
+      graph_span: 30h
+      update_interval: 5min
+      now:
+        show: true
+        label: now
+        color: '#9aa0a6'
+      apex_config:
+        chart:
+          height: 360
+        legend:
+          show: true
+          position: bottom
+        tooltip:
+          x:
+            format: ddd HH:mm
+        grid:
+          borderColor: rgba(127,127,127,0.2)
+        xaxis:
+          labels:
+            datetimeFormatter:
+              hour: HH:mm
+              day: ddd
+        annotations: {}
+      yaxis:
+      - id: soc
+        min: -40
+        max: 100
+        decimals: 0
+        apex_config:
+          tickAmount: 7
+          labels:
+            formatter: EVAL:function(v){return v<0?'':Math.round(v)+'%'}
+      - id: lanes
+        show: false
+        min: 0
+        max: 22.4
+      series:
+      - entity: sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state_of_charge
+        name: Battery
+        type: area
+        curve: straight
+        color: '#2fc4c4'
+        opacity: 0.18
+        stroke_width: 2
+        yaxis_id: soc
+        extend_to: now
+        show:
+          in_header: true
+          legend_value: false
+      - entity: sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state_of_charge
+        name: Forecast
+        type: line
+        curve: straight
+        color: '#e6e6e6'
+        stroke_width: 2
+        stroke_dash: 4
+        yaxis_id: soc
+        data_generator: |2-
+
+          const D='binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching', OP='binary_sensor.octopus_energy_electricity_23j0307021_1200041244369_off_peak', SNAP='sensor.car_charging_plan_snapshot';
+          const S=start.getTime(), E=end.getTime(), NOW=Date.now();
+          const ms=s=>new Date(s).getTime();
+          const iv=arr=>(Array.isArray(arr)?arr:[]).map(x=>[ms(x.start),ms(x.end),Math.abs(x.charge_in_kwh ?? x.kwh ?? 0)]).filter(x=>!isNaN(x[0])&&!isNaN(x[1]));
+          const ov=(a,list)=>list.some(b=>b[0]<a[1]&&b[1]>a[0]);
+          const steps=(ranges,v)=>{ const pts=[[S,0]]; ranges.slice().sort((a,b)=>a[0]-b[0]).forEach(([a,b])=>{ if(b<S||a>E) return; pts.push([Math.max(a,S),v]); pts.push([Math.min(b,E),0]); }); pts.push([E,0]); return pts.sort((a,b)=>a[0]-b[0]); };
+          const A=hass.states[D]?.attributes||{};
+          const completed=iv(A.completed_dispatches), live=iv(A.planned_dispatches), frozen=iv(hass.states[SNAP]?.attributes?.planned);
+          const dropped=frozen.filter(f=>f[1]<=NOW && !ov(f,completed));
+          const kept=frozen.filter(f=>!dropped.includes(f)).concat(live.filter(l=>l[1]>NOW && !ov(l,frozen)));
+          const charged=frozen.length?completed.filter(c=>ov(c,frozen)):completed;
+          const added=frozen.length?completed.filter(c=>!ov(c,frozen)):[];
+          const upcoming=live.filter(l=>l[1]>NOW).map(l=>[Math.max(l[0],NOW),l[1]]);
+
+          const soc=parseFloat(hass.states['sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state_of_charge']?.state); if(isNaN(soc)) return [];
+          const batt=82 /* 2021 Model 3 LR: ~78 kWh usable, ~82 kWh from the wall incl. charging losses (measured) */;
+          const recent=completed.slice(-8); const kwh=recent.reduce((s,c)=>s+c[2],0), hrs=recent.reduce((s,c)=>s+(c[1]-c[0])/3.6e6,0);
+          const kw=hrs>0?kwh/hrs:2.4, pct=kw/batt*100;
+          const pts=[[NOW,soc]]; let v=soc;
+          for(const [a,b] of upcoming.sort((x,y)=>x[0]-y[0])){ pts.push([a,v]); v=Math.min(100,v+(b-a)/3.6e6*pct); pts.push([b,v]); }
+          if(pts.length===1) pts.push([E,soc]); else pts.push([E,v]);
+          return pts;
+        show:
+          in_header: false
+          legend_value: false
+      - entity: number.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_target
+        name: Target
+        type: line
+        curve: stepline
+        color: '#ff6b6b'
+        stroke_width: 1
+        stroke_dash: 5
+        yaxis_id: soc
+        extend_to: end
+        show:
+          in_header: false
+          legend_value: false
+      - entity: binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching
+        name: lane
+        type: area
+        curve: stepline
+        color: '#1c1c1c'
+        opacity: 1
+        stroke_width: 0
+        yaxis_id: lanes
+        data_generator: return [[start.getTime(),6.4],[end.getTime(),6.4]];
+        show:
+          in_header: false
+          legend_value: false
+          in_legend: false
+      - entity: binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching
+        name: lane
+        type: area
+        curve: stepline
+        color: '#34383f'
+        opacity: 1
+        stroke_width: 0
+        yaxis_id: lanes
+        data_generator: return [[start.getTime(),6],[end.getTime(),6]];
+        show:
+          in_header: false
+          legend_value: false
+          in_legend: false
+      - entity: binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching
+        name: Off-peak
+        type: area
+        curve: stepline
+        color: '#3fcf86'
+        opacity: 1
+        stroke_width: 0
+        yaxis_id: lanes
+        data_generator: |2-
+
+          const D='binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching', OP='binary_sensor.octopus_energy_electricity_23j0307021_1200041244369_off_peak', SNAP='sensor.car_charging_plan_snapshot';
+          const S=start.getTime(), E=end.getTime(), NOW=Date.now();
+          const ms=s=>new Date(s).getTime();
+          const iv=arr=>(Array.isArray(arr)?arr:[]).map(x=>[ms(x.start),ms(x.end),Math.abs(x.charge_in_kwh ?? x.kwh ?? 0)]).filter(x=>!isNaN(x[0])&&!isNaN(x[1]));
+          const ov=(a,list)=>list.some(b=>b[0]<a[1]&&b[1]>a[0]);
+          const steps=(ranges,v)=>{ const pts=[[S,0]]; ranges.slice().sort((a,b)=>a[0]-b[0]).forEach(([a,b])=>{ if(b<S||a>E) return; pts.push([Math.max(a,S),v]); pts.push([Math.min(b,E),0]); }); pts.push([E,0]); return pts.sort((a,b)=>a[0]-b[0]); };
+          const A=hass.states[D]?.attributes||{};
+          const completed=iv(A.completed_dispatches), live=iv(A.planned_dispatches), frozen=iv(hass.states[SNAP]?.attributes?.planned);
+          const dropped=frozen.filter(f=>f[1]<=NOW && !ov(f,completed));
+          const kept=frozen.filter(f=>!dropped.includes(f)).concat(live.filter(l=>l[1]>NOW && !ov(l,frozen)));
+          const charged=frozen.length?completed.filter(c=>ov(c,frozen)):completed;
+          const added=frozen.length?completed.filter(c=>!ov(c,frozen)):[];
+          const upcoming=live.filter(l=>l[1]>NOW).map(l=>[Math.max(l[0],NOW),l[1]]);
+
+          const cache=(window.__opHist=window.__opHist||{}); const key=Math.floor(S/60000);
+          if(!cache[key]){ for(const k of Object.keys(cache)) delete cache[k]; cache[key]=hass.callWS({type:'history/history_during_period',start_time:start.toISOString(),end_time:new Date(NOW).toISOString(),entity_ids:[OP],minimal_response:true,no_attributes:true,significant_changes_only:false}); }
+          const hist=(await cache[key])[OP]||[]; const r=[]; let on=null;
+          for(const x of hist){ const t=((x.lu??x.lc)*1000); if(x.s==='on'&&on===null) on=t; if(x.s!=='on'&&on!==null){ r.push([on,t]); on=null; } }
+          if(on!==null) r.push([on,NOW]);
+          const gas=parseFloat(hass.states['sensor.octopus_energy_gas_e6s12803792462_8884829305_current_rate']?.state)||0.0858;
+          for(const ev of ['event.octopus_energy_electricity_23j0307021_1200041244369_current_day_rates','event.octopus_energy_electricity_23j0307021_1200041244369_next_day_rates']){
+            for(const x of (hass.states[ev]?.attributes?.rates||[])){ const a=ms(x.start), b=ms(x.end); if(b>NOW && x.value_inc_vat < gas/0.9) r.push([Math.max(a,NOW),b]); } }
+          return steps(r, 6.0);
+        show:
+          in_header: false
+          legend_value: false
+          in_legend: true
+      - entity: binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching
+        name: lane
+        type: area
+        curve: stepline
+        color: '#1c1c1c'
+        opacity: 1
+        stroke_width: 0
+        yaxis_id: lanes
+        data_generator: return [[start.getTime(),4.4],[end.getTime(),4.4]];
+        show:
+          in_header: false
+          legend_value: false
+          in_legend: false
+      - entity: binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching
+        name: lane
+        type: area
+        curve: stepline
+        color: '#34383f'
+        opacity: 1
+        stroke_width: 0
+        yaxis_id: lanes
+        data_generator: return [[start.getTime(),3.8],[end.getTime(),3.8]];
+        show:
+          in_header: false
+          legend_value: false
+          in_legend: false
+      - entity: binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching
+        name: Planned
+        type: area
+        curve: stepline
+        color: '#2fc4c4'
+        opacity: 0.55
+        stroke_width: 0
+        yaxis_id: lanes
+        data_generator: |2-
+
+          const D='binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching', OP='binary_sensor.octopus_energy_electricity_23j0307021_1200041244369_off_peak', SNAP='sensor.car_charging_plan_snapshot';
+          const S=start.getTime(), E=end.getTime(), NOW=Date.now();
+          const ms=s=>new Date(s).getTime();
+          const iv=arr=>(Array.isArray(arr)?arr:[]).map(x=>[ms(x.start),ms(x.end),Math.abs(x.charge_in_kwh ?? x.kwh ?? 0)]).filter(x=>!isNaN(x[0])&&!isNaN(x[1]));
+          const ov=(a,list)=>list.some(b=>b[0]<a[1]&&b[1]>a[0]);
+          const steps=(ranges,v)=>{ const pts=[[S,0]]; ranges.slice().sort((a,b)=>a[0]-b[0]).forEach(([a,b])=>{ if(b<S||a>E) return; pts.push([Math.max(a,S),v]); pts.push([Math.min(b,E),0]); }); pts.push([E,0]); return pts.sort((a,b)=>a[0]-b[0]); };
+          const A=hass.states[D]?.attributes||{};
+          const completed=iv(A.completed_dispatches), live=iv(A.planned_dispatches), frozen=iv(hass.states[SNAP]?.attributes?.planned);
+          const dropped=frozen.filter(f=>f[1]<=NOW && !ov(f,completed));
+          const kept=frozen.filter(f=>!dropped.includes(f)).concat(live.filter(l=>l[1]>NOW && !ov(l,frozen)));
+          const charged=frozen.length?completed.filter(c=>ov(c,frozen)):completed;
+          const added=frozen.length?completed.filter(c=>!ov(c,frozen)):[];
+          const upcoming=live.filter(l=>l[1]>NOW).map(l=>[Math.max(l[0],NOW),l[1]]);
+
+          return steps(kept, 3.8);
+        show:
+          in_header: false
+          legend_value: false
+          in_legend: true
+      - entity: binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching
+        name: Dropped
+        type: area
+        curve: stepline
+        color: '#ff6b6b'
+        opacity: 1
+        stroke_width: 0
+        yaxis_id: lanes
+        data_generator: |2-
+
+          const D='binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching', OP='binary_sensor.octopus_energy_electricity_23j0307021_1200041244369_off_peak', SNAP='sensor.car_charging_plan_snapshot';
+          const S=start.getTime(), E=end.getTime(), NOW=Date.now();
+          const ms=s=>new Date(s).getTime();
+          const iv=arr=>(Array.isArray(arr)?arr:[]).map(x=>[ms(x.start),ms(x.end),Math.abs(x.charge_in_kwh ?? x.kwh ?? 0)]).filter(x=>!isNaN(x[0])&&!isNaN(x[1]));
+          const ov=(a,list)=>list.some(b=>b[0]<a[1]&&b[1]>a[0]);
+          const steps=(ranges,v)=>{ const pts=[[S,0]]; ranges.slice().sort((a,b)=>a[0]-b[0]).forEach(([a,b])=>{ if(b<S||a>E) return; pts.push([Math.max(a,S),v]); pts.push([Math.min(b,E),0]); }); pts.push([E,0]); return pts.sort((a,b)=>a[0]-b[0]); };
+          const A=hass.states[D]?.attributes||{};
+          const completed=iv(A.completed_dispatches), live=iv(A.planned_dispatches), frozen=iv(hass.states[SNAP]?.attributes?.planned);
+          const dropped=frozen.filter(f=>f[1]<=NOW && !ov(f,completed));
+          const kept=frozen.filter(f=>!dropped.includes(f)).concat(live.filter(l=>l[1]>NOW && !ov(l,frozen)));
+          const charged=frozen.length?completed.filter(c=>ov(c,frozen)):completed;
+          const added=frozen.length?completed.filter(c=>!ov(c,frozen)):[];
+          const upcoming=live.filter(l=>l[1]>NOW).map(l=>[Math.max(l[0],NOW),l[1]]);
+
+          return steps(dropped, 3.8);
+        show:
+          in_header: false
+          legend_value: false
+          in_legend: true
+      - entity: binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching
+        name: lane
+        type: area
+        curve: stepline
+        color: '#1c1c1c'
+        opacity: 1
+        stroke_width: 0
+        yaxis_id: lanes
+        data_generator: return [[start.getTime(),2.2],[end.getTime(),2.2]];
+        show:
+          in_header: false
+          legend_value: false
+          in_legend: false
+      - entity: binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching
+        name: lane
+        type: area
+        curve: stepline
+        color: '#34383f'
+        opacity: 1
+        stroke_width: 0
+        yaxis_id: lanes
+        data_generator: return [[start.getTime(),1.6],[end.getTime(),1.6]];
+        show:
+          in_header: false
+          legend_value: false
+          in_legend: false
+      - entity: binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching
+        name: Charged
+        type: area
+        curve: stepline
+        color: '#2fc4c4'
+        opacity: 1
+        stroke_width: 0
+        yaxis_id: lanes
+        data_generator: |2-
+
+          const D='binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching', OP='binary_sensor.octopus_energy_electricity_23j0307021_1200041244369_off_peak', SNAP='sensor.car_charging_plan_snapshot';
+          const S=start.getTime(), E=end.getTime(), NOW=Date.now();
+          const ms=s=>new Date(s).getTime();
+          const iv=arr=>(Array.isArray(arr)?arr:[]).map(x=>[ms(x.start),ms(x.end),Math.abs(x.charge_in_kwh ?? x.kwh ?? 0)]).filter(x=>!isNaN(x[0])&&!isNaN(x[1]));
+          const ov=(a,list)=>list.some(b=>b[0]<a[1]&&b[1]>a[0]);
+          const steps=(ranges,v)=>{ const pts=[[S,0]]; ranges.slice().sort((a,b)=>a[0]-b[0]).forEach(([a,b])=>{ if(b<S||a>E) return; pts.push([Math.max(a,S),v]); pts.push([Math.min(b,E),0]); }); pts.push([E,0]); return pts.sort((a,b)=>a[0]-b[0]); };
+          const A=hass.states[D]?.attributes||{};
+          const completed=iv(A.completed_dispatches), live=iv(A.planned_dispatches), frozen=iv(hass.states[SNAP]?.attributes?.planned);
+          const dropped=frozen.filter(f=>f[1]<=NOW && !ov(f,completed));
+          const kept=frozen.filter(f=>!dropped.includes(f)).concat(live.filter(l=>l[1]>NOW && !ov(l,frozen)));
+          const charged=frozen.length?completed.filter(c=>ov(c,frozen)):completed;
+          const added=frozen.length?completed.filter(c=>!ov(c,frozen)):[];
+          const upcoming=live.filter(l=>l[1]>NOW).map(l=>[Math.max(l[0],NOW),l[1]]);
+
+          return steps(charged, 1.6);
+        show:
+          in_header: false
+          legend_value: false
+          in_legend: true
+      - entity: binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching
+        name: Unplanned
+        type: area
+        curve: stepline
+        color: '#3fcf86'
+        opacity: 1
+        stroke_width: 0
+        yaxis_id: lanes
+        data_generator: |2-
+
+          const D='binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching', OP='binary_sensor.octopus_energy_electricity_23j0307021_1200041244369_off_peak', SNAP='sensor.car_charging_plan_snapshot';
+          const S=start.getTime(), E=end.getTime(), NOW=Date.now();
+          const ms=s=>new Date(s).getTime();
+          const iv=arr=>(Array.isArray(arr)?arr:[]).map(x=>[ms(x.start),ms(x.end),Math.abs(x.charge_in_kwh ?? x.kwh ?? 0)]).filter(x=>!isNaN(x[0])&&!isNaN(x[1]));
+          const ov=(a,list)=>list.some(b=>b[0]<a[1]&&b[1]>a[0]);
+          const steps=(ranges,v)=>{ const pts=[[S,0]]; ranges.slice().sort((a,b)=>a[0]-b[0]).forEach(([a,b])=>{ if(b<S||a>E) return; pts.push([Math.max(a,S),v]); pts.push([Math.min(b,E),0]); }); pts.push([E,0]); return pts.sort((a,b)=>a[0]-b[0]); };
+          const A=hass.states[D]?.attributes||{};
+          const completed=iv(A.completed_dispatches), live=iv(A.planned_dispatches), frozen=iv(hass.states[SNAP]?.attributes?.planned);
+          const dropped=frozen.filter(f=>f[1]<=NOW && !ov(f,completed));
+          const kept=frozen.filter(f=>!dropped.includes(f)).concat(live.filter(l=>l[1]>NOW && !ov(l,frozen)));
+          const charged=frozen.length?completed.filter(c=>ov(c,frozen)):completed;
+          const added=frozen.length?completed.filter(c=>!ov(c,frozen)):[];
+          const upcoming=live.filter(l=>l[1]>NOW).map(l=>[Math.max(l[0],NOW),l[1]]);
+
+          return steps(added, 1.6);
+        show:
+          in_header: false
+          legend_value: false
+          in_legend: true
+      - entity: sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state
+        name: Bumped
+        type: area
+        curve: stepline
+        color: '#b07cff'
+        opacity: 1
+        stroke_width: 0
+        yaxis_id: lanes
+        data_generator: |2-
+
+          const D='binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching', OP='binary_sensor.octopus_energy_electricity_23j0307021_1200041244369_off_peak', SNAP='sensor.car_charging_plan_snapshot';
+          const S=start.getTime(), E=end.getTime(), NOW=Date.now();
+          const ms=s=>new Date(s).getTime();
+          const iv=arr=>(Array.isArray(arr)?arr:[]).map(x=>[ms(x.start),ms(x.end),Math.abs(x.charge_in_kwh ?? x.kwh ?? 0)]).filter(x=>!isNaN(x[0])&&!isNaN(x[1]));
+          const ov=(a,list)=>list.some(b=>b[0]<a[1]&&b[1]>a[0]);
+          const steps=(ranges,v)=>{ const pts=[[S,0]]; ranges.slice().sort((a,b)=>a[0]-b[0]).forEach(([a,b])=>{ if(b<S||a>E) return; pts.push([Math.max(a,S),v]); pts.push([Math.min(b,E),0]); }); pts.push([E,0]); return pts.sort((a,b)=>a[0]-b[0]); };
+          const A=hass.states[D]?.attributes||{};
+          const completed=iv(A.completed_dispatches), live=iv(A.planned_dispatches), frozen=iv(hass.states[SNAP]?.attributes?.planned);
+          const dropped=frozen.filter(f=>f[1]<=NOW && !ov(f,completed));
+          const kept=frozen.filter(f=>!dropped.includes(f)).concat(live.filter(l=>l[1]>NOW && !ov(l,frozen)));
+          const charged=frozen.length?completed.filter(c=>ov(c,frozen)):completed;
+          const added=frozen.length?completed.filter(c=>!ov(c,frozen)):[];
+          const upcoming=live.filter(l=>l[1]>NOW).map(l=>[Math.max(l[0],NOW),l[1]]);
+
+          const B='sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state'; const hist=(await hass.callWS({type:'history/history_during_period',start_time:start.toISOString(),end_time:new Date(NOW).toISOString(),entity_ids:[B],minimal_response:true,no_attributes:true,significant_changes_only:false}))[B]||[];
+          const r=[]; let on=null; for(const x of hist){ const t=((x.lu??x.lc)*1000); if(x.s==='BOOSTING'&&on===null) on=t; if(x.s!=='BOOSTING'&&on!==null){ r.push([on,t]); on=null; } } if(on!==null) r.push([on,NOW]);
+          return steps(r, 1.6);
+        show:
+          in_header: false
+          legend_value: false
+      - entity: binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching
+        name: Upcoming
+        type: area
+        curve: stepline
+        color: '#2fc4c4'
+        opacity: 0.35
+        stroke_width: 0
+        yaxis_id: lanes
+        data_generator: |2-
+
+          const D='binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching', OP='binary_sensor.octopus_energy_electricity_23j0307021_1200041244369_off_peak', SNAP='sensor.car_charging_plan_snapshot';
+          const S=start.getTime(), E=end.getTime(), NOW=Date.now();
+          const ms=s=>new Date(s).getTime();
+          const iv=arr=>(Array.isArray(arr)?arr:[]).map(x=>[ms(x.start),ms(x.end),Math.abs(x.charge_in_kwh ?? x.kwh ?? 0)]).filter(x=>!isNaN(x[0])&&!isNaN(x[1]));
+          const ov=(a,list)=>list.some(b=>b[0]<a[1]&&b[1]>a[0]);
+          const steps=(ranges,v)=>{ const pts=[[S,0]]; ranges.slice().sort((a,b)=>a[0]-b[0]).forEach(([a,b])=>{ if(b<S||a>E) return; pts.push([Math.max(a,S),v]); pts.push([Math.min(b,E),0]); }); pts.push([E,0]); return pts.sort((a,b)=>a[0]-b[0]); };
+          const A=hass.states[D]?.attributes||{};
+          const completed=iv(A.completed_dispatches), live=iv(A.planned_dispatches), frozen=iv(hass.states[SNAP]?.attributes?.planned);
+          const dropped=frozen.filter(f=>f[1]<=NOW && !ov(f,completed));
+          const kept=frozen.filter(f=>!dropped.includes(f)).concat(live.filter(l=>l[1]>NOW && !ov(l,frozen)));
+          const charged=frozen.length?completed.filter(c=>ov(c,frozen)):completed;
+          const added=frozen.length?completed.filter(c=>!ov(c,frozen)):[];
+          const upcoming=live.filter(l=>l[1]>NOW).map(l=>[Math.max(l[0],NOW),l[1]]);
+
+          return steps(upcoming, 1.6);
+        show:
+          in_header: false
+          legend_value: false
+          in_legend: false
+      - entity: input_datetime.car_must_be_ready_by
+        name: Deadline
+        type: line
+        curve: straight
+        color: '#ffb020'
+        stroke_width: 2
+        yaxis_id: soc
+        data_generator: if (hass.states['input_boolean.car_must_be_ready']?.state !== 'on') return []; const s = hass.states['input_datetime.car_must_be_ready_by']?.state; if (!s) return []; const t = new Date(s.replace(' ', 'T')).getTime(); if (isNaN(t) || t < start.getTime() || t > end.getTime()) return []; return [[t, -40], [t, 100]];
+        show:
+          in_header: false
+          legend_value: false
+        extend_to: false
+      grid_options:
+        columns: full
+      span:
+        end: hour
+        offset: +12h
+    - type: custom:apexcharts-card
+      header:
+        show: true
+        title: Cheap charging allowance
+        show_states: true
+        colorize_states: false
+      graph_span: 48h
+      update_interval: 5min
+      apex_config:
+        chart:
+          height: 200
+        legend:
+          show: false
+        tooltip:
+          x:
+            format: ddd HH:mm
+        grid:
+          borderColor: rgba(127,127,127,0.2)
+        xaxis:
+          labels:
+            datetimeFormatter:
+              hour: HH:mm
+              day: ddd
+        annotations:
+          yaxis:
+          - y: 6
+            borderColor: '#ff6b6b'
+            strokeDashArray: 5
+            label:
+              text: 6 h allowance
+              position: left
+              textAnchor: start
+              offsetX: 4
+              borderWidth: 0
+              style:
+                background: transparent
+                color: '#ff6b6b'
+      yaxis:
+      - min: 0
+        max: 8
+        decimals: 1
+        apex_config:
+          tickAmount: 4
+      series:
+      - entity: sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_cap_hours
+        name: Used
+        type: area
+        curve: stepline
+        color: '#2fc4c4'
+        opacity: 0.35
+        stroke_width: 2
+        extend_to: now
+        show:
+          in_header: true
+          legend_value: false
+      - entity: sensor.cheap_charging_left
+        name: Left
+        type: line
+        curve: stepline
+        color: '#3fcf86'
+        stroke_width: 0
+        show:
+          in_header: true
+          in_chart: false
+          legend_value: false
+      grid_options:
+        columns: full
+title: Home

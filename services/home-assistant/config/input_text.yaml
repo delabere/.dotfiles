@@ -1,0 +1,7 @@
+# Managed in the dotfiles repo (services/home-assistant/config). Edit here, then build-brain.
+smart_car_charge_normal_ready_by:
+  name: Smart car charge normal ready-by
+  icon: mdi:clock-outline
+  min: 0
+  max: 5
+  mode: text

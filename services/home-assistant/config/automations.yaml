@@ -1,0 +1,876 @@
+- id: '1697415571438'
+  alias: New Automation
+  description: ''
+  trigger: []
+  condition: []
+  action: []
+  mode: single
+- id: '1755436340003'
+  alias: Cosytag
+  description: ''
+  triggers:
+  - trigger: tag
+    tag_id: 0b0cf0cb-1721-4584-a267-4332be38b2ea
+  conditions: []
+  actions:
+  - action: scene.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: scene.new_scene
+  mode: single
+- id: '1755466067015'
+  alias: New automation
+  description: ''
+  triggers:
+  - trigger: tag
+    tag_id: 36a7c49a-525e-4009-b762-9afce96e95e2
+  conditions: []
+  actions:
+  - action: scene.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: scene.dark
+  mode: single
+- id: '1764527697629'
+  alias: Cosy Button - 1 presss
+  description: ''
+  triggers:
+  - device_id: 6784589242f1de4851522bd513e3c6e4
+    domain: bthome
+    type: button
+    subtype: press
+    trigger: device
+  conditions: []
+  actions:
+  - action: scene.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: scene.new_scene
+  mode: single
+- id: '1764527776014'
+  alias: Bright - button 2 tap
+  description: ''
+  triggers:
+  - device_id: 6784589242f1de4851522bd513e3c6e4
+    domain: bthome
+    type: button
+    subtype: double_press
+    trigger: device
+  conditions: []
+  actions:
+  - action: scene.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: scene.bright
+  mode: single
+- id: '1764527833055'
+  alias: Dark - Button long press 10s
+  description: ''
+  triggers:
+  - device_id: 6784589242f1de4851522bd513e3c6e4
+    domain: bthome
+    type: button
+    subtype: long_press
+    trigger: device
+  conditions: []
+  actions:
+  - action: scene.turn_on
+    metadata: {}
+    data:
+      transition: 10
+    target:
+      entity_id:
+      - scene.dark
+  mode: single
+- id: '1764540426287'
+  alias: Garden toggle triple
+  description: ''
+  triggers:
+  - device_id: 6784589242f1de4851522bd513e3c6e4
+    domain: bthome
+    type: button
+    subtype: triple_press
+    trigger: device
+  conditions: []
+  actions:
+  - type: toggle
+    device_id: 3a9c3c1d3c1ae9be2870d6865447a2b1
+    entity_id: e3c4498942f5c9ca2957278c845bdc59
+    domain: switch
+  mode: single
+- id: '1794478196863'
+  alias: Underfloor heating - follow downstairs Tado
+  description: 'Normal: follow downstairs Tado heat demand. Smart (input_boolean.smart_underfloor_heating
+    on): on cheap electricity (Octopus off-peak or car-charging slots), run with the
+    Tado whenever it calls for heat; and pre-heat the floor to the comfort temperature
+    + 1°C (Tado setpoint when on, otherwise the 21°C morning temperature) in the last
+    3 hours of a cheap block, or earlier if the room is 1.5°C+ behind. Pre-heat (the
+    +1°C overshoot, day or night) only happens in heating season, i.e. when the Met
+    Office outdoor temperature is below 15°C; following the Tado is unaffected. Pre-heat
+    works with the Tado off overnight, and skips when Tado is in Away mode (or, if
+    the Tado cloud connection is down, when the phones say nobody is home). Shelly
+    protection faults always stop it.'
+  triggers:
+  - trigger: state
+    entity_id: climate.tado_smart_thermostat_ru2093884160
+  - trigger: state
+    entity_id:
+    - binary_sensor.shellyplus1pm_e465b8930098_switch_0_overheating
+    - binary_sensor.shellyplus1pm_e465b8930098_switch_0_overcurrent
+    - binary_sensor.shellyplus1pm_e465b8930098_switch_0_overpowering
+    - binary_sensor.shellyplus1pm_e465b8930098_switch_0_overvoltage
+    - switch.shellyplus1pm_e465b8930098_switch_0
+  - trigger: state
+    entity_id:
+    - input_boolean.smart_underfloor_heating
+    - binary_sensor.octopus_energy_electricity_23j0307021_1200041244369_off_peak
+    - sensor.octopus_energy_electricity_23j0307021_1200041244369_current_rate
+    - sensor.tado_smart_thermostat_ru2093884160_current_temperature
+    - sensor.ranger_s_cottage_tado_mode
+  - trigger: homeassistant
+    event: start
+  - trigger: time_pattern
+    minutes: /5
+  actions:
+  - if:
+    - condition: template
+      value_template: '{{ fault }}'
+    then:
+    - action: persistent_notification.create
+      data:
+        title: Underfloor heating protection fault
+        message: The Shelly reported a protection fault. Check the underfloor heating
+          protection history and investigate the cause.
+        notification_id: underfloor_heating_fault
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ want_on and not relay_on }}'
+      sequence:
+      - action: switch.turn_on
+        target:
+          entity_id: switch.shellyplus1pm_e465b8930098_switch_0
+    - conditions:
+      - condition: template
+        value_template: '{{ relay_on and not want_on }}'
+      sequence:
+      - action: switch.turn_off
+        target:
+          entity_id: switch.shellyplus1pm_e465b8930098_switch_0
+  variables:
+    tado: climate.tado_smart_thermostat_ru2093884160
+    relay: switch.shellyplus1pm_e465b8930098_switch_0
+    morning_temperature: 21
+    heat_when_outside_below: 15
+    preheat_above_setpoint: 1
+    preheat_hysteresis: 0.3
+    preheat_last_hours: 3
+    early_preheat_deficit: 1.5
+    boiler_efficiency: 0.9
+    fault: '{{ ["binary_sensor.shellyplus1pm_e465b8930098_switch_0_overheating","binary_sensor.shellyplus1pm_e465b8930098_switch_0_overcurrent","binary_sensor.shellyplus1pm_e465b8930098_switch_0_overpowering","binary_sensor.shellyplus1pm_e465b8930098_switch_0_overvoltage"]
+      | select(''is_state'',''on'') | list | count > 0 }}'
+    tado_heat: '{{ is_state(tado,''heat'') }}'
+    tado_calling: '{{ is_state(tado,''heat'') and state_attr(tado,''hvac_action'')
+      == ''heating'' }}'
+    setpoint: '{{ state_attr(tado,''temperature'') | float(0) }}'
+    room: '{{ states(''sensor.tado_smart_thermostat_ru2093884160_current_temperature'')
+      | float(99) }}'
+    smart: '{{ is_state(''input_boolean.smart_underfloor_heating'',''on'') }}'
+    elec_rate: '{{ states(''sensor.octopus_energy_electricity_23j0307021_1200041244369_current_rate'')
+      | float(1) }}'
+    gas_rate: '{{ states(''sensor.octopus_energy_gas_e6s12803792462_8884829305_current_rate'')
+      | float(0) }}'
+    cheap: '{{ is_state(''binary_sensor.octopus_energy_electricity_23j0307021_1200041244369_off_peak'',''on'')
+      or (gas_rate > 0 and elec_rate < gas_rate / boiler_efficiency) }}'
+    relay_on: '{{ is_state(relay,''on'') }}'
+    tado_ok: '{{ (config_entry_attr(''01M7CP3SCQSE2X2YW6F0AEZESQ'',''state'') | string)
+      == ''loaded'' and states(''sensor.ranger_s_cottage_tado_mode'') in [''HOME'',''AWAY'']
+      }}'
+    tado_away: '{% if tado_ok %}{{ is_state(''sensor.ranger_s_cottage_tado_mode'',''AWAY'')
+      }}{% else %}{{ states(''zone.home'') | int(1) == 0 }}{% endif %}'
+    comfort: '{{ setpoint if tado_heat and setpoint >= 18 else morning_temperature
+      }}'
+    preheat_target: '{{ comfort + preheat_above_setpoint - (0 if relay_on else preheat_hysteresis)
+      }}'
+    cheap_hours_left: '{%- set t = now() -%}{%- set rates = ((state_attr(''event.octopus_energy_electricity_23j0307021_1200041244369_current_day_rates'',''rates'')
+      or []) + (state_attr(''event.octopus_energy_electricity_23j0307021_1200041244369_next_day_rates'',''rates'')
+      or [])) | sort(attribute=''start'') -%}{%- set ns = namespace(end=t) -%}{%-
+      for r in rates -%}{%- if as_datetime(r.start|string) <= ns.end < as_datetime(r.end|string)
+      and r.value_inc_vat < gas_rate / boiler_efficiency -%}{%- set ns.end = as_datetime(r.end|string)
+      -%}{%- endif -%}{%- endfor -%}{{ ((ns.end - t).total_seconds() / 3600) | round(2)
+      }}'
+    late_in_window: '{{ cheap_hours_left | float(0) <= preheat_last_hours }}'
+    far_behind: '{{ room <= comfort + preheat_above_setpoint - preheat_hysteresis
+      - early_preheat_deficit }}'
+    follow: '{{ tado_calling and cheap }}'
+    outside_temp: '{{ state_attr(''weather.forecast_home'',''temperature'') | float(10)
+      }}'
+    heating_season: '{{ outside_temp < heat_when_outside_below }}'
+    preheat: '{{ cheap and heating_season and not tado_away and room < preheat_target
+      and (late_in_window or far_behind) }}'
+    want_on: '{% if fault %}{{ false }}{% elif not smart %}{{ tado_calling }}{% else
+      %}{{ follow or preheat }}{% endif %}'
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 200
+- id: claude_lights_off_when_everyone_leaves
+  alias: Lights off when everyone leaves
+  description: When nobody has been home for 10 minutes, turn off any lights left
+    on and say which. The 10-minute wait ignores the brief zero home count during
+    HA restarts.
+  triggers:
+  - trigger: numeric_state
+    entity_id: zone.home
+    below: 1
+    for:
+      minutes: 10
+  conditions: []
+  actions:
+  - condition: template
+    value_template: '{{ on_now | count > 0 }}'
+  - action: switch.turn_off
+    target:
+      entity_id: '{{ on_now }}'
+  - action: notify.mobile_app_pixel_10_pro
+    data:
+      title: Lights switched off
+      message: 'Nobody is home, so I turned off: {{ names }}'
+  - action: notify.mobile_app_laire
+    data:
+      title: Lights switched off
+      message: 'Nobody is home, so I turned off: {{ names }}'
+  variables:
+    lights:
+    - switch.living_room_lights
+    - switch.island_lights_switch_1
+    - switch.kitchen_lights
+    - switch.shelly1_98cdac1f5772
+    - switch.wall_lamp_socket_1
+    - switch.shelly1_c45bbe6a6f8d
+    - switch.christmas_tree_socket_1
+    - switch.candle_socket_1
+    on_now: '{{ lights | select(''is_state'',''on'') | list }}'
+    names: '{{ on_now | map(''state_attr'',''friendly_name'') | join('', '') }}'
+  mode: single
+- id: claude_cosy_on_arrival_after_sunset
+  alias: Cosy lights on arrival after sunset
+  description: When someone gets home after sunset to an empty house (empty for 10+
+    minutes, which rules out HA restarts), set the Cosy scene. Before 23:00 the garden
+    lights come on too.
+  triggers:
+  - trigger: numeric_state
+    entity_id: zone.home
+    above: 0
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.from_state is not none and trigger.from_state.state
+      == ''0'' and (trigger.to_state.last_changed - trigger.from_state.last_changed).total_seconds()
+      > 600 }}'
+  - condition: state
+    entity_id: sun.sun
+    state: below_horizon
+  actions:
+  - action: scene.turn_on
+    target:
+      entity_id: scene.new_scene
+  - if:
+    - condition: time
+      before: '23:00:00'
+      after: '12:00:00'
+    then:
+    - action: switch.turn_on
+      target:
+        entity_id: switch.shelly1_c45bbe6a6f8d
+  mode: single
+- id: claude_garden_lights_schedule
+  alias: Garden lights schedule
+  description: Garden lights on at sunset if someone is home, off at 23:00. The triple-press
+    button still toggles them manually.
+  triggers:
+  - trigger: sun
+    event: sunset
+    id: 'on'
+  - trigger: time
+    at: '23:00:00'
+    id: 'off'
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: 'on'
+      - condition: numeric_state
+        entity_id: zone.home
+        above: 0
+      sequence:
+      - action: switch.turn_on
+        target:
+          entity_id: switch.shelly1_c45bbe6a6f8d
+    - conditions:
+      - condition: trigger
+        id: 'off'
+      sequence:
+      - action: switch.turn_off
+        target:
+          entity_id: switch.shelly1_c45bbe6a6f8d
+  mode: single
+- id: claude_tado_away_check
+  alias: Check Tado Home/Away
+  description: Tado's cloud API allows few calls a day, so automatic polling is off
+    for the Tado integration. This asks Tado for Home/Away at 21:00 and 02:00 (before
+    smart underfloor pre-heat decides), compares it with the phones, and appends one
+    line to /data/.state/home-assistant/logs/presence-log.csv. It also logs when the
+    Tado connection drops or comes back, and notifies Jack when it drops.
+  triggers:
+  - trigger: time
+    at: '21:00:00'
+    id: check
+  - trigger: time
+    at: 02:00:00
+    id: check
+  - trigger: state
+    entity_id: sensor.ranger_s_cottage_tado_mode
+    to: unavailable
+    for:
+      minutes: 2
+    id: dropped
+  - trigger: state
+    entity_id: sensor.ranger_s_cottage_tado_mode
+    from: unavailable
+    id: recovered
+  actions:
+  - if:
+    - condition: trigger
+      id: check
+    then:
+    - action: homeassistant.update_entity
+      target:
+        entity_id: sensor.ranger_s_cottage_tado_mode
+      continue_on_error: true
+    - delay:
+        seconds: 20
+  - variables:
+      event: '{{ {''check'':''scheduled check'',''dropped'':''tado connection dropped'',''recovered'':''tado
+        connection recovered''}.get(trigger.id | default(''''), ''manual check'')
+        }}'
+      entry_state: '{{ config_entry_attr(''01M7CP3SCQSE2X2YW6F0AEZESQ'',''state'')
+        | string }}'
+      tado_ok: '{{ (config_entry_attr(''01M7CP3SCQSE2X2YW6F0AEZESQ'',''state'') |
+        string) == ''loaded'' and states(''sensor.ranger_s_cottage_tado_mode'') in
+        [''HOME'',''AWAY''] }}'
+      connection: '{{ ''ok'' if tado_ok else (''integration '' ~ entry_state) if entry_state
+        != ''loaded'' else ''no answer'' }}'
+      tado_says: '{{ states(''sensor.ranger_s_cottage_tado_mode'') if tado_ok else
+        ''-'' }}'
+      phones_home: '{{ states(''zone.home'') | int(0) }}'
+      phones_say: '{{ ''AWAY'' if phones_home == 0 else ''HOME'' }}'
+      agree: '{{ (tado_says == phones_say) if tado_ok else ''-'' }}'
+      source_used: '{{ ''tado'' if tado_ok else ''phones'' }}'
+      decision: '{{ tado_says if tado_ok else phones_say }}'
+  - action: notify.send_message
+    target:
+      entity_id: notify.presence_log
+    data:
+      message: '{{ now().strftime(''%Y-%m-%d %H:%M'') }},{{ event }},{{ connection
+        }},{{ tado_says }},{{ phones_home }},{{ phones_say }},{{ agree }},{{ source_used
+        }},{{ decision }}'
+  - action: logbook.log
+    data:
+      name: Presence check
+      entity_id: sensor.ranger_s_cottage_tado_mode
+      message: '{{ event }}: Tado {{ connection }} ({{ tado_says }}), phones {{ phones_say
+        }} ({{ phones_home }} home), pre-heat uses {{ source_used }} → {{ decision
+        }}'
+  - if:
+    - condition: template
+      value_template: '{{ (trigger.id | default('''')) == ''dropped'' or ((trigger.id
+        | default('''')) == ''check'' and not tado_ok and now().hour == 21) }}'
+    then:
+    - action: notify.mobile_app_pixel_10_pro
+      data:
+        title: Tado connection lost
+        message: 'Home Assistant can''t reach Tado ({{ connection }}). Smart underfloor
+          pre-heat is using your phones for home/away until it''s fixed. To fix: Settings
+          → Devices & services → Tado → Reconfigure.'
+    - action: persistent_notification.create
+      data:
+        notification_id: tado_connection
+        title: Tado connection lost
+        message: 'Home Assistant can''t reach Tado ({{ connection }}). Smart underfloor
+          pre-heat is using your phones for home/away until it''s fixed. To fix: Settings
+          → Devices & services → Tado → Reconfigure.'
+  - if:
+    - condition: trigger
+      id: recovered
+    then:
+    - action: persistent_notification.dismiss
+      data:
+        notification_id: tado_connection
+  mode: queued
+- id: claude_smart_car_charge
+  alias: Smart car charge
+  description: 'When input_boolean.smart_car_charge is on: from the daily Octopus
+    allowance reset (or noon) until 21:00, keep Octopus''s ready-by time ~2 hours
+    ahead, moving it every hour, so Octopus spends the 6-hour cheap smart-charging
+    allowance during the day (making those hours cheap for the whole house too). At
+    22:00 restore the normal ready-by time. During Intelligent Octopus Go''s guaranteed
+    nightly home window (23:30-05:30, which is cheap for the whole home regardless
+    of the car), and only while the off-peak sensor agrees and Octopus is not already
+    charging the car in one of its own slots, use bump charge; stop it as soon as
+    that window ends. It never bumps in cheap periods that exist only because Octopus
+    is charging the car (e.g. 22:30-23:00 or 05:30-06:00 extensions), which avoids
+    a loop where a bump replaces the slot that made the house cheap. Only bumps this
+    automation started are stopped by it (input_boolean.smart_car_charge_bumping),
+    so a manual daytime bump is left alone. Every action and every allowance reset
+    is appended to /data/.state/home-assistant/logs/car-charge-log.csv.'
+  triggers:
+  - trigger: state
+    entity_id: sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_cap_hours
+    id: cap_change
+  - trigger: time_pattern
+    minutes: 0
+    id: roll
+  - trigger: time
+    at: '22:00:00'
+    id: restore
+  - trigger: state
+    entity_id: input_boolean.smart_car_charge
+    to: 'on'
+    id: enabled
+  - trigger: state
+    entity_id: input_boolean.smart_car_charge
+    to: 'off'
+    id: disabled
+  - trigger: state
+    entity_id: binary_sensor.octopus_energy_electricity_23j0307021_1200041244369_off_peak
+    to: 'on'
+    id: bump_window
+  - trigger: time_pattern
+    minutes: /30
+    id: bump_window
+  - trigger: state
+    entity_id: binary_sensor.octopus_energy_electricity_23j0307021_1200041244369_off_peak
+    to: 'off'
+    id: bump_off
+  - trigger: time_pattern
+    minutes: /30
+    id: bump_off
+  - trigger: state
+    entity_id: sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state_of_charge
+    id: bump_off
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: cap_change
+      - condition: template
+        value_template: '{{ trigger.from_state is not none and trigger.from_state.state
+          not in [''unknown'',''unavailable''] and trigger.to_state.state not in [''unknown'',''unavailable'']
+          and trigger.to_state.state | float(0) < trigger.from_state.state | float(0)
+          - 1 }}'
+      sequence:
+      - action: notify.send_message
+        target:
+          entity_id: notify.car_charge_log
+        data:
+          message: '{{ now().strftime(''%Y-%m-%d %H:%M'') }},allowance reset,{{ trigger.from_state.state
+            }}h -> {{ trigger.to_state.state }}h,{{ states(''select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time'')
+            }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_cap_hours'')
+            }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state_of_charge'')
+            }},{{ states(''number.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_target'')
+            }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state'')
+            }},{{ states(''switch.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_bump_charge'')
+            }}'
+      - condition: template
+        value_template: '{{ enabled and plugged and needs_charge and day_phase and
+          cap_used < daily_cap }}'
+      - variables:
+          new_rb: '{{ (now() + timedelta(hours=lead_hours)).strftime(''%H:00'') }}'
+      - if:
+        - condition: template
+          value_template: '{{ states(''select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time'')
+            != new_rb }}'
+        then:
+        - action: select.select_option
+          target:
+            entity_id: select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time
+          data:
+            option: '{{ new_rb }}'
+        - delay:
+            seconds: 5
+        - action: notify.send_message
+          target:
+            entity_id: notify.car_charge_log
+          data:
+            message: '{{ now().strftime(''%Y-%m-%d %H:%M'') }},ready-by moved,{{ new_rb
+              }},{{ states(''select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time'')
+              }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_cap_hours'')
+              }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state_of_charge'')
+              }},{{ states(''number.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_target'')
+              }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state'')
+              }},{{ states(''switch.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_bump_charge'')
+              }}'
+    - conditions:
+      - condition: trigger
+        id: roll
+      sequence:
+      - condition: template
+        value_template: '{{ enabled and plugged and needs_charge and day_phase and
+          cap_used < daily_cap }}'
+      - variables:
+          new_rb: '{{ (now() + timedelta(hours=lead_hours)).strftime(''%H:00'') }}'
+      - if:
+        - condition: template
+          value_template: '{{ states(''select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time'')
+            != new_rb }}'
+        then:
+        - action: select.select_option
+          target:
+            entity_id: select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time
+          data:
+            option: '{{ new_rb }}'
+        - delay:
+            seconds: 5
+        - action: notify.send_message
+          target:
+            entity_id: notify.car_charge_log
+          data:
+            message: '{{ now().strftime(''%Y-%m-%d %H:%M'') }},ready-by moved,{{ new_rb
+              }},{{ states(''select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time'')
+              }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_cap_hours'')
+              }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state_of_charge'')
+              }},{{ states(''number.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_target'')
+              }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state'')
+              }},{{ states(''switch.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_bump_charge'')
+              }}'
+    - conditions:
+      - condition: trigger
+        id: restore
+      - condition: template
+        value_template: '{{ enabled and states(''select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time'')
+          != normal_rb }}'
+      sequence:
+      - action: select.select_option
+        target:
+          entity_id: select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time
+        data:
+          option: '{{ normal_rb }}'
+      - delay:
+          seconds: 5
+      - action: notify.send_message
+        target:
+          entity_id: notify.car_charge_log
+        data:
+          message: '{{ now().strftime(''%Y-%m-%d %H:%M'') }},ready-by restored,{{
+            normal_rb }},{{ states(''select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time'')
+            }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_cap_hours'')
+            }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state_of_charge'')
+            }},{{ states(''number.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_target'')
+            }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state'')
+            }},{{ states(''switch.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_bump_charge'')
+            }}'
+    - conditions:
+      - condition: trigger
+        id: bump_window
+      - condition: template
+        value_template: '{{ enabled and off_peak and in_night_window and not smart_slot_now
+          and plugged and needs_charge and not is_state(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state'',''BOOSTING'')
+          }}'
+      sequence:
+      - action: switch.turn_on
+        target:
+          entity_id: switch.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_bump_charge
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.smart_car_charge_bumping
+      - delay:
+          seconds: 20
+      - action: notify.send_message
+        target:
+          entity_id: notify.car_charge_log
+        data:
+          message: '{{ now().strftime(''%Y-%m-%d %H:%M'') }},bump on,{{ ''started''
+            if is_state(''switch.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_bump_charge'',
+            ''on'') else ''did not start'' }} in nightly off-peak window,{{ states(''select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time'')
+            }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_cap_hours'')
+            }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state_of_charge'')
+            }},{{ states(''number.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_target'')
+            }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state'')
+            }},{{ states(''switch.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_bump_charge'')
+            }}'
+    - conditions:
+      - condition: trigger
+        id: bump_off
+      - condition: template
+        value_template: '{{ is_state(''input_boolean.smart_car_charge_bumping'',''on'')
+          and (not (off_peak and in_night_window) or not needs_charge) }}'
+      sequence:
+      - if:
+        - condition: state
+          entity_id: switch.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_bump_charge
+          state: 'on'
+        then:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_bump_charge
+      - action: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.smart_car_charge_bumping
+      - delay:
+          seconds: 5
+      - action: notify.send_message
+        target:
+          entity_id: notify.car_charge_log
+        data:
+          message: '{{ now().strftime(''%Y-%m-%d %H:%M'') }},bump off,{{ ''target
+            reached'' if not needs_charge else ''nightly off-peak window ended'' }},{{
+            states(''select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time'')
+            }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_cap_hours'')
+            }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state_of_charge'')
+            }},{{ states(''number.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_target'')
+            }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state'')
+            }},{{ states(''switch.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_bump_charge'')
+            }}'
+    - conditions:
+      - condition: trigger
+        id: enabled
+      sequence:
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.smart_car_charge_normal_ready_by
+        data:
+          value: '{{ states(''select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time'')
+            }}'
+      - action: notify.send_message
+        target:
+          entity_id: notify.car_charge_log
+        data:
+          message: '{{ now().strftime(''%Y-%m-%d %H:%M'') }},switched on,normal ready-by
+            saved,{{ states(''select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time'')
+            }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_cap_hours'')
+            }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state_of_charge'')
+            }},{{ states(''number.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_target'')
+            }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state'')
+            }},{{ states(''switch.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_bump_charge'')
+            }}'
+      - condition: template
+        value_template: '{{ enabled and plugged and needs_charge and day_phase and
+          cap_used < daily_cap }}'
+      - variables:
+          new_rb: '{{ (now() + timedelta(hours=lead_hours)).strftime(''%H:00'') }}'
+      - if:
+        - condition: template
+          value_template: '{{ states(''select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time'')
+            != new_rb }}'
+        then:
+        - action: select.select_option
+          target:
+            entity_id: select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time
+          data:
+            option: '{{ new_rb }}'
+        - delay:
+            seconds: 5
+        - action: notify.send_message
+          target:
+            entity_id: notify.car_charge_log
+          data:
+            message: '{{ now().strftime(''%Y-%m-%d %H:%M'') }},ready-by moved,{{ new_rb
+              }},{{ states(''select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time'')
+              }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_cap_hours'')
+              }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state_of_charge'')
+              }},{{ states(''number.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_target'')
+              }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state'')
+              }},{{ states(''switch.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_bump_charge'')
+              }}'
+    - conditions:
+      - condition: trigger
+        id: disabled
+      sequence:
+      - action: select.select_option
+        target:
+          entity_id: select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time
+        data:
+          option: '{{ normal_rb }}'
+      - if:
+        - condition: state
+          entity_id: input_boolean.smart_car_charge_bumping
+          state: 'on'
+        then:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_bump_charge
+        - action: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.smart_car_charge_bumping
+      - delay:
+          seconds: 5
+      - action: notify.send_message
+        target:
+          entity_id: notify.car_charge_log
+        data:
+          message: '{{ now().strftime(''%Y-%m-%d %H:%M'') }},switched off,ready-by
+            restored to {{ normal_rb }},{{ states(''select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time'')
+            }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_cap_hours'')
+            }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state_of_charge'')
+            }},{{ states(''number.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_target'')
+            }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state'')
+            }},{{ states(''switch.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_bump_charge'')
+            }}'
+  variables:
+    daily_cap: 6
+    lead_hours: 2
+    day_start_hour: 12
+    last_roll_hour: 21
+    enabled: '{{ is_state(''input_boolean.smart_car_charge'',''on'') }}'
+    plugged: '{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state'')
+      in [''SMART_CONTROL_IN_PROGRESS'',''SMART_CONTROL_CAPABLE'',''BOOSTING''] }}'
+    needs_charge: '{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state_of_charge'')
+      | float(100) < states(''number.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_target'')
+      | float(80) }}'
+    cap_used: '{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_cap_hours'')
+      | float(0) }}'
+    day_phase: '{{ day_start_hour <= now().hour <= last_roll_hour }}'
+    normal_rb: '{{ states(''input_text.smart_car_charge_normal_ready_by'') if states(''input_text.smart_car_charge_normal_ready_by'')
+      | regex_match(''^[0-2][0-9]:[03]0$'') else ''10:00'' }}'
+    off_peak: '{{ is_state(''binary_sensor.octopus_energy_electricity_23j0307021_1200041244369_off_peak'',''on'')
+      }}'
+    smart_slot_now: '{{ is_state(''binary_sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_dispatching'',''on'')
+      }}'
+    night_window_start: '23:30'
+    night_window_end: 05:30
+    in_night_window: '{{ now().strftime(''%H:%M'') >= night_window_start or now().strftime(''%H:%M'')
+      < night_window_end }}'
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 100
+- id: claude_car_deadline_override
+  alias: Car must-be-ready override
+  description: 'Hard deadline for the car (input_datetime.car_must_be_ready_by, active
+    while input_boolean.car_must_be_ready is on). Uses sensor.car_charge_forecast:
+    if the guaranteed charging (planned Octopus slots + Smart car charge night bumps)
+    won''t reach the Octopus target 30 minutes before the deadline, it bump-charges
+    at peak rate, starting only at the last safe moment (when uncovered hours left
+    = shortfall + 1 h) so Octopus can still schedule cheap slots first. Stops as soon
+    as the guaranteed forecast is back on track or the deadline passes. Only stops
+    bumps it started. Logged to car-charge-log.csv.'
+  triggers:
+  - trigger: state
+    entity_id: sensor.car_charge_forecast
+  - trigger: state
+    entity_id: input_boolean.car_must_be_ready
+  - trigger: state
+    entity_id: input_datetime.car_must_be_ready_by
+  actions:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ bump_now and plugged and not is_state(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state'',''BOOSTING'')
+          }}'
+      sequence:
+      - action: switch.turn_on
+        target:
+          entity_id: switch.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_bump_charge
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.car_deadline_bumping
+      - delay:
+          seconds: 20
+      - action: notify.send_message
+        target:
+          entity_id: notify.car_charge_log
+        data:
+          message: '{{ now().strftime(''%Y-%m-%d %H:%M'') }},deadline bump on,short
+            {{ f.short_hours }}h for {{ as_datetime(f.deadline).strftime(''%a %H:%M'')
+            }},{{ states(''select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time'')
+            }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_cap_hours'')
+            }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state_of_charge'')
+            }},{{ states(''number.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_target'')
+            }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state'')
+            }},{{ states(''switch.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_bump_charge'')
+            }}'
+      - action: notify.mobile_app_pixel_10_pro
+        data:
+          title: Bump charging for your deadline
+          message: Cheap charging won't get the car to {{ f.target | int }}% by {{
+            as_datetime(f.deadline).strftime('%a %H:%M') }}, so it's bump charging
+            now (about {{ f.short_hours }} h, ≈£{{ '%.2f' | format(f.short_cost_at_peak)
+            }} at peak).
+    - conditions:
+      - condition: template
+        value_template: '{{ is_state(''input_boolean.car_deadline_bumping'',''on'')
+          and not bump_now }}'
+      sequence:
+      - if:
+        - condition: template
+          value_template: '{{ is_state(''switch.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_bump_charge'',''on'')
+            and not is_state(''input_boolean.smart_car_charge_bumping'',''on'') }}'
+        then:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_bump_charge
+      - action: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.car_deadline_bumping
+      - delay:
+          seconds: 5
+      - action: notify.send_message
+        target:
+          entity_id: notify.car_charge_log
+        data:
+          message: '{{ now().strftime(''%Y-%m-%d %H:%M'') }},deadline bump off,{{
+            ''back on track'' if f.get(''on_track'') else ''deadline passed or cleared''
+            }},{{ states(''select.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_target_time'')
+            }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_cap_hours'')
+            }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state_of_charge'')
+            }},{{ states(''number.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_target'')
+            }},{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state'')
+            }},{{ states(''switch.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_bump_charge'')
+            }}'
+  variables:
+    f: '{{ state_attr(''sensor.car_charge_forecast'',''forecast'') or {} }}'
+    bump_now: '{{ f.get(''bump_now'', false) }}'
+    plugged: '{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state'')
+      in [''SMART_CONTROL_IN_PROGRESS'',''SMART_CONTROL_CAPABLE'',''BOOSTING''] }}'
+  mode: queued
+  max: 5
+- id: claude_car_morning_status
+  alias: Car morning status
+  description: '07:00: tells Jack the car''s battery if it is below the Octopus target,
+    or if a must-be-ready deadline is set (to confirm it is on track). Quiet otherwise,
+    and quiet when the car is unplugged or away.'
+  triggers:
+  - trigger: time
+    at: 07:00:00
+  conditions:
+  - condition: template
+    value_template: '{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state_of_charge'')
+      | float(0) < states(''number.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_target'')
+      | float(80) or is_state(''input_boolean.car_must_be_ready'',''on'') }}'
+  - condition: template
+    value_template: '{{ states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state'')
+      not in [''SMART_CONTROL_NOT_AVAILABLE'',''TEST_CHARGE_NOT_AVAILABLE''] }}'
+  actions:
+  - action: notify.mobile_app_pixel_10_pro
+    data:
+      title: Car this morning
+      message: '{%- set f = state_attr(''sensor.car_charge_forecast'',''forecast'')
+        or {} -%}{%- set soc = states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state_of_charge'')
+        | float(0) -%}{%- set goal = states(''number.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_target'')
+        | float(80) -%}{%- set pct = f.get(''pct_per_hour'', 2.9) | float(2.9) -%}
+
+        {%- if soc < goal -%}Car at {{ soc | round(0) | int }}% · {{ ((goal - soc)
+        / pct) | round(1) }} h of charging short of {{ goal | int }}%.{% if f.get(''expected_ready'')
+        %} Expected at {{ goal | int }}% by {{ (as_datetime(f.get(''expected_ready''))
+        | as_local).strftime(''%a %H:%M'') }}.{% endif %}
+
+        {%- else -%}Car at {{ soc | round(0) | int }}% ✅ ready.{%- endif -%}
+
+        {%- if f.get(''deadline'') %} Must be ready by {{ (as_datetime(f.get(''deadline''))
+        | as_local).strftime(''%a %H:%M'') }}: {{ ''on track ✅'' if f.get(''on_track'')
+        else ''short, will bump at peak if needed ⚠️'' }}.{% endif %}'
+  mode: single

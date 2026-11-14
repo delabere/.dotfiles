@@ -1,0 +1,34 @@
+# Managed in the dotfiles repo. Template sensors that used to be UI helpers (same names, so same entity IDs).
+- sensor:
+  - name: Electricity price
+    unique_id: electricity_price
+    state: '{{ (states(''sensor.octopus_energy_electricity_23j0307021_1200041244369_current_rate'')|float(0)*100)|round(1) }}'
+    unit_of_measurement: p/kWh
+    state_class: measurement
+  - name: Gas price
+    unique_id: gas_price
+    state: '{{ (states(''sensor.octopus_energy_gas_e6s12803792462_8884829305_current_rate'')|float(0)*100)|round(1) }}'
+    unit_of_measurement: p/kWh
+    state_class: measurement
+  - name: Next electricity price
+    unique_id: next_electricity_price
+    state: '{{ (states(''sensor.octopus_energy_electricity_23j0307021_1200041244369_next_rate'')|float(0)*100)|round(1) }}'
+    unit_of_measurement: p/kWh
+    state_class: measurement
+  - name: Cheap charging left
+    unique_id: cheap_charging_left
+    state: '{{ ([6 - (states(''sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_cap_hours'') | float(0)), 0] | max) | round(1) }}'
+    unit_of_measurement: h
+    state_class: measurement
+  - name: Car status
+    unique_id: car_status
+    state: |-
+      {%- set f = state_attr('sensor.car_charge_forecast','forecast') or {} -%}
+      {%- set soc = states('sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state_of_charge') | float(0) -%}{%- set goal = states('number.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_charge_target') | float(80) -%}
+      {%- set st = states('sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state') -%}
+      {%- macro w(iso) -%}{%- set t = as_datetime(iso) | as_local -%}{{ t.strftime('%a %H:%M') if t.date() != now().date() else t.strftime('%H:%M') }}{%- endmacro -%}
+      {%- if st in ['SMART_CONTROL_NOT_AVAILABLE','TEST_CHARGE_NOT_AVAILABLE'] -%}{{ soc | round(0) | int }}% · unplugged
+      {%- elif soc >= goal -%}{{ soc | round(0) | int }}% · ready
+      {%- elif is_state('sensor.octopus_energy_00000000_0002_4000_8020_000000076b06_intelligent_state','BOOSTING') and is_state('binary_sensor.octopus_energy_electricity_23j0307021_1200041244369_off_peak','off') -%}{{ soc | round(0) | int }}% · bump charging at peak
+      {%- elif f.get('expected_ready') -%}{{ soc | round(0) | int }}% · {{ goal | int }}% by ≈{{ w(f.get('expected_ready')) }}
+      {%- else -%}{{ soc | round(0) | int }}% · charging plan pending{%- endif -%}

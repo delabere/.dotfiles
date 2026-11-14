@@ -1,0 +1,16 @@
+# Managed in the dotfiles repo (services/home-assistant/config). Edit here, then build-brain.
+smart_underfloor_heating:
+  name: Smart underfloor heating
+  icon: mdi:heating-coil
+smart_car_charge:
+  name: Smart car charge
+  icon: mdi:car-electric
+smart_car_charge_bumping:
+  name: Smart car charge bumping
+  icon: mdi:lightning-bolt-circle
+car_must_be_ready:
+  name: Car must be ready
+  icon: mdi:alarm-check
+car_deadline_bumping:
+  name: Car deadline bumping
+  icon: mdi:alarm-light
