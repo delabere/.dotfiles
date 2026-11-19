@@ -178,6 +178,7 @@
         # another Linux builder the first time: switch once with
         # `{ nix.linux-builder.enable = true; }` in place of the module below.
         darwinConfigurations.Mac = mkMac [
+          ./darwin/mount-brain.nix
           inputs.nix-rosetta-builder.darwinModules.default
           {
             nix-rosetta-builder = {
