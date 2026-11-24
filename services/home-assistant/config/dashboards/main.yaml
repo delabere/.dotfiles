@@ -153,6 +153,14 @@ views:
         action: toggle
       icon_tap_action:
         action: toggle
+    - type: tile
+      entity: switch.porik
+      name: Christmas tree
+      icon: mdi:pine-tree
+      tap_action:
+        action: toggle
+      icon_tap_action:
+        action: toggle
   - type: grid
     cards:
     - type: heading

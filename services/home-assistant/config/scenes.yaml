@@ -29,6 +29,9 @@
       device_class: outlet
       friendly_name: Candle Socket 1
       state: 'on'
+    switch.porik:
+      friendly_name: Christmas tree
+      state: 'on'
   metadata: {}
   icon: mdi:television-classic
 - id: '1678460107210'
@@ -58,6 +61,9 @@
       device_class: outlet
       friendly_name: Wall Lamp Socket 1
       state: 'off'
+    switch.porik:
+      friendly_name: Christmas tree
+      state: 'on'
   icon: mdi:brightness-7
   metadata: {}
 - id: '1678460256595'
@@ -94,6 +100,9 @@
     switch.shelly1_c45bbe6a6f8d:
       friendly_name: Jardin Lume
       state: 'off'
+    switch.porik:
+      friendly_name: Christmas tree
+      state: 'off'
   icon: mdi:moon-waning-crescent
   metadata: {}
 - id: '1699100317401'
@@ -113,6 +122,9 @@
     switch.kitchen_lights:
       icon: mdi:light-recessed
       friendly_name: Kitchen Lights
+      state: 'off'
+    switch.porik:
+      friendly_name: Christmas tree
       state: 'off'
   icon: mdi:moon-new
   metadata: {}
