@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>China 2026 Review</title>
+<style>
+  :root {
+    --bg: #0f1419; --panel: #172029; --line: #26323d; --text: #eef0f2; --muted: #93a1ad;
+    --accent: #f2b134; --done: #4cc38a; --chapA: #22303b; --chapB: #1b2630; --label: #7fb3d5;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; }
+  header { display: flex; gap: 12px; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  header h1 { font-size: 17px; margin: 0 12px 0 0; font-weight: 650; }
+  select, button, textarea { font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+  select, button { padding: 6px 10px; cursor: pointer; }
+  button.primary { background: var(--accent); color: #1a1205; border-color: var(--accent); font-weight: 600; }
+  button.tab[aria-selected="true"] { border-color: var(--accent); color: var(--accent); }
+  main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; padding: 16px; max-width: 1600px; margin: 0 auto; }
+  @media (max-width: 1000px) { main { grid-template-columns: 1fr; } }
+  video { width: 100%; background: #000; border-radius: 10px; display: block; }
+  #bar { position: relative; height: 46px; margin-top: 10px; border-radius: 8px; overflow: hidden; cursor: pointer; background: var(--chapB); user-select: none; }
+  .chap { position: absolute; top: 0; height: 100%; border-right: 1px solid var(--bg); font-size: 11px; color: var(--muted); padding: 3px 6px; white-space: nowrap; overflow: hidden; }
+  .lab { position: absolute; top: 20px; width: 2px; height: 10px; background: var(--label); }
+  .dot { position: absolute; bottom: 3px; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg); }
+  .dot.done { background: var(--done); } .dot.wontfix { background: var(--muted); }
+  #head { position: absolute; top: 0; width: 2px; height: 100%; background: #fff; pointer-events: none; }
+  #hover { position: absolute; top: -2px; transform: translateX(-50%); font-size: 11px; background: #000c; padding: 1px 5px; border-radius: 4px; display: none; pointer-events: none; }
+  .where { color: var(--muted); font-size: 13px; margin: 10px 0 6px; }
+  .where b { color: var(--text); font-weight: 600; }
+  textarea { width: 100%; min-height: 70px; padding: 8px 10px; resize: vertical; }
+  .row { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+  aside { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; max-height: calc(100vh - 110px); overflow: auto; }
+  aside h2 { font-size: 14px; margin: 4px 0 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+  .item { border-top: 1px solid var(--line); padding: 10px 2px; }
+  .item:first-of-type { border-top: 0; }
+  .item .t { color: var(--accent); cursor: pointer; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .item.done .t { color: var(--done); }
+  .item .meta { color: var(--muted); font-size: 12px; }
+  .item .txt { margin: 3px 0; white-space: pre-wrap; }
+  .item .reply { border-left: 2px solid var(--done); padding-left: 8px; color: #cfe; font-size: 13px; margin: 4px 0; }
+  .item button { font-size: 12px; padding: 3px 8px; margin-right: 4px; }
+  .filters { display: flex; gap: 6px; margin-bottom: 8px; }
+  .filters button { font-size: 12px; padding: 3px 8px; }
+  #compare { position: fixed; inset: 0; background: #000e; display: none; flex-direction: column; padding: 16px; z-index: 10; }
+  #compare .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex: 1; min-height: 0; }
+  @media (max-width: 800px) { #compare .pair { grid-template-columns: 1fr; } }
+  #compare video { height: 100%; object-fit: contain; }
+  #compare .cap { color: var(--muted); font-size: 13px; margin-bottom: 4px; }
+  .empty { color: var(--muted); font-size: 14px; padding: 8px 2px; }
+  kbd { background: var(--chapA); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>China 2026 Review</h1>
+  <select id="ver" aria-label="Version"></select>
+  <button class="tab" data-tab="comments" aria-selected="true">Comments</button>
+  <button class="tab" data-tab="changes" aria-selected="false">Changes in this version</button>
+  <span style="color:var(--muted);font-size:13px;margin-left:auto"><kbd>Space</kbd> play · <kbd>←</kbd><kbd>→</kbd> 5 s · <kbd>C</kbd> comment · <kbd>⌘↵</kbd> save</span>
+</header>
+<main>
+  <section>
+    <video id="v" controls playsinline preload="metadata"></video>
+    <div id="bar"><div id="head"></div><div id="hover"></div></div>
+    <div class="where" id="where"></div>
+    <textarea id="txt" placeholder="Comment on this moment, e.g. 'drop this shot', 'hold longer', 'too dark', 'wrong label'…"></textarea>
+    <div class="row">
+      <button class="primary" id="add">Add comment at <span id="addt">0:00</span></button>
+      <span style="color:var(--muted);font-size:13px">Pauses the film while you type. Comments are pinned to the shot, so they survive later edits.</span>
+    </div>
+  </section>
+  <aside>
+    <div id="pane-comments">
+      <h2>Comments</h2>
+      <div class="filters">
+        <button data-f="open">Open</button><button data-f="all">All</button><button data-f="done">Done</button>
+      </div>
+      <div id="list"></div>
+    </div>
+    <div id="pane-changes" hidden>
+      <h2>What changed</h2>
+      <div id="changes"></div>
+    </div>
+  </aside>
+</main>
+<div id="compare">
+  <div class="row" style="margin:0 0 10px"><b id="cmpTitle"></b><span style="margin-left:auto"></span>
+    <button id="cmpPlay">Play both</button><button id="cmpClose">Close</button></div>
+  <div class="pair">
+    <div style="display:flex;flex-direction:column;min-height:0"><div class="cap" id="capA">Before</div><video id="va" muted playsinline></video></div>
+    <div style="display:flex;flex-direction:column;min-height:0"><div class="cap" id="capB">After</div><video id="vb" playsinline></video></div>
+  </div>
+</div>
+<script>
+const $ = s => document.querySelector(s);
+const v = $("#v"), bar = $("#bar");
+let versions = [], cur = null, manifest = {shots: [], chapters: [], labels: []}, comments = [], filter = "open";
+const fmt = t => { t = Math.max(0, t || 0); const m = Math.floor(t / 60), s = Math.floor(t % 60); return `${m}:${String(s).padStart(2, "0")}`; };
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+const getJSON = (u, d) => fetch(u, {cache: "no-store"}).then(r => r.ok ? r.json() : d).catch(() => d);
+
+async function init() {
+  versions = await getJSON("/media/versions.json", []);
+  $("#ver").innerHTML = versions.map(x => `<option value="${esc(x.id)}">${esc(x.label || x.id)}</option>`).join("");
+  const want = new URLSearchParams(location.search).get("v") || (versions.at(-1) || {}).id;
+  if (want) { $("#ver").value = want; await loadVersion(want); }
+  else $("#where").textContent = "No versions rendered yet.";
+  await refresh();
+}
+async function loadVersion(id, t) {
+  cur = versions.find(x => x.id === id); if (!cur) return;
+  manifest = await getJSON(`/media/${cur.id}/manifest.json`, {shots: [], chapters: [], labels: []});
+  v.src = `/media/${cur.id}/${cur.file || "film.mp4"}`;
+  if (t != null) v.addEventListener("loadedmetadata", () => { v.currentTime = t; }, {once: true});
+  history.replaceState(null, "", `?v=${encodeURIComponent(id)}`);
+  drawBar(); renderChanges();
+}
+function dur() { return v.duration || manifest.duration || 1; }
+function drawBar() {
+  bar.querySelectorAll(".chap,.lab,.dot").forEach(e => e.remove());
+  const D = dur();
+  (manifest.chapters || []).forEach((c, i, a) => {
+    const end = (a[i + 1] || {}).start ?? D, e = document.createElement("div");
+    e.className = "chap"; e.style.left = `${c.start / D * 100}%`; e.style.width = `${(end - c.start) / D * 100}%`;
+    e.style.background = i % 2 ? "var(--chapB)" : "var(--chapA)"; e.textContent = c.title; bar.prepend(e);
+  });
+  (manifest.labels || []).forEach(l => { const e = document.createElement("div"); e.className = "lab"; e.title = l.text; e.style.left = `${l.t / D * 100}%`; bar.appendChild(e); });
+  comments.filter(c => c.version === cur?.id).forEach(c => {
+    const e = document.createElement("div"); e.className = `dot ${c.status}`; e.style.left = `${c.t / D * 100}%`; e.title = c.text;
+    e.onclick = ev => { ev.stopPropagation(); v.currentTime = c.t; }; bar.appendChild(e);
+  });
+}
+function shotAt(t) { return (manifest.shots || []).find(s => s.start <= t && t < s.end); }
+function where() {
+  const t = v.currentTime, s = shotAt(t);
+  $("#addt").textContent = fmt(t);
+  $("#where").innerHTML = s ? `<b>${fmt(t)}</b> · ${esc(s.chapter || "")} · ${esc(s.kind === "card" ? "map card" : s.name)}` : `<b>${fmt(t)}</b>`;
+  $("#head").style.left = `${t / dur() * 100}%`;
+}
+v.addEventListener("timeupdate", where); v.addEventListener("loadedmetadata", () => { drawBar(); where(); });
+bar.addEventListener("click", e => { const r = bar.getBoundingClientRect(); v.currentTime = (e.clientX - r.left) / r.width * dur(); });
+bar.addEventListener("mousemove", e => { const r = bar.getBoundingClientRect(), h = $("#hover"); h.style.display = "block"; h.style.left = `${e.clientX - r.left}px`; h.textContent = fmt((e.clientX - r.left) / r.width * dur()); });
+bar.addEventListener("mouseleave", () => $("#hover").style.display = "none");
+$("#txt").addEventListener("focus", () => v.pause());
+async function add() {
+  const text = $("#txt").value.trim(); if (!text || !cur) return;
+  const r = await fetch("/api/comments", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({version: cur.id, t: v.currentTime, text})});
+  if (r.ok) { $("#txt").value = ""; await refresh(); } else alert("Couldn't save the comment.");
+}
+$("#add").onclick = add;
+$("#txt").addEventListener("keydown", e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) add(); });
+async function refresh() { comments = await getJSON("/api/comments", []); renderList(); drawBar(); }
+function renderList() {
+  document.querySelectorAll(".filters button").forEach(b => b.style.borderColor = b.dataset.f === filter ? "var(--accent)" : "");
+  const rows = comments.filter(c => filter === "all" || (filter === "open" ? c.status === "open" : c.status !== "open"))
+    .sort((a, b) => (a.version === b.version ? a.t - b.t : a.version < b.version ? 1 : -1));
+  $("#list").innerHTML = rows.length ? rows.map(c => `
+    <div class="item ${esc(c.status)}">
+      <span class="t" data-v="${esc(c.version)}" data-t="${c.t}">${fmt(c.t)}</span>
+      <span class="meta"> · ${esc(c.version)}${c.shot ? " · " + esc(c.shot.chapter || "") : ""} · ${esc(c.status)}</span>
+      <div class="txt">${esc(c.text)}</div>
+      ${c.reply ? `<div class="reply">${esc(c.reply)}</div>` : ""}
+      <button data-act="${c.status === "open" ? "done" : "open"}" data-id="${c.id}">${c.status === "open" ? "Mark done" : "Reopen"}</button>
+      <button data-act="del" data-id="${c.id}">Delete</button>
+    </div>`).join("") : `<div class="empty">No ${filter === "all" ? "" : filter} comments.</div>`;
+}
+$("#list").addEventListener("click", async e => {
+  const t = e.target.closest(".t");
+  if (t) { if (t.dataset.v !== cur?.id) { $("#ver").value = t.dataset.v; await loadVersion(t.dataset.v, +t.dataset.t); } else v.currentTime = +t.dataset.t; return; }
+  const b = e.target.closest("button[data-act]"); if (!b) return;
+  if (b.dataset.act === "del") { if (!confirm("Delete this comment?")) return; await fetch(`/api/comments/${b.dataset.id}`, {method: "DELETE"}); }
+  else await fetch(`/api/comments/${b.dataset.id}`, {method: "PATCH", headers: {"Content-Type": "application/json"}, body: JSON.stringify({status: b.dataset.act})});
+  refresh();
+});
+document.querySelectorAll(".filters button").forEach(b => b.onclick = () => { filter = b.dataset.f; renderList(); });
+$("#ver").onchange = e => loadVersion(e.target.value);
+document.querySelectorAll(".tab").forEach(b => b.onclick = () => {
+  document.querySelectorAll(".tab").forEach(x => x.setAttribute("aria-selected", x === b));
+  $("#pane-comments").hidden = b.dataset.tab !== "comments"; $("#pane-changes").hidden = b.dataset.tab !== "changes";
+});
+async function renderChanges() {
+  const ch = await getJSON(`/media/${cur.id}/changes.json`, []);
+  $("#changes").innerHTML = ch.length ? ch.map((c, i) => `
+    <div class="item">
+      <span class="t" data-t="${c.after?.t0 ?? 0}">${fmt(c.after?.t0)}</span>
+      <div class="txt">${esc(c.desc)}</div>
+      ${c.comment ? `<div class="meta">Re: “${esc(c.comment)}”</div>` : ""}
+      ${c.before ? `<button data-cmp="${i}">Before / after</button>` : ""}
+    </div>`).join("") : `<div class="empty">This is the first version — nothing to compare yet.</div>`;
+  $("#changes").onclick = e => {
+    const t = e.target.closest(".t"); if (t) { v.currentTime = +t.dataset.t; return; }
+    const b = e.target.closest("button[data-cmp]"); if (b) openCompare(ch[+b.dataset.cmp]);
+  };
+}
+const va = $("#va"), vb = $("#vb"); let cmp = null;
+function openCompare(c) {
+  cmp = c; v.pause(); $("#cmpTitle").textContent = c.desc;
+  const bv = versions.find(x => x.id === c.before.version) || cur;
+  va.src = `/media/${bv.id}/${bv.file || "film.mp4"}`; vb.src = `/media/${cur.id}/${cur.file || "film.mp4"}`;
+  $("#capA").textContent = `Before · ${bv.id} · ${fmt(c.before.t0)}`; $("#capB").textContent = `After · ${cur.id} · ${fmt(c.after.t0)}`;
+  va.onloadedmetadata = () => va.currentTime = c.before.t0; vb.onloadedmetadata = () => vb.currentTime = c.after.t0;
+  $("#compare").style.display = "flex";
+}
+$("#cmpPlay").onclick = () => {
+  if (!cmp) return; va.currentTime = cmp.before.t0; vb.currentTime = cmp.after.t0; va.play(); vb.play();
+};
+[va, vb].forEach((x, i) => x.addEventListener("timeupdate", () => {
+  if (!cmp) return; const end = i ? cmp.after.t1 : cmp.before.t1, start = i ? cmp.after.t0 : cmp.before.t0;
+  if (end && x.currentTime >= end) { x.pause(); x.currentTime = start; }
+}));
+$("#cmpClose").onclick = () => { $("#compare").style.display = "none"; va.pause(); vb.pause(); cmp = null; };
+document.addEventListener("keydown", e => {
+  if (e.target.tagName === "TEXTAREA" || e.target.tagName === "SELECT") return;
+  if (e.key === " ") { e.preventDefault(); v.paused ? v.play() : v.pause(); }
+  else if (e.key === "ArrowLeft") v.currentTime -= 5; else if (e.key === "ArrowRight") v.currentTime += 5;
+  else if (e.key.toLowerCase() === "c") { e.preventDefault(); $("#txt").focus(); }
+  else if (e.key === "Escape") $("#cmpClose").click();
+});
+init();
+</script>
+</body>
+</html>

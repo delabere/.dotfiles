@@ -24,6 +24,7 @@
       ./../../services/terminus.nix
       ./../../services/vellum.nix
       ./../../services/backup.nix
+      ./../../services/china-review.nix
     ];
 
   services.vellum.instances = {
