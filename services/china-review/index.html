@@ -269,7 +269,7 @@ function drawSel() {
 }
 const shotAt = t => (manifest.shots || []).find(s => s.start <= t && t < s.end);
 const photoAt = t => (manifest.photos || []).find(p => p.start <= t && t < p.end);
-const photoLabel = p => p.name.replace(/^ph_/, "").replace(/\.mov$/, "").replace(/^f_/, "").replace(/^dog_/, "dog supercut #").replace(/_(\d+)$/, " #$1");
+const photoLabel = p => p.name.replace(/^p9_dog_/, "dog_").replace(/^p9_/, "").replace(/^ph_/, "").replace(/\.mov$/, "").replace(/^f_/, "").replace(/^dog_/, "dog supercut #").replace(/_(\d+)$/, " #$1");
 function jumpPhoto(dir) {
   const t = v.currentTime, ps = (manifest.photos || []).filter(p => p.kind !== "supercut" || true);
   const p = dir > 0 ? ps.find(p => p.start > t + 0.05) : [...ps].reverse().find(p => p.start < t - 0.3);
