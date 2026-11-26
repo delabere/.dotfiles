@@ -86,6 +86,25 @@
   .stars .film { margin-left: auto; font-size: 12px; padding: 2px 8px; border: 1px solid var(--line); border-radius: 12px; color: var(--muted); }
   .stars .film.on { background: var(--accent); color: #221; border-color: var(--accent); }
   .ph input { width: 100%; padding: 3px 6px; font-size: 12px; margin-top: 4px; }
+  /* photo ideas */
+  #ideaView { padding: 16px; max-width: 1500px; margin: 0 auto; }
+  .idea { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 14px; background: var(--panel); border: 2px solid var(--line); border-radius: 10px; padding: 10px; margin-bottom: 14px; }
+  .idea.approved { border-color: var(--done); } .idea.rejected { opacity: .55; }
+  @media (max-width: 900px) { .idea { grid-template-columns: 1fr; } }
+  .idea video { aspect-ratio: 16/9; background: #000; }
+  .idea h3 { margin: 0 0 4px; font-size: 16px; }
+  .idea .meta { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+  .idea .capt { font-size: 13px; margin-bottom: 8px; }
+  .strip { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .strip .th { position: relative; width: 104px; height: 78px; border: 3px solid transparent; border-radius: 6px; overflow: hidden; cursor: pointer; background: #000; }
+  .strip .th img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .strip .th.on { border-color: var(--accent); }
+  .strip .th .n { position: absolute; top: 2px; left: 2px; background: var(--accent); color: #221; font-size: 11px; font-weight: 700; border-radius: 9px; padding: 0 6px; }
+  .strip .th .z { position: absolute; bottom: 2px; right: 2px; background: #000a; color: #fff; font-size: 11px; border-radius: 4px; padding: 0 4px; text-decoration: none; }
+  .idea .btns { display: flex; gap: 8px; } .idea .btns button { flex: 1; }
+  .idea .btns button.ok.on { background: var(--done); color: #052; border-color: var(--done); }
+  .idea .btns button.no.on { background: var(--out); color: #fff; border-color: var(--out); }
+  .idea input { width: 100%; padding: 5px 8px; font-size: 13px; margin-top: 8px; }
   #lb { position: fixed; inset: 0; background: #000e; z-index: 30; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 14px; }
   #lb img { max-width: 100%; max-height: calc(100vh - 110px); object-fit: contain; }
   #lb .bar { display: flex; gap: 12px; align-items: center; margin-top: 10px; color: var(--text); font-size: 14px; flex-wrap: wrap; justify-content: center; }
@@ -99,6 +118,7 @@
   <button class="tab" data-tab="changes" aria-selected="false">Changes in this version</button>
   <button class="tab" data-tab="phone" aria-selected="false">Phone clips</button>
   <button class="tab" data-tab="photos" aria-selected="false">Phone photos</button>
+  <button class="tab" data-tab="ideas" aria-selected="false">Photo ideas</button>
 </header>
 <div id="filmView">
 <main>
@@ -151,6 +171,15 @@
   </div>
   <div class="keys" style="margin:0 0 10px">Click a photo to view it big · <kbd>←</kbd> <kbd>→</kbd> previous / next · <kbd>1</kbd>–<kbd>5</kbd> stars · <kbd>0</kbd> clear · <kbd>F</kbd> use in film · <kbd>Esc</kbd> close</div>
   <div id="photoGrid"></div>
+</div>
+<div id="ideaView" hidden>
+  <h2>Photo ideas — suggested photo inserts, each shown as a mini edit</h2>
+  <div class="filters" id="ideafilters">
+    <button data-i="all">All</button><button data-i="open">Undecided</button><button data-i="approved">Approved</button><button data-i="rejected">Skipped</button>
+    <span id="ideacount" style="color:var(--muted);font-size:13px;margin-left:8px;align-self:center"></span>
+  </div>
+  <div class="keys" style="margin:0 0 10px">Play the preview to see the photo in place. The suggested photo is selected; click others to add them too (numbers = order they'd appear), click again to remove. 🔍 opens a photo full size.</div>
+  <div id="ideaList"></div>
 </div>
 <div id="lb"><img id="lbimg" alt=""><div class="bar"><span id="lbmeta"></span><span class="stars" id="lbstars"></span><button id="lbprev">◀</button><button id="lbnext">▶</button><button id="lbclose">Close</button></div></div>
 <div id="compare">
@@ -282,9 +311,9 @@ $("#ver").onchange = e => loadVersion(e.target.value);
 document.querySelectorAll(".tab").forEach(b => b.onclick = () => {
   document.querySelectorAll(".tab").forEach(x => x.setAttribute("aria-selected", x === b));
   const tab = b.dataset.tab;
-  $("#filmView").hidden = tab === "phone" || tab === "photos"; $("#phoneView").hidden = tab !== "phone"; $("#photoView").hidden = tab !== "photos";
+  $("#filmView").hidden = ["phone", "photos", "ideas"].includes(tab); $("#phoneView").hidden = tab !== "phone"; $("#photoView").hidden = tab !== "photos"; $("#ideaView").hidden = tab !== "ideas";
   $("#pane-comments").hidden = tab !== "comments"; $("#pane-changes").hidden = tab !== "changes";
-  if (tab === "phone") { v.pause(); loadPhone(); } else if (tab === "photos") { v.pause(); loadPhotos(); } else drawTimeline();
+  if (tab === "phone") { v.pause(); loadPhone(); } else if (tab === "photos") { v.pause(); loadPhotos(); } else if (tab === "ideas") { v.pause(); loadIdeas(); } else drawTimeline();
 });
 async function renderChanges() {
   const ch = await getJSON(`/media/${cur.id}/changes.json`, []);
@@ -432,6 +461,50 @@ document.addEventListener("keydown", e => {
   else if (e.key.toLowerCase() === "f") { savePhoto(p, {film: !p.film}); $("#lbstars").innerHTML = starsHtml(p); }
   else return;
   e.preventDefault();
+});
+/* ---- photo ideas ---- */
+let ideas = [], idf = "all";
+async function loadIdeas() { ideas = await getJSON("/api/ideas", []); renderIdeas(); }
+function ideaCard(it) {
+  const all = [it.photo, ...(it.alts || [])], sel = it.selected || [];
+  return `<div class="idea ${it.status}" data-id="${esc(it.id)}">
+    <video controls preload="none" playsinline poster="/media/photos/thumb/${encodeURIComponent(it.photo)}" src="/media/photo_ideas/${encodeURIComponent(it.id)}.mp4"></video>
+    <div>
+      <h3>${esc(it.why)}</h3>
+      <div class="meta">${esc(it.chapter || "")} · photo ${esc(it.date || "")} · goes after ${esc(it.after)} (${fmt(it.t)} in r3)</div>
+      ${it.caption ? `<div class="capt">Caption: <b>${esc(it.caption[0])}</b> / ${esc(it.caption[1])}</div>` : ""}
+      <div class="strip">${all.map(n => `<div class="th ${sel.includes(n) ? "on" : ""}" data-n="${esc(n)}" title="${esc(n)}">
+        <img loading="lazy" src="/media/photos/thumb/${encodeURIComponent(n)}" alt="">
+        ${sel.includes(n) ? `<span class="n">${sel.indexOf(n) + 1}</span>` : ""}
+        <a class="z" href="/media/photos/med/${encodeURIComponent(n)}" target="_blank" rel="noopener">🔍</a></div>`).join("")}</div>
+      <div class="btns"><button class="ok ${it.status === "approved" ? "on" : ""}" data-s="approved">Approve</button><button class="no ${it.status === "rejected" ? "on" : ""}" data-s="rejected">Skip</button></div>
+      <input placeholder="Comment (e.g. 'use the 2nd photo after the shot instead', 'name of this dish is …')" value="${esc(it.note || "")}">
+    </div></div>`;
+}
+function renderIdeas() {
+  document.querySelectorAll("#ideafilters [data-i]").forEach(b => b.classList.toggle("on", b.dataset.i === idf));
+  const n = s => ideas.filter(i => i.status === s).length;
+  $("#ideacount").textContent = `${ideas.length} ideas · ${n("approved")} approved · ${n("rejected")} skipped · ${n("open")} undecided`;
+  $("#ideaList").innerHTML = ideas.filter(i => idf === "all" || i.status === idf).map(ideaCard).join("") || `<div class="empty">Nothing here.</div>`;
+}
+async function saveIdea(it, body) {
+  Object.assign(it, body);
+  await fetch(`/api/ideas/${encodeURIComponent(it.id)}`, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
+}
+function redrawIdea(card, it) { const tmp = document.createElement("div"); tmp.innerHTML = ideaCard(it); const v0 = card.querySelector("video"); const nc = tmp.firstElementChild; nc.replaceChild(v0, nc.querySelector("video")); card.replaceWith(nc); }
+$("#ideafilters").addEventListener("click", e => { const b = e.target.closest("[data-i]"); if (b) { idf = b.dataset.i; renderIdeas(); } });
+$("#ideaList").addEventListener("click", async e => {
+  const card = e.target.closest(".idea"); if (!card || e.target.closest("a")) return;
+  const it = ideas.find(x => x.id === card.dataset.id);
+  const th = e.target.closest(".th");
+  if (th) { const n = th.dataset.n, sel = [...(it.selected || [])]; const k = sel.indexOf(n); if (k >= 0) sel.splice(k, 1); else sel.push(n); await saveIdea(it, {selected: sel}); return redrawIdea(card, it); }
+  const b = e.target.closest("button[data-s]"); if (!b) return;
+  await saveIdea(it, {status: it.status === b.dataset.s ? "open" : b.dataset.s}); redrawIdea(card, it); $("#ideacount") && renderIdeasCount();
+});
+function renderIdeasCount() { const n = s => ideas.filter(i => i.status === s).length; $("#ideacount").textContent = `${ideas.length} ideas · ${n("approved")} approved · ${n("rejected")} skipped · ${n("open")} undecided`; }
+$("#ideaList").addEventListener("change", e => {
+  if (e.target.tagName !== "INPUT") return;
+  saveIdea(ideas.find(x => x.id === e.target.closest(".idea").dataset.id), {note: e.target.value});
 });
 init();
 </script>

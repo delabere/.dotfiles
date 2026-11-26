@@ -1,6 +1,7 @@
 """Tiny comments API for the video review page (stdlib only, low memory).
 
 GET    /api/comments              -> all comments
+GET    /api/ideas, POST /api/ideas/<id> {status open|approved|rejected, selected [photo names], note}  (photo insert ideas)
 GET    /api/photos, POST /api/photos/<name> {rating 0-5, film, note}   (phone photo grading)
 POST   /api/comments              {version, t, text}            -> new comment (shot looked up from the version's manifest)
 PATCH  /api/comments/<id>         {status: "open"|"done"|"wontfix", reply?}
@@ -76,6 +77,26 @@ def photo_list():
     return [{**p, **ov.get(p["name"], {})} for p in base]
 
 
+IDEA_DB = os.path.join(STATE, "ideas.json")
+
+
+def idea_overrides():
+    try:
+        with open(IDEA_DB) as f: return json.load(f)
+    except FileNotFoundError:
+        return {}
+
+
+def idea_list():
+    """Review/photo_ideas.json (Claude's suggested photo inserts) + the viewer's decision, selected photos and note."""
+    try:
+        with open(os.path.join(REVIEW, "photo_ideas.json")) as f: base = json.load(f)
+    except (FileNotFoundError, ValueError):
+        base = []
+    ov = idea_overrides()
+    return [{**{"status": "open", "selected": [p["photo"]], "note": ""}, **p, **ov.get(p["id"], {})} for p in base]
+
+
 def shot_at(version, t):
     try:
         with open(os.path.join(REVIEW, version, "manifest.json")) as f: m = json.load(f)
@@ -111,9 +132,23 @@ class H(BaseHTTPRequestHandler):
             with LOCK: return self._send(200, phone_list())
         if self.path.startswith("/api/photos"):
             with LOCK: return self._send(200, photo_list())
+        if self.path.startswith("/api/ideas"):
+            with LOCK: return self._send(200, idea_list())
         self._send(404, {"error": "not found"})
 
     def do_POST(self):
+        if self.path.startswith("/api/ideas/"):
+            iid = self._id(); b = self._json()
+            with LOCK:
+                ov = idea_overrides(); cur = ov.get(iid, {})
+                if b.get("status") in ("open", "approved", "rejected"): cur["status"] = b["status"]
+                if isinstance(b.get("selected"), list): cur["selected"] = [str(x)[:100] for x in b["selected"]][:12]
+                if "note" in b: cur["note"] = str(b["note"])[:1000]
+                ov[iid] = cur
+                tmp = IDEA_DB + ".tmp"
+                with open(tmp, "w") as f: json.dump(ov, f, indent=1, ensure_ascii=False)
+                os.replace(tmp, IDEA_DB)
+            return self._send(200, {"id": iid, **cur})
         if self.path.startswith("/api/photos/"):
             name = self._id(); b = self._json()
             with LOCK:
