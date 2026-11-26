@@ -29,6 +29,8 @@
   .chap { position: absolute; top: 0; height: 18px; font-size: 11px; color: var(--muted); padding: 2px 6px; white-space: nowrap; overflow: hidden; border-right: 1px solid var(--bg); }
   .clip { position: absolute; top: 20px; height: 34px; border-right: 1px solid var(--bg); overflow: hidden; font-size: 10px; color: #c9d3db; padding: 2px 3px; white-space: nowrap; }
   .clip.card { background: var(--card) !important; }
+  .ph { position: absolute; top: 44px; height: 10px; background: #e05aa8; border-radius: 3px; border: 1px solid var(--bg); cursor: pointer; z-index: 2; }
+  .ph.supercut { background: #b06de0; }
   .lab { position: absolute; top: 56px; width: 2px; height: 10px; background: var(--label); }
   .cm { position: absolute; top: 68px; height: 14px; min-width: 10px; border-radius: 7px; background: var(--accent); border: 2px solid var(--bg); }
   .cm.done { background: var(--done); } .cm.wontfix { background: var(--muted); }
@@ -91,7 +93,6 @@
   .idea { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 14px; background: var(--panel); border: 2px solid var(--line); border-radius: 10px; padding: 10px; margin-bottom: 14px; }
   .idea.approved { border-color: var(--done); } .idea.rejected { opacity: .55; }
   @media (max-width: 900px) { .idea { grid-template-columns: 1fr; } }
-  .idea video { aspect-ratio: 16/9; background: #000; }
   .idea h3 { margin: 0 0 4px; font-size: 16px; }
   .idea .meta { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
   .idea .capt { font-size: 13px; margin-bottom: 8px; }
@@ -100,11 +101,27 @@
   .strip .th img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .strip .th.on { border-color: var(--accent); }
   .strip .th .n { position: absolute; top: 2px; left: 2px; background: var(--accent); color: #221; font-size: 11px; font-weight: 700; border-radius: 9px; padding: 0 6px; }
-  .strip .th .z { position: absolute; bottom: 2px; right: 2px; background: #000a; color: #fff; font-size: 11px; border-radius: 4px; padding: 0 4px; text-decoration: none; }
   .idea .btns { display: flex; gap: 8px; } .idea .btns button { flex: 1; }
   .idea .btns button.ok.on { background: var(--done); color: #052; border-color: var(--done); }
   .idea .btns button.no.on { background: var(--out); color: #fff; border-color: var(--out); }
   .idea input { width: 100%; padding: 5px 8px; font-size: 13px; margin-top: 8px; }
+  .stage { position: relative; aspect-ratio: 16/9; background: #000; border-radius: 6px; overflow: hidden; cursor: pointer; }
+  .stage video { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .stage .ov { position: absolute; inset: 0; display: none; overflow: hidden; background: #000; }
+  .stage .ov.show { display: block; }
+  .stage .ov img { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .stage .ov .bgb { object-fit: cover; filter: blur(24px) brightness(.75); transform: scale(1.15); }
+  .stage .ov .fg { object-fit: contain; }
+  .stage .ov .fg.kb { animation: kb var(--d, 1.2s) ease-out forwards; }
+  @keyframes kb { from { transform: scale(1); } to { transform: scale(1.05); } }
+  .stage .ov .cap { position: absolute; left: 50%; bottom: 8%; transform: translateX(-50%); background: #0a0c0e88; color: #faf8f4; padding: 6px 18px; border-radius: 12px; text-align: center; font-size: clamp(12px, 2.2vw, 20px); line-height: 1.35; white-space: nowrap; }
+  .stage .play { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 16px; padding: 10px 18px; background: #000b; color: #fff; border: 1px solid #fff6; border-radius: 24px; }
+  .strip .th .sel { position: absolute; top: 3px; left: 3px; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; font-size: 12px; font-weight: 700; background: #000b; color: #fff; border: 1px solid #fff8; }
+  .strip .th.on .sel { background: var(--accent); color: #221; border-color: var(--accent); }
+  #ilb { position: fixed; inset: 0; background: #000e; z-index: 31; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 14px; }
+  #ilb img { max-width: 100%; max-height: calc(100vh - 100px); object-fit: contain; }
+  #ilb .bar { display: flex; gap: 10px; align-items: center; margin-top: 10px; color: var(--text); flex-wrap: wrap; justify-content: center; }
+  #ilbsel.on { background: var(--accent); color: #221; border-color: var(--accent); }
   #lb { position: fixed; inset: 0; background: #000e; z-index: 30; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 14px; }
   #lb img { max-width: 100%; max-height: calc(100vh - 110px); object-fit: contain; }
   #lb .bar { display: flex; gap: 12px; align-items: center; margin-top: 10px; color: var(--text); font-size: 14px; flex-wrap: wrap; justify-content: center; }
@@ -127,11 +144,12 @@
     <div class="tlbar">
       <button id="zout" title="Zoom out (-)">−</button><button id="zin" title="Zoom in (=)">+</button><button id="zfit">Fit</button>
       <span id="zlabel"></span>
+      <button id="phprev" title="Previous photo (Shift+P)">◀ photo</button><button id="phnext" title="Next photo (P)">photo ▶</button>
       <span style="margin-left:auto" id="selinfo"></span><button id="selclear" hidden>Clear selection</button>
     </div>
     <div id="tl"><div id="track"><div id="sel"></div><div id="head"></div></div></div>
     <div id="tip"></div>
-    <div class="keys"><kbd>Space</kbd> play · <kbd>,</kbd> <kbd>.</kbd> 1 frame · <kbd>←</kbd> <kbd>→</kbd> 1 s · <kbd>⇧</kbd>+<kbd>←</kbd><kbd>→</kbd> 5 s · <kbd>[</kbd> <kbd>]</kbd> previous / next clip · <kbd>=</kbd> <kbd>-</kbd> zoom (or ⌘+scroll) · <kbd>⇧</kbd>+drag on the timeline to select a section · <kbd>C</kbd> comment · <kbd>⌘↵</kbd> save</div>
+    <div class="keys"><kbd>Space</kbd> play · <kbd>,</kbd> <kbd>.</kbd> 1 frame · <kbd>←</kbd> <kbd>→</kbd> 1 s · <kbd>⇧</kbd>+<kbd>←</kbd><kbd>→</kbd> 5 s · <kbd>[</kbd> <kbd>]</kbd> previous / next clip · <kbd>=</kbd> <kbd>-</kbd> zoom (or ⌘+scroll) · <kbd>⇧</kbd>+drag on the timeline to select a section · <kbd>P</kbd> <kbd>⇧P</kbd> next / previous photo (pink on the timeline) · <kbd>C</kbd> comment · <kbd>⌘↵</kbd> save</div>
     <div class="where" id="where"></div>
     <textarea id="txt" placeholder="Comment on this moment (or the selected section), e.g. 'drop this shot', 'hold longer', 'too dark', 'wrong label'…"></textarea>
     <div class="row">
@@ -178,9 +196,10 @@
     <button data-i="all">All</button><button data-i="open">Undecided</button><button data-i="approved">Approved</button><button data-i="rejected">Skipped</button>
     <span id="ideacount" style="color:var(--muted);font-size:13px;margin-left:8px;align-self:center"></span>
   </div>
-  <div class="keys" style="margin:0 0 10px">Play the preview to see the photo in place. The suggested photo is selected; click others to add them too (numbers = order they'd appear), click again to remove. 🔍 opens a photo full size.</div>
+  <div class="keys" style="margin:0 0 10px">Press ▶ Preview to watch the film run into the cut with the selected photos over it (the sound carries on). Click a photo to view it big (<kbd>←</kbd> <kbd>→</kbd> to flip, <kbd>Space</kbd> to add/remove); the round badge adds/removes it directly; numbers = order they'd appear.</div>
   <div id="ideaList"></div>
 </div>
+<div id="ilb"><img id="ilbimg" alt=""><div class="bar"><span id="ilbmeta"></span><button id="ilbprev">◀</button><button id="ilbsel"></button><button id="ilbnext">▶</button><button id="ilbclose">Close</button></div></div>
 <div id="lb"><img id="lbimg" alt=""><div class="bar"><span id="lbmeta"></span><span class="stars" id="lbstars"></span><button id="lbprev">◀</button><button id="lbnext">▶</button><button id="lbclose">Close</button></div></div>
 <div id="compare">
   <div class="row" style="margin:0 0 10px"><b id="cmpTitle"></b><span style="margin-left:auto"></span>
@@ -228,11 +247,12 @@ function setZoom(p, anchorT) {
 function drawTimeline() {
   if (!pps) pps = fitPps();
   const D = dur(), W = D * pps; track.style.width = `${W}px`;
-  track.querySelectorAll(".chap,.clip,.lab,.cm").forEach(e => e.remove());
+  track.querySelectorAll(".chap,.clip,.lab,.cm,.ph").forEach(e => e.remove());
   const add = (cls, l, w, html, title) => { const e = document.createElement("div"); e.className = cls; e.style.left = `${l * pps}px`; if (w != null) e.style.width = `${Math.max(1, w * pps)}px`; if (html) e.innerHTML = html; if (title) e.title = title; track.appendChild(e); return e; };
   (manifest.chapters || []).forEach((c, i, a) => { const end = (a[i + 1] || {}).start ?? D; const e = add("chap", c.start, end - c.start, esc(c.title)); e.style.background = i % 2 ? "var(--chapB)" : "var(--chapA)"; });
   (manifest.shots || []).forEach((s, i) => { const e = add(`clip${s.kind === "card" ? " card" : ""}`, s.start, s.end - s.start, pps > 25 ? esc(s.kind === "card" ? "map" : s.name.replace(/^DJI_\d{8}_?/, "").replace(/\.\w+$/, "")) : "", s.name); e.style.background = i % 2 ? "var(--clipA)" : "var(--clipB)"; });
   (manifest.labels || []).forEach(l => add("lab", l.t, null, "", l.text));
+  (manifest.photos || []).forEach(p => { const e = add(`ph${p.kind === "supercut" ? " supercut" : ""}`, p.start, p.end - p.start, "", "Photo: " + photoLabel(p)); e.onclick = ev => { ev.stopPropagation(); v.currentTime = p.start + 0.01; }; });
   comments.filter(c => c.version === cur?.id).forEach(c => {
     const e = add(`cm ${c.status}`, c.t, c.t_end ? c.t_end - c.t : null, "", c.text);
     if (!c.t_end) e.style.marginLeft = "-5px";
@@ -248,11 +268,19 @@ function drawSel() {
   $("#selinfo").textContent = `Selected ${fmt(a, 1)} – ${fmt(b, 1)} (${(b - a).toFixed(1)} s)`; $("#selclear").hidden = false;
 }
 const shotAt = t => (manifest.shots || []).find(s => s.start <= t && t < s.end);
+const photoAt = t => (manifest.photos || []).find(p => p.start <= t && t < p.end);
+const photoLabel = p => p.name.replace(/^ph_/, "").replace(/\.mov$/, "").replace(/^f_/, "").replace(/^dog_/, "dog supercut #").replace(/_(\d+)$/, " #$1");
+function jumpPhoto(dir) {
+  const t = v.currentTime, ps = (manifest.photos || []).filter(p => p.kind !== "supercut" || true);
+  const p = dir > 0 ? ps.find(p => p.start > t + 0.05) : [...ps].reverse().find(p => p.start < t - 0.3);
+  if (p) { v.currentTime = p.start + 0.01; const x = p.start * pps; if (x < tl.scrollLeft || x > tl.scrollLeft + tl.clientWidth) tl.scrollLeft = x - tl.clientWidth / 3; }
+}
 function where() {
   const t = v.currentTime, s = shotAt(t);
   const range = sel && Math.abs(sel.b - sel.a) >= 0.05;
   $("#addt").textContent = range ? `${fmt(Math.min(sel.a, sel.b))}–${fmt(Math.max(sel.a, sel.b))}` : fmt(t);
-  $("#where").innerHTML = s ? `<b>${fmt(t, 1)}</b> · ${esc(s.chapter || "")} · ${esc(s.kind === "card" ? "map card" : s.name)} <span style="opacity:.7">(clip ${fmt(s.start)}–${fmt(s.end)})</span>` : `<b>${fmt(t, 1)}</b>`;
+  const ph = photoAt(t);
+  $("#where").innerHTML = (ph ? `<span style="color:#e05aa8">■ photo ${esc(photoLabel(ph))}</span> · ` : "") + (s ? `<b>${fmt(t, 1)}</b> · ${esc(s.chapter || "")} · ${esc(s.kind === "card" ? "map card" : s.name)} <span style="opacity:.7">(clip ${fmt(s.start)}–${fmt(s.end)})</span>` : `<b>${fmt(t, 1)}</b>`);
   $("#head").style.left = `${t * pps}px`;
   if (!v.paused) { const x = t * pps; if (x < tl.scrollLeft + 40 || x > tl.scrollLeft + tl.clientWidth - 40) tl.scrollLeft = x - tl.clientWidth / 3; }
 }
@@ -267,7 +295,8 @@ window.addEventListener("mouseup", e => { if (drag) { drag = null; if (sel) v.cu
 tl.addEventListener("click", e => { if (e.shiftKey) return; v.currentTime = Math.max(0, Math.min(dur(), tAt(e))); });
 tl.addEventListener("mousemove", e => {
   const t = tAt(e), s = shotAt(t), tip = $("#tip"); tip.style.display = "block"; tip.style.left = `${e.clientX + 12}px`; tip.style.top = `${e.clientY - 28}px`;
-  tip.textContent = `${fmt(t, 1)}${s ? " · " + (s.kind === "card" ? "map card" : s.name) : ""}`;
+  const ph = photoAt(t);
+  tip.textContent = `${fmt(t, 1)}${ph ? " · photo " + photoLabel(ph) : s ? " · " + (s.kind === "card" ? "map card" : s.name) : ""}`;
 });
 tl.addEventListener("mouseleave", () => $("#tip").style.display = "none");
 tl.addEventListener("wheel", e => { if (e.ctrlKey || e.metaKey) { e.preventDefault(); setZoom(pps * (e.deltaY < 0 ? 1.25 : 0.8), tAt(e)); } }, {passive: false});
@@ -362,6 +391,7 @@ document.addEventListener("keydown", e => {
   else if (k === "[") jumpClip(-1); else if (k === "]") jumpClip(1);
   else if (k === "=" || k === "+") setZoom(pps * 2); else if (k === "-") setZoom(pps / 2);
   else if (k.toLowerCase() === "c") { e.preventDefault(); $("#txt").focus(); }
+  else if (k.toLowerCase() === "p") { e.preventDefault(); jumpPhoto(e.shiftKey ? -1 : 1); }
   else if (k === "Escape") { if ($("#compare").style.display === "flex") $("#cmpClose").click(); else { sel = null; drawSel(); where(); } }
 });
 /* ---- phone picker ---- */
@@ -463,49 +493,119 @@ document.addEventListener("keydown", e => {
   e.preventDefault();
 });
 /* ---- photo ideas ---- */
-let ideas = [], idf = "all";
+// Live preview: the film plays up to the cut, then the selected photos show over it while the sound carries on.
+// 1 photo = 1.2 s, 2 = 1 s each, 3+ = 0.7 s each.
+const IDEA_FILM = "r3s";
+let ideas = [], idf = "all", playing = null;
+const perPhoto = n => n <= 1 ? 1.2 : n === 2 ? 1.0 : 0.7;
 async function loadIdeas() { ideas = await getJSON("/api/ideas", []); renderIdeas(); }
-function ideaCard(it) {
+const med = n => `/media/photos/med/${encodeURIComponent(n)}`, thumb = n => `/media/photos/thumb/${encodeURIComponent(n)}`;
+function stripHtml(it) {
   const all = [it.photo, ...(it.alts || [])], sel = it.selected || [];
+  return all.map((n, k) => `<div class="th ${sel.includes(n) ? "on" : ""}" data-n="${esc(n)}" data-k="${k}" title="Click to view">
+    <img loading="lazy" src="${thumb(n)}" alt="">
+    <button class="sel" data-sel="${esc(n)}" aria-label="${sel.includes(n) ? "Remove from the edit" : "Add to the edit"}">${sel.includes(n) ? sel.indexOf(n) + 1 : "+"}</button></div>`).join("");
+}
+function ideaCard(it) {
+  const n = (it.selected || []).length, tot = n * perPhoto(n);
   return `<div class="idea ${it.status}" data-id="${esc(it.id)}">
-    <video controls preload="none" playsinline poster="/media/photos/thumb/${encodeURIComponent(it.photo)}" src="/media/photo_ideas/${encodeURIComponent(it.id)}.mp4"></video>
+    <div>
+      <div class="stage"><video preload="none" playsinline poster="${thumb(it.photo)}"></video>
+        <div class="ov"><img class="bgb" alt=""><img class="fg" alt="">${it.caption ? `<div class="cap"><b>${esc(it.caption[0])}</b><br>${esc(it.caption[1])}</div>` : ""}</div>
+        <button class="play">▶ Preview</button></div>
+      <div class="meta" style="margin-top:6px">${n ? `${n} photo${n > 1 ? "s" : ""} × ${perPhoto(n)} s = ${tot.toFixed(1)} s over the film, sound carries on` : "No photo selected: nothing would be added"}</div>
+    </div>
     <div>
       <h3>${esc(it.why)}</h3>
-      <div class="meta">${esc(it.chapter || "")} · photo ${esc(it.date || "")} · goes after ${esc(it.after)} (${fmt(it.t)} in r3)</div>
+      <div class="meta">${esc(it.chapter || "")} · photo ${esc(it.date || "")} · at ${fmt(it.t)}, after ${esc(it.after)}</div>
       ${it.caption ? `<div class="capt">Caption: <b>${esc(it.caption[0])}</b> / ${esc(it.caption[1])}</div>` : ""}
-      <div class="strip">${all.map(n => `<div class="th ${sel.includes(n) ? "on" : ""}" data-n="${esc(n)}" title="${esc(n)}">
-        <img loading="lazy" src="/media/photos/thumb/${encodeURIComponent(n)}" alt="">
-        ${sel.includes(n) ? `<span class="n">${sel.indexOf(n) + 1}</span>` : ""}
-        <a class="z" href="/media/photos/med/${encodeURIComponent(n)}" target="_blank" rel="noopener">🔍</a></div>`).join("")}</div>
+      <div class="strip">${stripHtml(it)}</div>
       <div class="btns"><button class="ok ${it.status === "approved" ? "on" : ""}" data-s="approved">Approve</button><button class="no ${it.status === "rejected" ? "on" : ""}" data-s="rejected">Skip</button></div>
-      <input placeholder="Comment (e.g. 'use the 2nd photo after the shot instead', 'name of this dish is …')" value="${esc(it.note || "")}">
+      <input placeholder="Comment (e.g. 'put it after the next shot', 'this dish is called …')" value="${esc(it.note || "")}">
     </div></div>`;
 }
+function renderIdeasCount() { const n = s => ideas.filter(i => i.status === s).length; $("#ideacount").textContent = `${ideas.length} ideas · ${n("approved")} approved · ${n("rejected")} skipped · ${n("open")} undecided`; }
 function renderIdeas() {
   document.querySelectorAll("#ideafilters [data-i]").forEach(b => b.classList.toggle("on", b.dataset.i === idf));
-  const n = s => ideas.filter(i => i.status === s).length;
-  $("#ideacount").textContent = `${ideas.length} ideas · ${n("approved")} approved · ${n("rejected")} skipped · ${n("open")} undecided`;
+  renderIdeasCount();
   $("#ideaList").innerHTML = ideas.filter(i => idf === "all" || i.status === idf).map(ideaCard).join("") || `<div class="empty">Nothing here.</div>`;
 }
 async function saveIdea(it, body) {
-  Object.assign(it, body);
+  Object.assign(it, body); renderIdeasCount();
   await fetch(`/api/ideas/${encodeURIComponent(it.id)}`, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
 }
-function redrawIdea(card, it) { const tmp = document.createElement("div"); tmp.innerHTML = ideaCard(it); const v0 = card.querySelector("video"); const nc = tmp.firstElementChild; nc.replaceChild(v0, nc.querySelector("video")); card.replaceWith(nc); }
-$("#ideafilters").addEventListener("click", e => { const b = e.target.closest("[data-i]"); if (b) { idf = b.dataset.i; renderIdeas(); } });
-$("#ideaList").addEventListener("click", async e => {
-  const card = e.target.closest(".idea"); if (!card || e.target.closest("a")) return;
-  const it = ideas.find(x => x.id === card.dataset.id);
-  const th = e.target.closest(".th");
-  if (th) { const n = th.dataset.n, sel = [...(it.selected || [])]; const k = sel.indexOf(n); if (k >= 0) sel.splice(k, 1); else sel.push(n); await saveIdea(it, {selected: sel}); return redrawIdea(card, it); }
-  const b = e.target.closest("button[data-s]"); if (!b) return;
-  await saveIdea(it, {status: it.status === b.dataset.s ? "open" : b.dataset.s}); redrawIdea(card, it); $("#ideacount") && renderIdeasCount();
+function redrawIdea(it) {
+  const card = document.querySelector(`.idea[data-id="${CSS.escape(it.id)}"]`); if (!card) return;
+  const tmp = document.createElement("div"); tmp.innerHTML = ideaCard(it); const nc = tmp.firstElementChild;
+  if (playing && playing.card === card) stopIdea();
+  card.replaceWith(nc);
+}
+function stopIdea() {
+  if (!playing) return; const {card, v} = playing; v.pause(); cancelAnimationFrame(playing.raf);
+  card.querySelector(".ov").classList.remove("show"); card.querySelector(".play").hidden = false; playing = null;
+}
+function playIdea(card) {
+  stopIdea();
+  const it = ideas.find(x => x.id === card.dataset.id), sel = it.selected || [], d = perPhoto(sel.length), tot = sel.length * d;
+  const v = card.querySelector("video"), ov = card.querySelector(".ov"), bg = ov.querySelector(".bgb"), fg = ov.querySelector(".fg");
+  sel.forEach(n => { const im = new Image(); im.src = med(n); });
+  if (!v.src) v.src = `/media/${IDEA_FILM}/film.mp4`;
+  v.controls = false; card.querySelector(".play").hidden = true;
+  const start = Math.max(0, it.t - 3), end = it.t + tot + 2.5;
+  playing = {card, v, shown: -1};
+  const go = () => { v.currentTime = start; v.play(); tick(); };
+  const tick = () => {
+    if (!playing || playing.v !== v) return;
+    const e = v.currentTime - it.t, k = e >= 0 && e < tot ? Math.floor(e / d) : -1;
+    if (k !== playing.shown) {
+      playing.shown = k;
+      if (k < 0) ov.classList.remove("show");
+      else { bg.src = fg.src = med(sel[k]); ov.style.setProperty("--d", d + "s"); fg.classList.remove("kb"); void fg.offsetWidth; fg.classList.add("kb"); ov.classList.add("show"); }
+    }
+    if (v.currentTime >= end) { stopIdea(); return; }
+    playing.raf = requestAnimationFrame(tick);
+  };
+  if (v.readyState >= 1) go(); else v.addEventListener("loadedmetadata", go, {once: true});
+}
+// in-page photo viewer for one idea's photos
+let ilb = null;
+function openIlb(it, k) {
+  ilb = {it, k}; const all = [it.photo, ...(it.alts || [])], n = all[k], sel = it.selected || [];
+  $("#ilbimg").src = med(n);
+  $("#ilbmeta").textContent = `${k + 1} / ${all.length}${k === 0 ? " · suggested" : ""}`;
+  $("#ilbsel").textContent = sel.includes(n) ? `✓ In the edit (#${sel.indexOf(n) + 1}) · click to remove` : "+ Add to the edit";
+  $("#ilbsel").classList.toggle("on", sel.includes(n));
+  $("#ilb").style.display = "flex";
+}
+function closeIlb() { $("#ilb").style.display = "none"; if (ilb) redrawIdea(ilb.it); ilb = null; }
+async function toggleSel(it, n) { const sel = [...(it.selected || [])], k = sel.indexOf(n); if (k >= 0) sel.splice(k, 1); else sel.push(n); await saveIdea(it, {selected: sel}); }
+$("#ilbprev").onclick = () => { const all = [ilb.it.photo, ...(ilb.it.alts || [])]; openIlb(ilb.it, (ilb.k + all.length - 1) % all.length); };
+$("#ilbnext").onclick = () => { const all = [ilb.it.photo, ...(ilb.it.alts || [])]; openIlb(ilb.it, (ilb.k + 1) % all.length); };
+$("#ilbsel").onclick = async () => { const all = [ilb.it.photo, ...(ilb.it.alts || [])]; await toggleSel(ilb.it, all[ilb.k]); openIlb(ilb.it, ilb.k); };
+$("#ilbclose").onclick = closeIlb;
+$("#ilb").addEventListener("click", e => { if (e.target.id === "ilb") closeIlb(); });
+document.addEventListener("keydown", e => {
+  if (!ilb || ["INPUT", "TEXTAREA"].includes(e.target.tagName)) return;
+  if (e.key === "ArrowRight") $("#ilbnext").click(); else if (e.key === "ArrowLeft") $("#ilbprev").click();
+  else if (e.key === " " || e.key.toLowerCase() === "s") $("#ilbsel").click(); else if (e.key === "Escape") closeIlb(); else return;
+  e.preventDefault();
 });
-function renderIdeasCount() { const n = s => ideas.filter(i => i.status === s).length; $("#ideacount").textContent = `${ideas.length} ideas · ${n("approved")} approved · ${n("rejected")} skipped · ${n("open")} undecided`; }
+$("#ideafilters").addEventListener("click", e => { const b = e.target.closest("[data-i]"); if (b) { idf = b.dataset.i; stopIdea(); renderIdeas(); } });
+$("#ideaList").addEventListener("click", async e => {
+  const card = e.target.closest(".idea"); if (!card) return;
+  const it = ideas.find(x => x.id === card.dataset.id);
+  if (e.target.closest(".play")) return playIdea(card);
+  if (e.target.closest(".stage")) { if (playing && playing.card === card) stopIdea(); else playIdea(card); return; }
+  const sb = e.target.closest("button.sel"); if (sb) { await toggleSel(it, sb.dataset.sel); return redrawIdea(it); }
+  const th = e.target.closest(".th"); if (th) return openIlb(it, +th.dataset.k);
+  const b = e.target.closest("button[data-s]"); if (!b) return;
+  await saveIdea(it, {status: it.status === b.dataset.s ? "open" : b.dataset.s}); redrawIdea(it);
+});
 $("#ideaList").addEventListener("change", e => {
   if (e.target.tagName !== "INPUT") return;
   saveIdea(ideas.find(x => x.id === e.target.closest(".idea").dataset.id), {note: e.target.value});
 });
+$("#phprev").onclick = () => jumpPhoto(-1); $("#phnext").onclick = () => jumpPhoto(1);
 init();
 </script>
 </body>
