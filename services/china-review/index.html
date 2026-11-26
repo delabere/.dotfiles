@@ -8,31 +8,39 @@
   :root {
     --bg: #0f1419; --panel: #172029; --line: #26323d; --text: #eef0f2; --muted: #93a1ad;
     --accent: #f2b134; --done: #4cc38a; --chapA: #22303b; --chapB: #1b2630; --label: #7fb3d5;
+    --clipA: #2c3d4b; --clipB: #354a5a; --card: #5a4a24; --sel: #f2b13440; --out: #c0584a;
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; }
-  header { display: flex; gap: 12px; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
-  header h1 { font-size: 17px; margin: 0 12px 0 0; font-weight: 650; }
-  select, button, textarea { font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+  header { display: flex; gap: 10px; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  header h1 { font-size: 17px; margin: 0 10px 0 0; font-weight: 650; }
+  select, button, textarea, input { font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
   select, button { padding: 6px 10px; cursor: pointer; }
   button.primary { background: var(--accent); color: #1a1205; border-color: var(--accent); font-weight: 600; }
-  button.tab[aria-selected="true"] { border-color: var(--accent); color: var(--accent); }
-  main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; padding: 16px; max-width: 1600px; margin: 0 auto; }
+  button.tab[aria-selected="true"], button.on { border-color: var(--accent); color: var(--accent); }
+  main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; padding: 16px; max-width: 1700px; margin: 0 auto; }
   @media (max-width: 1000px) { main { grid-template-columns: 1fr; } }
   video { width: 100%; background: #000; border-radius: 10px; display: block; }
-  #bar { position: relative; height: 46px; margin-top: 10px; border-radius: 8px; overflow: hidden; cursor: pointer; background: var(--chapB); user-select: none; }
-  .chap { position: absolute; top: 0; height: 100%; border-right: 1px solid var(--bg); font-size: 11px; color: var(--muted); padding: 3px 6px; white-space: nowrap; overflow: hidden; }
-  .lab { position: absolute; top: 20px; width: 2px; height: 10px; background: var(--label); }
-  .dot { position: absolute; bottom: 3px; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg); }
-  .dot.done { background: var(--done); } .dot.wontfix { background: var(--muted); }
-  #head { position: absolute; top: 0; width: 2px; height: 100%; background: #fff; pointer-events: none; }
-  #hover { position: absolute; top: -2px; transform: translateX(-50%); font-size: 11px; background: #000c; padding: 1px 5px; border-radius: 4px; display: none; pointer-events: none; }
+  /* timeline */
+  .tlbar { display: flex; gap: 6px; align-items: center; margin-top: 10px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+  .tlbar button { padding: 3px 9px; font-size: 13px; }
+  #tl { position: relative; margin-top: 6px; overflow-x: auto; overflow-y: hidden; border-radius: 8px; background: var(--chapB); user-select: none; cursor: pointer; }
+  #track { position: relative; height: 86px; }
+  .chap { position: absolute; top: 0; height: 18px; font-size: 11px; color: var(--muted); padding: 2px 6px; white-space: nowrap; overflow: hidden; border-right: 1px solid var(--bg); }
+  .clip { position: absolute; top: 20px; height: 34px; border-right: 1px solid var(--bg); overflow: hidden; font-size: 10px; color: #c9d3db; padding: 2px 3px; white-space: nowrap; }
+  .clip.card { background: var(--card) !important; }
+  .lab { position: absolute; top: 56px; width: 2px; height: 10px; background: var(--label); }
+  .cm { position: absolute; top: 68px; height: 14px; min-width: 10px; border-radius: 7px; background: var(--accent); border: 2px solid var(--bg); }
+  .cm.done { background: var(--done); } .cm.wontfix { background: var(--muted); }
+  #sel { position: absolute; top: 0; height: 100%; background: var(--sel); border-left: 2px solid var(--accent); border-right: 2px solid var(--accent); display: none; pointer-events: none; }
+  #head { position: absolute; top: 0; width: 2px; height: 100%; background: #fff; pointer-events: none; z-index: 2; }
+  #tip { position: fixed; font-size: 12px; background: #000d; padding: 2px 6px; border-radius: 4px; display: none; pointer-events: none; z-index: 5; }
   .where { color: var(--muted); font-size: 13px; margin: 10px 0 6px; }
   .where b { color: var(--text); font-weight: 600; }
   textarea { width: 100%; min-height: 70px; padding: 8px 10px; resize: vertical; }
   .row { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
   aside { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; max-height: calc(100vh - 110px); overflow: auto; }
-  aside h2 { font-size: 14px; margin: 4px 0 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+  aside h2, #phoneView h2 { font-size: 14px; margin: 4px 0 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
   .item { border-top: 1px solid var(--line); padding: 10px 2px; }
   .item:first-of-type { border-top: 0; }
   .item .t { color: var(--accent); cursor: pointer; font-variant-numeric: tabular-nums; font-weight: 600; }
@@ -41,7 +49,7 @@
   .item .txt { margin: 3px 0; white-space: pre-wrap; }
   .item .reply { border-left: 2px solid var(--done); padding-left: 8px; color: #cfe; font-size: 13px; margin: 4px 0; }
   .item button { font-size: 12px; padding: 3px 8px; margin-right: 4px; }
-  .filters { display: flex; gap: 6px; margin-bottom: 8px; }
+  .filters { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
   .filters button { font-size: 12px; padding: 3px 8px; }
   #compare { position: fixed; inset: 0; background: #000e; display: none; flex-direction: column; padding: 16px; z-index: 10; }
   #compare .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex: 1; min-height: 0; }
@@ -50,6 +58,37 @@
   #compare .cap { color: var(--muted); font-size: 13px; margin-bottom: 4px; }
   .empty { color: var(--muted); font-size: 14px; padding: 8px 2px; }
   kbd { background: var(--chapA); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; font-size: 12px; }
+  .keys { color: var(--muted); font-size: 12px; margin-top: 6px; line-height: 1.9; }
+  /* phone picker */
+  #phoneView { padding: 16px; max-width: 1700px; margin: 0 auto; }
+  #phoneGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+  .pc { background: var(--panel); border: 2px solid var(--line); border-radius: 10px; padding: 8px; }
+  .pc.in { border-color: var(--done); } .pc.out { border-color: var(--out); opacity: .72; }
+  .pc video { aspect-ratio: 16/9; object-fit: contain; }
+  .pc .meta { color: var(--muted); font-size: 12px; margin: 6px 0 2px; }
+  .pc .why { font-size: 13px; margin-bottom: 6px; }
+  .pc input { width: 100%; padding: 5px 8px; font-size: 13px; margin-top: 6px; }
+  .pc .btns { display: flex; gap: 6px; }
+  .pc .btns button { flex: 1; font-size: 13px; padding: 4px; }
+  .pc .btns button.in.on { background: var(--done); color: #052; border-color: var(--done); }
+  .pc .btns button.out.on { background: var(--out); color: #fff; border-color: var(--out); }
+  /* phone photos */
+  #photoView { padding: 16px; max-width: 1800px; margin: 0 auto; }
+  #photoView select { padding: 4px 8px; }
+  #photoGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+  .ph { background: var(--panel); border: 2px solid var(--line); border-radius: 8px; padding: 6px; }
+  .ph.film { border-color: var(--accent); }
+  .ph img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 4px; cursor: zoom-in; display: block; background: #000; }
+  .ph .meta { color: var(--muted); font-size: 11px; margin: 4px 0; }
+  .stars { display: flex; gap: 2px; align-items: center; }
+  .stars button { padding: 0 3px; font-size: 18px; line-height: 1.2; background: none; border: none; color: var(--line); cursor: pointer; }
+  .stars button.on { color: var(--accent); }
+  .stars .film { margin-left: auto; font-size: 12px; padding: 2px 8px; border: 1px solid var(--line); border-radius: 12px; color: var(--muted); }
+  .stars .film.on { background: var(--accent); color: #221; border-color: var(--accent); }
+  .ph input { width: 100%; padding: 3px 6px; font-size: 12px; margin-top: 4px; }
+  #lb { position: fixed; inset: 0; background: #000e; z-index: 30; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 14px; }
+  #lb img { max-width: 100%; max-height: calc(100vh - 110px); object-fit: contain; }
+  #lb .bar { display: flex; gap: 12px; align-items: center; margin-top: 10px; color: var(--text); font-size: 14px; flex-wrap: wrap; justify-content: center; }
 </style>
 </head>
 <body>
@@ -58,17 +97,26 @@
   <select id="ver" aria-label="Version"></select>
   <button class="tab" data-tab="comments" aria-selected="true">Comments</button>
   <button class="tab" data-tab="changes" aria-selected="false">Changes in this version</button>
-  <span style="color:var(--muted);font-size:13px;margin-left:auto"><kbd>Space</kbd> play · <kbd>←</kbd><kbd>→</kbd> 5 s · <kbd>C</kbd> comment · <kbd>⌘↵</kbd> save</span>
+  <button class="tab" data-tab="phone" aria-selected="false">Phone clips</button>
+  <button class="tab" data-tab="photos" aria-selected="false">Phone photos</button>
 </header>
+<div id="filmView">
 <main>
   <section>
     <video id="v" controls playsinline preload="metadata"></video>
-    <div id="bar"><div id="head"></div><div id="hover"></div></div>
+    <div class="tlbar">
+      <button id="zout" title="Zoom out (-)">−</button><button id="zin" title="Zoom in (=)">+</button><button id="zfit">Fit</button>
+      <span id="zlabel"></span>
+      <span style="margin-left:auto" id="selinfo"></span><button id="selclear" hidden>Clear selection</button>
+    </div>
+    <div id="tl"><div id="track"><div id="sel"></div><div id="head"></div></div></div>
+    <div id="tip"></div>
+    <div class="keys"><kbd>Space</kbd> play · <kbd>,</kbd> <kbd>.</kbd> 1 frame · <kbd>←</kbd> <kbd>→</kbd> 1 s · <kbd>⇧</kbd>+<kbd>←</kbd><kbd>→</kbd> 5 s · <kbd>[</kbd> <kbd>]</kbd> previous / next clip · <kbd>=</kbd> <kbd>-</kbd> zoom (or ⌘+scroll) · <kbd>⇧</kbd>+drag on the timeline to select a section · <kbd>C</kbd> comment · <kbd>⌘↵</kbd> save</div>
     <div class="where" id="where"></div>
-    <textarea id="txt" placeholder="Comment on this moment, e.g. 'drop this shot', 'hold longer', 'too dark', 'wrong label'…"></textarea>
+    <textarea id="txt" placeholder="Comment on this moment (or the selected section), e.g. 'drop this shot', 'hold longer', 'too dark', 'wrong label'…"></textarea>
     <div class="row">
       <button class="primary" id="add">Add comment at <span id="addt">0:00</span></button>
-      <span style="color:var(--muted);font-size:13px">Pauses the film while you type. Comments are pinned to the shot, so they survive later edits.</span>
+      <span style="color:var(--muted);font-size:13px">Comments are pinned to the shot, so they survive later edits.</span>
     </div>
   </section>
   <aside>
@@ -85,6 +133,26 @@
     </div>
   </aside>
 </main>
+</div>
+<div id="phoneView" hidden>
+  <h2>Phone clips — choose what goes in the film</h2>
+  <div class="filters" id="pfilters">
+    <button data-p="all">All</button><button data-p="in">In</button><button data-p="out">Out</button><button data-p="undecided">Undecided</button>
+    <span id="pcount" style="color:var(--muted);font-size:13px;margin-left:8px;align-self:center"></span>
+  </div>
+  <div id="phoneGrid"></div>
+</div>
+<div id="photoView" hidden>
+  <h2>Phone photos — rate them; mark the ones worth trying in the film</h2>
+  <div class="filters" id="phfilters">
+    <select id="phchap" aria-label="Chapter"><option value="">All places</option></select>
+    <button data-r="all">All</button><button data-r="unrated">Unrated</button><button data-r="3">3★+</button><button data-r="4">4★+</button><button data-r="film">In film</button>
+    <span id="phcount" style="color:var(--muted);font-size:13px;margin-left:8px;align-self:center"></span>
+  </div>
+  <div class="keys" style="margin:0 0 10px">Click a photo to view it big · <kbd>←</kbd> <kbd>→</kbd> previous / next · <kbd>1</kbd>–<kbd>5</kbd> stars · <kbd>0</kbd> clear · <kbd>F</kbd> use in film · <kbd>Esc</kbd> close</div>
+  <div id="photoGrid"></div>
+</div>
+<div id="lb"><img id="lbimg" alt=""><div class="bar"><span id="lbmeta"></span><span class="stars" id="lbstars"></span><button id="lbprev">◀</button><button id="lbnext">▶</button><button id="lbclose">Close</button></div></div>
 <div id="compare">
   <div class="row" style="margin:0 0 10px"><b id="cmpTitle"></b><span style="margin-left:auto"></span>
     <button id="cmpPlay">Play both</button><button id="cmpClose">Close</button></div>
@@ -95,17 +163,20 @@
 </div>
 <script>
 const $ = s => document.querySelector(s);
-const v = $("#v"), bar = $("#bar");
+const v = $("#v"), tl = $("#tl"), track = $("#track");
 let versions = [], cur = null, manifest = {shots: [], chapters: [], labels: []}, comments = [], filter = "open";
-const fmt = t => { t = Math.max(0, t || 0); const m = Math.floor(t / 60), s = Math.floor(t % 60); return `${m}:${String(s).padStart(2, "0")}`; };
+let pps = 0, sel = null;            // pixels per second; selection {a, b}
+const FPS = () => manifest.fps || 24;
+const fmt = (t, frames) => { t = Math.max(0, t || 0); const m = Math.floor(t / 60), s = Math.floor(t % 60);
+  const base = `${m}:${String(s).padStart(2, "0")}`; return frames ? `${base}.${String(Math.floor((t % 1) * FPS())).padStart(2, "0")}` : base; };
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
 const getJSON = (u, d) => fetch(u, {cache: "no-store"}).then(r => r.ok ? r.json() : d).catch(() => d);
 
 async function init() {
   versions = await getJSON("/media/versions.json", []);
   $("#ver").innerHTML = versions.map(x => `<option value="${esc(x.id)}">${esc(x.label || x.id)}</option>`).join("");
-  const want = new URLSearchParams(location.search).get("v") || (versions.at(-1) || {}).id;
-  if (want) { $("#ver").value = want; await loadVersion(want); }
+  const q = new URLSearchParams(location.search), want = q.get("v") || (versions.at(-1) || {}).id;
+  if (want) { $("#ver").value = want; await loadVersion(want, q.has("t") ? +q.get("t") : null); }
   else $("#where").textContent = "No versions rendered yet.";
   await refresh();
 }
@@ -115,50 +186,82 @@ async function loadVersion(id, t) {
   v.src = `/media/${cur.id}/${cur.file || "film.mp4"}`;
   if (t != null) v.addEventListener("loadedmetadata", () => { v.currentTime = t; }, {once: true});
   history.replaceState(null, "", `?v=${encodeURIComponent(id)}`);
-  drawBar(); renderChanges();
+  pps = 0; drawTimeline(); renderChanges();
 }
-function dur() { return v.duration || manifest.duration || 1; }
-function drawBar() {
-  bar.querySelectorAll(".chap,.lab,.dot").forEach(e => e.remove());
-  const D = dur();
-  (manifest.chapters || []).forEach((c, i, a) => {
-    const end = (a[i + 1] || {}).start ?? D, e = document.createElement("div");
-    e.className = "chap"; e.style.left = `${c.start / D * 100}%`; e.style.width = `${(end - c.start) / D * 100}%`;
-    e.style.background = i % 2 ? "var(--chapB)" : "var(--chapA)"; e.textContent = c.title; bar.prepend(e);
-  });
-  (manifest.labels || []).forEach(l => { const e = document.createElement("div"); e.className = "lab"; e.title = l.text; e.style.left = `${l.t / D * 100}%`; bar.appendChild(e); });
+const dur = () => v.duration || manifest.duration || 1;
+const fitPps = () => (tl.clientWidth - 2) / dur();
+function setZoom(p, anchorT) {
+  const old = pps || fitPps(); pps = Math.max(fitPps(), Math.min(200, p));
+  const at = anchorT ?? v.currentTime, offs = at * old - tl.scrollLeft;
+  drawTimeline(); tl.scrollLeft = at * pps - offs;
+  $("#zlabel").textContent = pps <= fitPps() + 0.01 ? "whole film" : `${Math.round(tl.clientWidth / pps)} s visible`;
+}
+function drawTimeline() {
+  if (!pps) pps = fitPps();
+  const D = dur(), W = D * pps; track.style.width = `${W}px`;
+  track.querySelectorAll(".chap,.clip,.lab,.cm").forEach(e => e.remove());
+  const add = (cls, l, w, html, title) => { const e = document.createElement("div"); e.className = cls; e.style.left = `${l * pps}px`; if (w != null) e.style.width = `${Math.max(1, w * pps)}px`; if (html) e.innerHTML = html; if (title) e.title = title; track.appendChild(e); return e; };
+  (manifest.chapters || []).forEach((c, i, a) => { const end = (a[i + 1] || {}).start ?? D; const e = add("chap", c.start, end - c.start, esc(c.title)); e.style.background = i % 2 ? "var(--chapB)" : "var(--chapA)"; });
+  (manifest.shots || []).forEach((s, i) => { const e = add(`clip${s.kind === "card" ? " card" : ""}`, s.start, s.end - s.start, pps > 25 ? esc(s.kind === "card" ? "map" : s.name.replace(/^DJI_\d{8}_?/, "").replace(/\.\w+$/, "")) : "", s.name); e.style.background = i % 2 ? "var(--clipA)" : "var(--clipB)"; });
+  (manifest.labels || []).forEach(l => add("lab", l.t, null, "", l.text));
   comments.filter(c => c.version === cur?.id).forEach(c => {
-    const e = document.createElement("div"); e.className = `dot ${c.status}`; e.style.left = `${c.t / D * 100}%`; e.title = c.text;
-    e.onclick = ev => { ev.stopPropagation(); v.currentTime = c.t; }; bar.appendChild(e);
+    const e = add(`cm ${c.status}`, c.t, c.t_end ? c.t_end - c.t : null, "", c.text);
+    if (!c.t_end) e.style.marginLeft = "-5px";
+    e.onclick = ev => { ev.stopPropagation(); v.currentTime = c.t; };
   });
+  drawSel(); where();
 }
-function shotAt(t) { return (manifest.shots || []).find(s => s.start <= t && t < s.end); }
+function drawSel() {
+  const s = $("#sel");
+  if (!sel || Math.abs(sel.b - sel.a) < 0.05) { s.style.display = "none"; $("#selinfo").textContent = ""; $("#selclear").hidden = true; return; }
+  const a = Math.min(sel.a, sel.b), b = Math.max(sel.a, sel.b);
+  s.style.display = "block"; s.style.left = `${a * pps}px`; s.style.width = `${(b - a) * pps}px`;
+  $("#selinfo").textContent = `Selected ${fmt(a, 1)} – ${fmt(b, 1)} (${(b - a).toFixed(1)} s)`; $("#selclear").hidden = false;
+}
+const shotAt = t => (manifest.shots || []).find(s => s.start <= t && t < s.end);
 function where() {
   const t = v.currentTime, s = shotAt(t);
-  $("#addt").textContent = fmt(t);
-  $("#where").innerHTML = s ? `<b>${fmt(t)}</b> · ${esc(s.chapter || "")} · ${esc(s.kind === "card" ? "map card" : s.name)}` : `<b>${fmt(t)}</b>`;
-  $("#head").style.left = `${t / dur() * 100}%`;
+  const range = sel && Math.abs(sel.b - sel.a) >= 0.05;
+  $("#addt").textContent = range ? `${fmt(Math.min(sel.a, sel.b))}–${fmt(Math.max(sel.a, sel.b))}` : fmt(t);
+  $("#where").innerHTML = s ? `<b>${fmt(t, 1)}</b> · ${esc(s.chapter || "")} · ${esc(s.kind === "card" ? "map card" : s.name)} <span style="opacity:.7">(clip ${fmt(s.start)}–${fmt(s.end)})</span>` : `<b>${fmt(t, 1)}</b>`;
+  $("#head").style.left = `${t * pps}px`;
+  if (!v.paused) { const x = t * pps; if (x < tl.scrollLeft + 40 || x > tl.scrollLeft + tl.clientWidth - 40) tl.scrollLeft = x - tl.clientWidth / 3; }
 }
-v.addEventListener("timeupdate", where); v.addEventListener("loadedmetadata", () => { drawBar(); where(); });
-bar.addEventListener("click", e => { const r = bar.getBoundingClientRect(); v.currentTime = (e.clientX - r.left) / r.width * dur(); });
-bar.addEventListener("mousemove", e => { const r = bar.getBoundingClientRect(), h = $("#hover"); h.style.display = "block"; h.style.left = `${e.clientX - r.left}px`; h.textContent = fmt((e.clientX - r.left) / r.width * dur()); });
-bar.addEventListener("mouseleave", () => $("#hover").style.display = "none");
+v.addEventListener("timeupdate", where); v.addEventListener("seeked", where);
+v.addEventListener("loadedmetadata", () => { pps = 0; drawTimeline(); });
+window.addEventListener("resize", () => { if (pps < fitPps()) pps = fitPps(); drawTimeline(); });
+const tAt = e => (e.clientX - track.getBoundingClientRect().left) / pps;
+let drag = null;
+tl.addEventListener("mousedown", e => { if (e.shiftKey) { drag = {a: tAt(e)}; sel = {a: drag.a, b: drag.a}; drawSel(); e.preventDefault(); } });
+window.addEventListener("mousemove", e => { if (drag) { sel.b = Math.max(0, Math.min(dur(), tAt(e))); drawSel(); where(); } });
+window.addEventListener("mouseup", e => { if (drag) { drag = null; if (sel) v.currentTime = Math.min(sel.a, sel.b); } });
+tl.addEventListener("click", e => { if (e.shiftKey) return; v.currentTime = Math.max(0, Math.min(dur(), tAt(e))); });
+tl.addEventListener("mousemove", e => {
+  const t = tAt(e), s = shotAt(t), tip = $("#tip"); tip.style.display = "block"; tip.style.left = `${e.clientX + 12}px`; tip.style.top = `${e.clientY - 28}px`;
+  tip.textContent = `${fmt(t, 1)}${s ? " · " + (s.kind === "card" ? "map card" : s.name) : ""}`;
+});
+tl.addEventListener("mouseleave", () => $("#tip").style.display = "none");
+tl.addEventListener("wheel", e => { if (e.ctrlKey || e.metaKey) { e.preventDefault(); setZoom(pps * (e.deltaY < 0 ? 1.25 : 0.8), tAt(e)); } }, {passive: false});
+$("#zin").onclick = () => setZoom(pps * 2); $("#zout").onclick = () => setZoom(pps / 2); $("#zfit").onclick = () => setZoom(0);
+$("#selclear").onclick = () => { sel = null; drawSel(); where(); };
 $("#txt").addEventListener("focus", () => v.pause());
 async function add() {
   const text = $("#txt").value.trim(); if (!text || !cur) return;
-  const r = await fetch("/api/comments", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({version: cur.id, t: v.currentTime, text})});
-  if (r.ok) { $("#txt").value = ""; await refresh(); } else alert("Couldn't save the comment.");
+  const body = {version: cur.id, text, t: v.currentTime};
+  if (sel && Math.abs(sel.b - sel.a) >= 0.05) { body.t = Math.min(sel.a, sel.b); body.t_end = Math.max(sel.a, sel.b); }
+  const r = await fetch("/api/comments", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
+  if (r.ok) { $("#txt").value = ""; sel = null; await refresh(); } else alert("Couldn't save the comment.");
 }
 $("#add").onclick = add;
 $("#txt").addEventListener("keydown", e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) add(); });
-async function refresh() { comments = await getJSON("/api/comments", []); renderList(); drawBar(); }
+async function refresh() { comments = await getJSON("/api/comments", []); renderList(); drawTimeline(); }
 function renderList() {
-  document.querySelectorAll(".filters button").forEach(b => b.style.borderColor = b.dataset.f === filter ? "var(--accent)" : "");
+  document.querySelectorAll(".filters [data-f]").forEach(b => b.classList.toggle("on", b.dataset.f === filter));
   const rows = comments.filter(c => filter === "all" || (filter === "open" ? c.status === "open" : c.status !== "open"))
     .sort((a, b) => (a.version === b.version ? a.t - b.t : a.version < b.version ? 1 : -1));
   $("#list").innerHTML = rows.length ? rows.map(c => `
     <div class="item ${esc(c.status)}">
-      <span class="t" data-v="${esc(c.version)}" data-t="${c.t}">${fmt(c.t)}</span>
+      <span class="t" data-v="${esc(c.version)}" data-t="${c.t}">${fmt(c.t)}${c.t_end ? "–" + fmt(c.t_end) : ""}</span>
       <span class="meta"> · ${esc(c.version)}${c.shot ? " · " + esc(c.shot.chapter || "") : ""} · ${esc(c.status)}</span>
       <div class="txt">${esc(c.text)}</div>
       ${c.reply ? `<div class="reply">${esc(c.reply)}</div>` : ""}
@@ -174,11 +277,14 @@ $("#list").addEventListener("click", async e => {
   else await fetch(`/api/comments/${b.dataset.id}`, {method: "PATCH", headers: {"Content-Type": "application/json"}, body: JSON.stringify({status: b.dataset.act})});
   refresh();
 });
-document.querySelectorAll(".filters button").forEach(b => b.onclick = () => { filter = b.dataset.f; renderList(); });
+document.querySelectorAll(".filters [data-f]").forEach(b => b.onclick = () => { filter = b.dataset.f; renderList(); });
 $("#ver").onchange = e => loadVersion(e.target.value);
 document.querySelectorAll(".tab").forEach(b => b.onclick = () => {
   document.querySelectorAll(".tab").forEach(x => x.setAttribute("aria-selected", x === b));
-  $("#pane-comments").hidden = b.dataset.tab !== "comments"; $("#pane-changes").hidden = b.dataset.tab !== "changes";
+  const tab = b.dataset.tab;
+  $("#filmView").hidden = tab === "phone" || tab === "photos"; $("#phoneView").hidden = tab !== "phone"; $("#photoView").hidden = tab !== "photos";
+  $("#pane-comments").hidden = tab !== "comments"; $("#pane-changes").hidden = tab !== "changes";
+  if (tab === "phone") { v.pause(); loadPhone(); } else if (tab === "photos") { v.pause(); loadPhotos(); } else drawTimeline();
 });
 async function renderChanges() {
   const ch = await getJSON(`/media/${cur.id}/changes.json`, []);
@@ -203,20 +309,129 @@ function openCompare(c) {
   va.onloadedmetadata = () => va.currentTime = c.before.t0; vb.onloadedmetadata = () => vb.currentTime = c.after.t0;
   $("#compare").style.display = "flex";
 }
-$("#cmpPlay").onclick = () => {
-  if (!cmp) return; va.currentTime = cmp.before.t0; vb.currentTime = cmp.after.t0; va.play(); vb.play();
-};
+$("#cmpPlay").onclick = () => { if (!cmp) return; va.currentTime = cmp.before.t0; vb.currentTime = cmp.after.t0; va.play(); vb.play(); };
 [va, vb].forEach((x, i) => x.addEventListener("timeupdate", () => {
   if (!cmp) return; const end = i ? cmp.after.t1 : cmp.before.t1, start = i ? cmp.after.t0 : cmp.before.t0;
   if (end && x.currentTime >= end) { x.pause(); x.currentTime = start; }
 }));
 $("#cmpClose").onclick = () => { $("#compare").style.display = "none"; va.pause(); vb.pause(); cmp = null; };
+function step(d) { v.pause(); v.currentTime = Math.max(0, Math.min(dur(), v.currentTime + d)); }
+function jumpClip(dir) {
+  const t = v.currentTime + 0.001, ss = manifest.shots || [];
+  const starts = ss.map(s => s.start);
+  const nxt = dir > 0 ? starts.find(s => s > t + 0.02) : [...starts].reverse().find(s => s < t - 0.3);
+  if (nxt != null) v.currentTime = nxt;
+}
 document.addEventListener("keydown", e => {
-  if (e.target.tagName === "TEXTAREA" || e.target.tagName === "SELECT") return;
-  if (e.key === " ") { e.preventDefault(); v.paused ? v.play() : v.pause(); }
-  else if (e.key === "ArrowLeft") v.currentTime -= 5; else if (e.key === "ArrowRight") v.currentTime += 5;
-  else if (e.key.toLowerCase() === "c") { e.preventDefault(); $("#txt").focus(); }
-  else if (e.key === "Escape") $("#cmpClose").click();
+  if ($("#filmView").hidden) return;
+  if (["TEXTAREA", "SELECT", "INPUT"].includes(e.target.tagName)) return;
+  const k = e.key;
+  if (k === " ") { e.preventDefault(); v.paused ? v.play() : v.pause(); }
+  else if (k === "ArrowLeft") { e.preventDefault(); step(e.shiftKey ? -5 : -1); }
+  else if (k === "ArrowRight") { e.preventDefault(); step(e.shiftKey ? 5 : 1); }
+  else if (k === ",") step(-1 / FPS()); else if (k === ".") step(1 / FPS());
+  else if (k === "[") jumpClip(-1); else if (k === "]") jumpClip(1);
+  else if (k === "=" || k === "+") setZoom(pps * 2); else if (k === "-") setZoom(pps / 2);
+  else if (k.toLowerCase() === "c") { e.preventDefault(); $("#txt").focus(); }
+  else if (k === "Escape") { if ($("#compare").style.display === "flex") $("#cmpClose").click(); else { sel = null; drawSel(); where(); } }
+});
+/* ---- phone picker ---- */
+let phone = [], pf = "all";
+async function loadPhone() { phone = await getJSON("/api/phone", []); renderPhone(); }
+const pstat = p => p.status || "undecided";
+function renderPhone() {
+  document.querySelectorAll("#pfilters [data-p]").forEach(b => b.classList.toggle("on", b.dataset.p === pf));
+  const n = s => phone.filter(p => pstat(p) === s).length;
+  $("#pcount").textContent = `${n("in")} in · ${n("out")} out · ${n("undecided")} undecided`;
+  const rows = phone.filter(p => pf === "all" || pstat(p) === pf);
+  $("#phoneGrid").innerHTML = rows.map(p => `
+    <div class="pc ${pstat(p)}" data-n="${esc(p.name)}">
+      <video controls preload="metadata" playsinline src="/phone/${encodeURIComponent(p.name)}#t=0.5"></video>
+      <div class="meta">${esc(p.date || "")} · ${esc(p.chapter || "")} · ${esc(p.name)}</div>
+      <div class="why">Claude: <b>${esc((p.claude || "").toUpperCase())}</b> — ${esc(p.reason || "")}</div>
+      <div class="btns"><button class="in ${pstat(p) === "in" ? "on" : ""}" data-s="in">In</button><button class="out ${pstat(p) === "out" ? "on" : ""}" data-s="out">Out</button></div>
+      <input placeholder="Note (e.g. 'only the guitar bit', 'use 0:05–0:12')" value="${esc(p.note || "")}">
+    </div>`).join("") || `<div class="empty">Nothing here.</div>`;
+}
+$("#pfilters").addEventListener("click", e => { const b = e.target.closest("[data-p]"); if (b) { pf = b.dataset.p; renderPhone(); } });
+$("#phoneGrid").addEventListener("click", async e => {
+  const b = e.target.closest("button[data-s]"); if (!b) return;
+  const card = b.closest(".pc"), name = card.dataset.n, p = phone.find(x => x.name === name);
+  p.status = b.dataset.s; await fetch(`/api/phone/${encodeURIComponent(name)}`, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({status: p.status})});
+  renderPhone();
+});
+$("#phoneGrid").addEventListener("change", async e => {
+  if (e.target.tagName !== "INPUT") return;
+  const name = e.target.closest(".pc").dataset.n, p = phone.find(x => x.name === name); p.note = e.target.value;
+  await fetch(`/api/phone/${encodeURIComponent(name)}`, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({note: p.note})});
+});
+/* ---- phone photos ---- */
+let photos = [], phf = "all", lbI = -1, phRows = [];
+async function loadPhotos() {
+  if (!photos.length) {
+    photos = await getJSON("/api/photos", []);
+    const chs = [...new Set(photos.map(p => p.chapter))];
+    $("#phchap").innerHTML = `<option value="">All places</option>` + chs.map(c => `<option>${esc(c)}</option>`).join("");
+  }
+  renderPhotos();
+}
+const starsHtml = p => [1, 2, 3, 4, 5].map(n => `<button data-star="${n}" class="${(p.rating || 0) >= n ? "on" : ""}" aria-label="${n} stars">★</button>`).join("") +
+  `<button class="film ${p.film ? "on" : ""}" data-film="1">${p.film ? "In film" : "Use in film"}</button>`;
+function renderPhotos() {
+  document.querySelectorAll("#phfilters [data-r]").forEach(b => b.classList.toggle("on", b.dataset.r === phf));
+  const ch = $("#phchap").value;
+  phRows = photos.filter(p => (!ch || p.chapter === ch) && (phf === "all" || (phf === "unrated" ? !p.rating : phf === "film" ? p.film : (p.rating || 0) >= +phf)));
+  const rated = photos.filter(p => p.rating).length, film = photos.filter(p => p.film).length;
+  $("#phcount").textContent = `${phRows.length} shown · ${rated} of ${photos.length} rated · ${film} marked for the film`;
+  $("#photoGrid").innerHTML = phRows.map((p, i) => `
+    <div class="ph ${p.film ? "film" : ""}" data-n="${esc(p.name)}" data-i="${i}">
+      <img loading="lazy" src="/media/photos/thumb/${encodeURIComponent(p.name)}" alt="">
+      <div class="meta">${esc(p.date)} · ${esc(p.chapter)}</div>
+      <div class="stars">${starsHtml(p)}</div>
+      <input placeholder="Note" value="${esc(p.note || "")}">
+    </div>`).join("") || `<div class="empty">Nothing here.</div>`;
+}
+async function savePhoto(p, body) {
+  Object.assign(p, body);
+  await fetch(`/api/photos/${encodeURIComponent(p.name)}`, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
+}
+function photoAct(p, el) {
+  if (el.dataset.star) return savePhoto(p, {rating: p.rating === +el.dataset.star ? 0 : +el.dataset.star});
+  if (el.dataset.film) return savePhoto(p, {film: !p.film});
+}
+$("#phfilters").addEventListener("click", e => { const b = e.target.closest("[data-r]"); if (b) { phf = b.dataset.r; renderPhotos(); } });
+$("#phchap").onchange = renderPhotos;
+$("#photoGrid").addEventListener("click", async e => {
+  const card = e.target.closest(".ph"); if (!card) return;
+  const p = photos.find(x => x.name === card.dataset.n);
+  if (e.target.tagName === "IMG") return openLb(+card.dataset.i);
+  const b = e.target.closest("button"); if (!b) return;
+  await photoAct(p, b); card.querySelector(".stars").innerHTML = starsHtml(p); card.classList.toggle("film", !!p.film);
+});
+$("#photoGrid").addEventListener("change", e => {
+  if (e.target.tagName !== "INPUT") return;
+  savePhoto(photos.find(x => x.name === e.target.closest(".ph").dataset.n), {note: e.target.value});
+});
+function openLb(i) {
+  if (i < 0 || i >= phRows.length) return;
+  lbI = i; const p = phRows[i];
+  $("#lbimg").src = `/media/photos/med/${encodeURIComponent(p.name)}`;
+  $("#lbmeta").textContent = `${i + 1} / ${phRows.length} · ${p.date} · ${p.chapter}`;
+  $("#lbstars").innerHTML = starsHtml(p); $("#lb").style.display = "flex";
+  const nx = phRows[i + 1]; if (nx) new Image().src = `/media/photos/med/${encodeURIComponent(nx.name)}`;
+}
+function closeLb() { $("#lb").style.display = "none"; lbI = -1; renderPhotos(); }
+$("#lbstars").addEventListener("click", async e => { const b = e.target.closest("button"); if (!b) return; const p = phRows[lbI]; await photoAct(p, b); $("#lbstars").innerHTML = starsHtml(p); });
+$("#lbprev").onclick = () => openLb(lbI - 1); $("#lbnext").onclick = () => openLb(lbI + 1); $("#lbclose").onclick = closeLb;
+document.addEventListener("keydown", e => {
+  if (lbI < 0 || ["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName)) return;
+  const p = phRows[lbI];
+  if (e.key === "ArrowRight") openLb(lbI + 1); else if (e.key === "ArrowLeft") openLb(lbI - 1);
+  else if (e.key === "Escape") closeLb();
+  else if (/^[0-5]$/.test(e.key)) { savePhoto(p, {rating: +e.key}); $("#lbstars").innerHTML = starsHtml(p); }
+  else if (e.key.toLowerCase() === "f") { savePhoto(p, {film: !p.film}); $("#lbstars").innerHTML = starsHtml(p); }
+  else return;
+  e.preventDefault();
 });
 init();
 </script>

@@ -12,25 +12,44 @@ let
   bonjourHost = "brain._smb._tcp.local"; # advertised by avahi on brain (services/samba.nix)
   tailscaleHost = "brain";
   mountBrain = pkgs.writeShellScript "mount-brain-share" ''
+    log() { echo "$(/bin/date): $*" >&2; }
     mounted() { /sbin/mount | /usr/bin/grep -q "on /Volumes/delabere "; }
+    on_tailscale() { /sbin/mount | /usr/bin/grep "on /Volumes/delabere " | /usr/bin/grep -q "@${tailscaleHost}/"; }
+    at_home() { /sbin/ping -c 1 -t 1 ${lanHost} >/dev/null 2>&1; }
     try_mount() {
       /usr/bin/osascript -e 'try' -e "mount volume \"smb://$1/delabere\"" -e 'end try' >/dev/null 2>&1
     }
+
+    # Self-heal: mounted through Tailscale while we're at home (e.g. brain rebooted and the
+    # share came back over the tunnel). That's ~10x slower for video, so move it to the LAN,
+    # but only when nothing has files open on it (unmounting under Resolve would break it).
+    if mounted && on_tailscale && at_home; then
+      if /usr/sbin/lsof +f -- /Volumes/delabere >/dev/null 2>&1; then
+        log "share is on Tailscale at home but files are open; leaving it"
+        /usr/bin/osascript -e 'display notification "Quit Resolve and other apps using it to switch to the home network." with title "brain share is on Tailscale (slow)"' >/dev/null 2>&1
+        exit 0
+      fi
+      log "share is on Tailscale at home; remounting over the LAN"
+      /usr/sbin/diskutil unmount /Volumes/delabere >/dev/null 2>&1 || exit 0
+    fi
+
     # retry for ~5 min while the network comes up after login or wake
     for i in $(/usr/bin/seq 1 30); do
       mounted && exit 0
       # LAN first, only if brain answers there (i.e. we're at home). Prefer its
       # Bonjour name so Finder shows "brain"; fall back to the raw LAN address.
-      if /sbin/ping -c 1 -t 1 ${lanHost} >/dev/null 2>&1; then
+      if at_home; then
         try_mount ${bonjourHost}
         mounted || try_mount ${lanHost}
-      else
+      # Only use Tailscale once the LAN has been unreachable for ~2 min, so a brain reboot or a
+      # slow Wi-Fi join at home doesn't leave the share stuck on the tunnel.
+      elif [ "$i" -gt 12 ]; then
         try_mount ${tailscaleHost}
       fi
       mounted && exit 0
       /bin/sleep 10
     done
-    echo "$(/bin/date): could not mount brain's share" >&2
+    log "could not mount brain's share"
     exit 1
   '';
 in

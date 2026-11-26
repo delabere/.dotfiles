@@ -30,6 +30,10 @@ in
     handle /api/* {
       reverse_proxy 127.0.0.1:3031
     }
+    handle_path /phone/* {
+      root * "/mnt/bigboi/share/China2026Edit/Phone camera/Videos"
+      file_server
+    }
     handle_path /media/* {
       root * ${reviewDir}
       header Cache-Control "no-cache"
