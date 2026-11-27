@@ -45,14 +45,21 @@ in
     addToSystemPackages = true;
     environmentFiles = [ config.age.secrets.hermes-env.path ];
 
-    hermesHomeFiles."SOUL.md" = ./hermes/SOUL.md;
+    hermesHomeFiles = {
+      "SOUL.md" = ./hermes/SOUL.md;
+      # Personal skills, version-controlled here
+      "skills/personal/use-claude/SKILL.md" = ./hermes/skills/use-claude/SKILL.md;
+    };
 
     # The google-workspace skill (Gmail, Calendar, Drive, Docs, Sheets) prefers
     # the gws CLI and points it at Hermes's own google_token.json; its Python
     # fallback libraries are already in the default package.
     # Skill scripts (google_api.py, setup.py) run via the terminal tool and
     # import Hermes's own modules, so `python3` must be Hermes's sealed venv.
-    extraPackages = [ pkgs.gws hermesPython ];
+    # claude: the bundled claude-code skill delegates coding jobs to Claude
+    # Code, signed in with Jack's subscription (CLAUDE_CODE_OAUTH_TOKEN, a
+    # 1-year `claude setup-token` token in hermes-env.age; renew by Nov 2027).
+    extraPackages = [ pkgs.gws hermesPython pkgs.claude-code pkgs.git ];
 
     # Official vendor-hosted MCP servers (OAuth with dynamic client
     # registration; tokens land in .hermes/mcp-tokens/, which restic covers).
@@ -109,6 +116,10 @@ in
       };
 
       timezone = config.time.timeZone;
+
+      # Secrets are stripped from terminal commands unless listed here;
+      # Claude Code needs its token.
+      terminal.env_passthrough = [ "CLAUDE_CODE_OAUTH_TOKEN" ];
 
       # Fixed OAuth callback ports so the login can be tunnelled over SSH.
       mcp_servers = {
