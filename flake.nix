@@ -43,6 +43,10 @@
       url = "github:cpick/nix-rosetta-builder";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Hermes Agent on brain (services/hermes.nix). Pinned to a release tag and
+    # left on its own nixpkgs lock: upstream Nix support is best effort, so
+    # build what they tested and bump the tag deliberately.
+    hermes-agent.url = "github:NousResearch/hermes-agent/v0.23.4";
   };
 
   outputs =
@@ -160,6 +164,7 @@
               ./machines/brain/configuration.nix
               agenix.nixosModules.default
               nixarr.nixosModules.default
+              inputs.hermes-agent.nixosModules.default
               {
                 nixpkgs.config.allowUnfree = true;
                 nixpkgs.overlays = [ (import ./overlay.nix inputs) ];

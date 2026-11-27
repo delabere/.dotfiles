@@ -11,4 +11,6 @@ in
   "minuspod-env.age".publicKeys = [ brain-delabere brain-system ];
   "restic-password.age".publicKeys = [ brain-delabere brain-system mac-delabere ];
   "rclone-conf.age".publicKeys = [ brain-delabere brain-system mac-delabere ];
+  # editable from the Mac too: `agenix -e hermes-env.age`
+  "hermes-env.age".publicKeys = [ brain-delabere brain-system mac-delabere ];
 }

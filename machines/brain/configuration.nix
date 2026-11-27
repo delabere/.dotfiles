@@ -23,6 +23,7 @@
       ./../../services/notes-git.nix
       ./../../services/terminus.nix
       ./../../services/vellum.nix
+      ./../../services/hermes.nix
       ./../../services/backup.nix
       ./../../services/china-review.nix
     ];

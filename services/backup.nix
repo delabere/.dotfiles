@@ -13,6 +13,11 @@ let
     # Home Assistant recorder (SQLite): online, consistent copy
     ${pkgs.sqlite}/bin/sqlite3 /data/.state/home-assistant/home-assistant_v2.db \
       ".backup '${prepareDir}/home-assistant_v2.db'"
+    # Hermes session history (SQLite, written live by the gateway)
+    if [ -f /var/lib/hermes/.hermes/state.db ]; then
+      ${pkgs.sqlite}/bin/sqlite3 /var/lib/hermes/.hermes/state.db \
+        ".backup '${prepareDir}/hermes-state.db'"
+    fi
     # Terminus is deliberately not backed up; remove any dump left by earlier runs
     rm -f ${prepareDir}/terminus_production.sql
   '';
@@ -29,6 +34,14 @@ let
       "/data/.state/home-assistant/home-assistant_v2.db"
       "/data/.state/home-assistant/home-assistant_v2.db-wal"
       "/data/.state/home-assistant/home-assistant_v2.db-shm"
+      "/var/lib/hermes/.hermes/state.db"
+      "/var/lib/hermes/.hermes/state.db-wal"
+      "/var/lib/hermes/.hermes/state.db-shm"
+      # Hermes caches and the nix store pointers it recreates on start
+      "/var/lib/hermes/.hermes/cache"
+      "/var/lib/hermes/current-package"
+      "/var/lib/hermes/current-entrypoint"
+      "/var/lib/hermes/.gc-root"
       # Terminus (TRMNL server): not backed up at all
       "${vols}/terminus_*"
       # sockets and IPC, meaningless after restore
@@ -48,6 +61,9 @@ let
     vols
     prepareDir
     "/var/lib/tailscale"
+    # Hermes: memory, skills, cron jobs, OAuth tokens (Google, Notion,
+    # Todoist); its state.db comes from the consistent copy in prepareDir
+    "/var/lib/hermes"
   ];
 in
 {

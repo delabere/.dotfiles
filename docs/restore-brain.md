@@ -10,6 +10,8 @@ pairings, history, service data) is in the nightly restic backups.
 | Services, packages, Home Assistant integrations, templates, sensors | `services/*.nix`, `machines/brain/` |
 | HA automations, scenes, helpers, template helpers, Main dashboard | `services/home-assistant/config/` (linked into HA as `nix/`) |
 | HA logins & pairings (Octopus, Tado, HomeKit, Shelly, phones…), history, logs | backups: `/data/.state/home-assistant` |
+| Hermes config, personality (`SOUL.md`), MCP servers | `services/hermes.nix`, `services/hermes/` |
+| Hermes memory, skills, cron jobs, chat history, OAuth logins (Google, Notion, Todoist) | backups: `/var/lib/hermes` |
 | Vellum, n8n, MinusPod, *arr configs, Tailscale identity | backups |
 | Plex, Tdarr, Jellyfin, Terminus | **not backed up**: set up fresh and rescan libraries after a restore |
 | Secrets (Tailscale key, backup password, rclone config…) | `secrets/*.age` (agenix) |
@@ -22,8 +24,8 @@ Defined in `services/backup.nix`.
 - **offsite**: Google Drive `backups/brain-restic` (rclone remote `gdrive`), nightly ~04:30, keeps 7 / 4 / 6.
 
 Before each run, `backup-prepare` writes consistent copies of live databases to
-`/var/backup/prepare` (the HA recorder via `sqlite3 .backup`); that copy
-are backed up instead of the live files.
+`/var/backup/prepare` (the HA recorder and Hermes's `state.db`, via `sqlite3 .backup`);
+those copies are backed up instead of the live files.
 
 The backup password is `secrets/restic-password.age`. It can be decrypted on brain **and on the
 Mac** (`agenix -d secrets/restic-password.age -i ~/.ssh/id_ed25519`), so losing brain doesn't lose
@@ -55,18 +57,22 @@ journalctl -u restic-backups-local -e         # last run's log
    Services start empty at this point; that's expected.
 5. **Restore data** (stop services that own it first):
    ```sh
-   sudo systemctl stop home-assistant docker
+   sudo systemctl stop home-assistant docker hermes-agent
    sudo restic-offsite snapshots                       # or restic-local if the external disk survived
    sudo restic-offsite restore latest --target / \
      --include /data/.state --include /var/lib/docker/volumes --include /var/lib/tailscale \
-     --include /var/backup/prepare
+     --include /var/lib/hermes --include /var/backup/prepare
    ```
 6. **Put the database copies back**:
    ```sh
    sudo cp /var/backup/prepare/home-assistant_v2.db /data/.state/home-assistant/
    sudo chown hass:hass /data/.state/home-assistant/home-assistant_v2.db
-   sudo systemctl start docker
+   sudo cp /var/backup/prepare/hermes-state.db /var/lib/hermes/.hermes/state.db
+   sudo chown hermes:hermes /var/lib/hermes/.hermes/state.db
+   sudo systemctl start docker hermes-agent
    ```
+   Hermes comes back with the same Telegram bot, memory, scheduled jobs and logins. If the
+   Home Assistant token was revoked, make a new one and update `secrets/hermes-env.age`.
 7. **Start Home Assistant**: `sudo systemctl start home-assistant`. Logins, pairings, dashboards
    and automations come back as they were.
 8. **Network things to check**: brain's LAN IP (`192.168.1.11` is referenced by Terminus
