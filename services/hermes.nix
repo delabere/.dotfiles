@@ -47,6 +47,21 @@ let
     export PATH=${pkgs.nodejs}/bin:$PATH
     exec npx -y @softeria/ms-365-mcp-server@0.193.0 --preset outlook --read-only "$@"
   '';
+
+  # Real OpenRouter spend for the `spend` skill (the key stays out of the
+  # agent's terminal env; this reads it from Hermes's own .env).
+  openrouterSpend = pkgs.writeShellApplication {
+    name = "openrouter-spend";
+    runtimeInputs = [ pkgs.curl pkgs.jq pkgs.gnugrep pkgs.coreutils ];
+    text = ''
+      key=$(grep '^OPENROUTER_API_KEY=' "''${HERMES_HOME:-/var/lib/hermes/.hermes}/.env" | cut -d= -f2-)
+      auth="Authorization: Bearer $key"
+      jq -n --argjson key "$(curl -fsS https://openrouter.ai/api/v1/key -H "$auth" | jq .data)" \
+            --argjson credits "$(curl -fsS https://openrouter.ai/api/v1/credits -H "$auth" | jq .data)" \
+        '{key: ($key | {label, usage, usage_daily, usage_weekly, usage_monthly, limit, limit_remaining, limit_reset}),
+          credits: ($credits + {left: ($credits.total_credits - $credits.total_usage)})}'
+    '';
+  };
 in
 {
   systemd.tmpfiles.rules = [ "d /var/lib/hermes/ms365 0700 hermes hermes -" ];
@@ -82,6 +97,7 @@ in
       "SOUL.md" = ./hermes/SOUL.md;
       # Personal skills, version-controlled here
       "skills/personal/use-claude/SKILL.md" = ./hermes/skills/use-claude/SKILL.md;
+      "skills/personal/spend/SKILL.md" = ./hermes/skills/spend/SKILL.md;
     };
 
     # The google-workspace skill (Gmail, Calendar, Drive, Docs, Sheets) prefers
@@ -92,7 +108,7 @@ in
     # claude: the bundled claude-code skill delegates coding jobs to Claude
     # Code, signed in with Jack's subscription (CLAUDE_CODE_OAUTH_TOKEN, a
     # 1-year `claude setup-token` token in hermes-env.age; renew by Nov 2027).
-    extraPackages = [ pkgs.gws hermesPython pkgs.claude-code pkgs.git ms365Mcp ];
+    extraPackages = [ pkgs.gws hermesPython pkgs.claude-code pkgs.git ms365Mcp openrouterSpend ];
 
     # Official vendor-hosted MCP servers (OAuth with dynamic client
     # registration; tokens land in .hermes/mcp-tokens/, which restic covers).
@@ -150,7 +166,9 @@ in
       # One OpenRouter balance for every model; switch from Telegram with /model.
       model = {
         provider = "openrouter";
-        default = "anthropic/claude-sonnet-5.5";
+        # DeepSeek V4.1 Flash: accurate in our side-by-side tests (Nov 2026) at
+        # ~1/40 of Sonnet 5.5's price. `/model` switches up for hard jobs.
+        default = "deepseek/deepseek-v4.1-flash";
       };
 
       timezone = config.time.timeZone;
@@ -193,7 +211,8 @@ in
       # Voice notes are transcribed on brain (faster-whisper), privately.
       stt = {
         provider = "local";
-        echo_transcripts = false;
+        # Echo each voice note's transcript back (🎙️) while checking Whisper's accuracy.
+        echo_transcripts = true;
         # turbo (Whisper large-v3-turbo): much better than small, esp. accents;
         # freed after 10 idle minutes since brain is short on RAM.
         local.model = "turbo";
@@ -206,11 +225,17 @@ in
       telegram.reactions = true;
       display.show_reasoning = false;
 
-      # Keep the one long Telegram chat small: compact at 120k tokens rather
-      # than at a fraction of Sonnet's 1M window (Vellum ran at ~587k/reply).
+      # Cost is driven by how much chat history rides along on every call (the
+      # fixed prompt is only ~13.5k tokens). Keep the long Telegram chat small:
+      # - compact (summarise) at 50k tokens instead of near the 1M window,
+      # - drop bulky old tool output (emails, HA dumps) past 30k, no LLM needed,
+      # - after 30 idle minutes compact before replying (the prompt cache has
+      #   gone cold by then anyway, so it costs nothing extra).
       compression = {
         enabled = true;
-        threshold_tokens = 120000;
+        threshold_tokens = 50000;
+        proactive_prune_tokens = 30000;
+        idle_compact_after_seconds = 1800;
       };
 
       # Built-in memory only (MEMORY.md + USER.md); no external providers.

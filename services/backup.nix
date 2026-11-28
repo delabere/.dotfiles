@@ -39,6 +39,8 @@ let
       "/var/lib/hermes/.hermes/state.db-shm"
       # Hermes caches and the nix store pointers it recreates on start
       "/var/lib/hermes/.hermes/cache"
+      "/var/lib/hermes/.cache"   # downloaded Whisper models (re-downloaded on demand)
+      "/var/lib/hermes/.npm"     # npx package cache
       "/var/lib/hermes/current-package"
       "/var/lib/hermes/current-entrypoint"
       "/var/lib/hermes/.gc-root"
