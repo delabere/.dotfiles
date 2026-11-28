@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1f3b5c"/>
+      <stop offset="1" stop-color="#0f1e33"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffd27a"/>
+      <stop offset="1" stop-color="#f29a3a"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="640" fill="url(#bg)"/>
+  <!-- soft halo -->
+  <circle cx="320" cy="320" r="210" fill="#ffffff" opacity="0.05"/>
+  <!-- brain outline: two hemispheres -->
+  <g fill="none" stroke="#e9f1fb" stroke-width="26" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M318 170 C 270 140, 205 160, 196 212 C 150 222, 130 272, 152 312 C 124 346, 136 404, 186 418 C 194 462, 250 486, 296 462 C 308 476, 318 476, 318 476 Z"/>
+    <path d="M322 170 C 370 140, 435 160, 444 212 C 490 222, 510 272, 488 312 C 516 346, 504 404, 454 418 C 446 462, 390 486, 344 462 C 332 476, 322 476, 322 476 Z"/>
+    <!-- folds -->
+    <path d="M206 300 C 236 290, 262 304, 270 330" opacity="0.85"/>
+    <path d="M220 384 C 244 368, 274 372, 288 392" opacity="0.85"/>
+    <path d="M434 300 C 404 290, 378 304, 370 330" opacity="0.85"/>
+    <path d="M420 384 C 396 368, 366 372, 352 392" opacity="0.85"/>
+  </g>
+  <!-- spark: the assistant -->
+  <g transform="translate(320 318)">
+    <path d="M0 -64 L 16 -16 L 64 0 L 16 16 L 0 64 L -16 16 L -64 0 L -16 -16 Z" fill="url(#glow)"/>
+  </g>
+</svg>

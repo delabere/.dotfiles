@@ -33,11 +33,44 @@ let
     ln -s "$venv/bin/python3" $out/bin/python3
     ln -s "$venv/bin/python3" $out/bin/python
   '';
+
+  # Outlook/Hotmail via Microsoft Graph (Softeria ms-365-mcp-server, pinned;
+  # npx caches it under the hermes user's ~/.npm). Personal-account mode,
+  # `consumers` authority (refresh tokens from `common` stop working), token
+  # cache as files under /var/lib/hermes/ms365 (backed up). One-time login:
+  #   sudo -u hermes -E ms365-mcp --login     (device code at microsoft.com/devicelogin)
+  ms365Mcp = pkgs.writeShellScriptBin "ms365-mcp" ''
+    export MS365_MCP_TENANT_ID=consumers
+    export MS365_MCP_USE_KEYTAR=0
+    export MS365_MCP_TOKEN_CACHE_PATH=/var/lib/hermes/ms365/token-cache.json
+    export MS365_MCP_SELECTED_ACCOUNT_PATH=/var/lib/hermes/ms365/selected-account.json
+    export PATH=${pkgs.nodejs}/bin:$PATH
+    exec npx -y @softeria/ms-365-mcp-server@0.193.0 --preset outlook --read-only "$@"
+  '';
 in
 {
+  systemd.tmpfiles.rules = [ "d /var/lib/hermes/ms365 0700 hermes hermes -" ];
+
   age.secrets.hermes-env = {
     file = ./../secrets/hermes-env.age;
     owner = config.services.hermes-agent.user;
+  };
+
+  # Bundled skills are copied out of the Nix store read-only, so the agent's
+  # self-improvement (skill_manage patching a bundled skill) fails with EACCES.
+  # Make the copies writable before each start; personal/ (root-owned, from
+  # hermesHomeFiles) stays read-only on purpose.
+  systemd.services.hermes-skills-writable = {
+    description = "Make Hermes's bundled skill copies writable";
+    before = [ "hermes-agent.service" ];
+    requiredBy = [ "hermes-agent.service" ];
+    serviceConfig.Type = "oneshot";
+    script = ''
+      d=/var/lib/hermes/.hermes/skills
+      [ -d "$d" ] || exit 0
+      find "$d" -mindepth 1 -path "$d/personal" -prune -o -user hermes -print0 \
+        | xargs -0r chmod u+w,g+w
+    '';
   };
 
   services.hermes-agent = {
@@ -59,7 +92,7 @@ in
     # claude: the bundled claude-code skill delegates coding jobs to Claude
     # Code, signed in with Jack's subscription (CLAUDE_CODE_OAUTH_TOKEN, a
     # 1-year `claude setup-token` token in hermes-env.age; renew by Nov 2027).
-    extraPackages = [ pkgs.gws hermesPython pkgs.claude-code pkgs.git ];
+    extraPackages = [ pkgs.gws hermesPython pkgs.claude-code pkgs.git ms365Mcp ];
 
     # Official vendor-hosted MCP servers (OAuth with dynamic client
     # registration; tokens land in .hermes/mcp-tokens/, which restic covers).
@@ -77,6 +110,11 @@ in
         auth = "oauth";
         # search/fetch duplicate the find-* tools; templates are niche
         tools.exclude = [ "search" "fetch" "export-project-template" "import-project-template" ];
+      };
+      # Hotmail mail + calendar (read-only for now); see ms365Mcp above.
+      outlook = {
+        command = "${ms365Mcp}/bin/ms365-mcp";
+        timeout = 60;
       };
       # Home Assistant on this host via ha-mcp (states, history, statistics,
       # service calls). Token: long-lived token "hermes-brain" on Jack's HA
@@ -136,7 +174,37 @@ in
           title_generation = cheap;
           background_review = cheap;
           approval = cheap;
+          voice_chat = cheap;
         };
+
+      # If the main model errors or is rate-limited, carry on with this.
+      fallback_providers = [
+        { provider = "openrouter"; model = "google/gemini-3.6-flash"; }
+      ];
+
+      # Voice replies: free Microsoft Edge voices, British. Whether a chat gets
+      # voice notes back is per chat: `/voice on` (only after a voice note) or
+      # `/voice tts` (always); Hermes keeps that in gateway_voice_mode.json.
+      tts = {
+        provider = "edge";
+        edge.voice = "en-GB-RyanNeural";
+      };
+
+      # Voice notes are transcribed on brain (faster-whisper), privately.
+      stt = {
+        provider = "local";
+        echo_transcripts = false;
+        # turbo (Whisper large-v3-turbo): much better than small, esp. accents;
+        # freed after 10 idle minutes since brain is short on RAM.
+        local.model = "turbo";
+        local.unload_after_idle_seconds = 600;
+      };
+
+      # Telegram: stream replies as they're written, 👀/✅/❌ reactions while
+      # working, and keep the model's reasoning out of the chat.
+      streaming.enabled = true;
+      telegram.reactions = true;
+      display.show_reasoning = false;
 
       # Keep the one long Telegram chat small: compact at 120k tokens rather
       # than at a fraction of Sonnet's 1M window (Vellum ran at ~587k/reply).
