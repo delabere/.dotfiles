@@ -25,14 +25,18 @@ let
     text = ''
       action=''${1:-switch}
       [ $# -gt 0 ] && shift
-      # Brian (Hermes) deploys approved changes itself and pushes them to
-      # GitHub master; deploying from a Mac that's behind would undo them.
-      if [ "$action" != build ] && [ -z "''${BUILD_BRAIN_FORCE:-}" ]; then
-        git -C "$HOME/.dotfiles" fetch -q origin master || true
-        if ! git -C "$HOME/.dotfiles" merge-base --is-ancestor origin/master HEAD; then
-          echo "build-brain: ~/.dotfiles is behind GitHub master (Brian may have deployed changes)." >&2
-          echo "Run 'git -C ~/.dotfiles pull --rebase' first, or BUILD_BRAIN_FORCE=1 to override." >&2
-          exit 1
+      # Brian (Hermes) deploys changes to brain itself and pushes them to
+      # GitHub master. Pull them in first so a deploy from here never undoes
+      # them: fast-forward, or rebase local commits on top (uncommitted
+      # changes are stashed and restored). Stops only on a real conflict.
+      d="$HOME/.dotfiles"
+      if [ -z "''${BUILD_BRAIN_FORCE:-}" ] && git -C "$d" fetch -q origin master; then
+        if ! git -C "$d" merge-base --is-ancestor origin/master HEAD; then
+          echo "build-brain: pulling Brian's changes from GitHub master…" >&2
+          if ! git -C "$d" pull -q --rebase --autostash origin master; then
+            echo "build-brain: couldn't rebase onto GitHub master; sort out ~/.dotfiles (or BUILD_BRAIN_FORCE=1)." >&2
+            exit 1
+          fi
         fi
       fi
       exec nixos-rebuild "$action" --flake "$HOME/.dotfiles#brain" \
