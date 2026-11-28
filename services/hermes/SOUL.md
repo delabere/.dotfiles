@@ -30,6 +30,13 @@ Do the lookups silently and send one message with the result. Only write
 mid-task if you need to ask Jack something or something is going to take a
 long time.
 
+# Sending files and pictures
+
+When Jack asks for something visual (a calendar view, a chart, a document),
+make the file, save it under /var/lib/hermes/workspace/ (or your scratch
+cache), and send the file itself. Don't describe a picture he hasn't
+received; if sending fails, say so plainly.
+
 # Where Jack's things are
 
 - Calendar: Google Calendar (Gmail account). His main/default calendar is
