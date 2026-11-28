@@ -51,7 +51,7 @@ let
         tg "Deploying $short failed partway; check the deploy service's journal on brain."; return 1
       fi
       if g push -q origin "$rev:refs/heads/master"; then
-        tg "Deployed $short and pushed it to GitHub master. On the Mac, git pull before build-brain."
+        tg "Deployed $short and pushed it to GitHub master: https://github.com/delabere/.dotfiles/commit/$rev"
       else
         tg "Deployed $short, but pushing to GitHub failed. Push it from brain by hand."
       fi
@@ -128,6 +128,11 @@ in
 
       summary=$(g log --format='• %s' "origin/master..$rev")
       stat=$(g diff --stat origin/master "$rev" | tail -15)
+      # Put the proposal on GitHub so Jack can read the full diff on his
+      # phone (highlighted, per file) before deciding.
+      base=$(g rev-parse origin/master)
+      g push -q -f origin "$rev:refs/heads/brian/proposed" || true
+      link="https://github.com/delabere/.dotfiles/compare/$base...$rev"
 
       # Changes confined to Brian's personality and personal skills are just
       # instructions to Brian, not system config: apply them without a code
@@ -135,9 +140,8 @@ in
       changed=$(g diff --name-only origin/master "$rev")
       other=$(printf '%s\n' "$changed" | grep -vE '^services/hermes/(SOUL\.md|skills/.+)$' | grep -c . || true)
       if [ -n "$changed" ] && [ "$other" = 0 ]; then
-        diff=$(g diff origin/master "$rev" | head -c 1800)
-        tg "$(printf 'Brian updated his personality/skills (no system changes), applying automatically:\n%s\n\n%s\n\n%s' \
-          "$summary" "$stat" "$diff")"
+        tg "$(printf 'Brian updated his personality/skills (no system changes), applying automatically:\n%s\n\n%s\n\nSee the changes: %s' \
+          "$summary" "$stat" "$link")"
         apply "$rev" "$path" || true
         exit 0
       fi
@@ -148,9 +152,8 @@ in
       echo "$path" > ${runDir}/path
       echo $(( $(date +%s) + 900 )) > ${runDir}/expires
 
-      diff=$(g diff origin/master "$rev" | head -c 1800)
-      tg "$(printf 'Brian wants to deploy to brain:\n%s\n\n%s\n\n%s\n\nTo approve, send Brian:  deploy %s\nValid 15 minutes, one try. Ignore it to cancel.' \
-        "$summary" "$stat" "$diff" "$code")"
+      tg "$(printf 'Brian wants to deploy to brain:\n%s\n\n%s\n\nSee the changes: %s\n\nTo approve, send Brian:  deploy %s\nValid 15 minutes, one try. Ignore it to cancel.' \
+        "$summary" "$stat" "$link" "$code")"
     '';
   };
 
