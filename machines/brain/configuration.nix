@@ -24,6 +24,7 @@
       ./../../services/terminus.nix
       ./../../services/vellum.nix
       ./../../services/hermes.nix
+      ./../../services/hermes-selfdeploy.nix
       ./../../services/backup.nix
       ./../../services/china-review.nix
     ];

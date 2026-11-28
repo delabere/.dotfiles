@@ -21,10 +21,20 @@ let
   #   build-brain switch -L   extra args go to nixos-rebuild
   build-brain = pkgs.writeShellApplication {
     name = "build-brain";
-    runtimeInputs = [ pkgs.nixos-rebuild-ng ];
+    runtimeInputs = [ pkgs.nixos-rebuild-ng pkgs.git ];
     text = ''
       action=''${1:-switch}
       [ $# -gt 0 ] && shift
+      # Brian (Hermes) deploys approved changes itself and pushes them to
+      # GitHub master; deploying from a Mac that's behind would undo them.
+      if [ "$action" != build ] && [ -z "''${BUILD_BRAIN_FORCE:-}" ]; then
+        git -C "$HOME/.dotfiles" fetch -q origin master || true
+        if ! git -C "$HOME/.dotfiles" merge-base --is-ancestor origin/master HEAD; then
+          echo "build-brain: ~/.dotfiles is behind GitHub master (Brian may have deployed changes)." >&2
+          echo "Run 'git -C ~/.dotfiles pull --rebase' first, or BUILD_BRAIN_FORCE=1 to override." >&2
+          exit 1
+        fi
+      fi
       exec nixos-rebuild "$action" --flake "$HOME/.dotfiles#brain" \
         --target-host delabere@brain --elevate sudo --use-substitutes "$@"
     '';

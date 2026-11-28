@@ -101,6 +101,7 @@ in
       # Personal skills, version-controlled here
       "skills/personal/use-claude/SKILL.md" = ./hermes/skills/use-claude/SKILL.md;
       "skills/personal/spend/SKILL.md" = ./hermes/skills/spend/SKILL.md;
+      "skills/personal/self-fix/SKILL.md" = ./hermes/skills/self-fix/SKILL.md;
     };
 
     # The google-workspace skill (Gmail, Calendar, Drive, Docs, Sheets) prefers
@@ -176,6 +177,16 @@ in
 
       timezone = config.time.timeZone;
 
+      # Self-fix (services/hermes-selfdeploy.nix): pushing and switching brain
+      # happen only in the root deploy service after Jack's code, never from
+      # the agent's own terminal, even if a command is approved.
+      approvals.deny = [
+        "*git push*"
+        "*nixos-rebuild*"
+        "*switch-to-configuration*"
+        "*nix-env*--set*"
+      ];
+
       # Secrets are stripped from terminal commands unless listed here;
       # Claude Code needs its token.
       terminal.env_passthrough = [ "CLAUDE_CODE_OAUTH_TOKEN" ];
@@ -226,18 +237,28 @@ in
       # working, and keep the model's reasoning out of the chat.
       streaming.enabled = true;
       telegram.reactions = true;
-      display.show_reasoning = false;
+      display = {
+        show_reasoning = false;
+        # On Telegram, just the answer: no "🔧 tool…" progress bubbles or
+        # "let me check…" interim messages (the 👀 reaction shows it's working).
+        platforms.telegram = {
+          show_reasoning = false;
+          tool_progress = "off";
+          interim_assistant_messages = false;
+        };
+      };
 
       # Cost is driven by how much chat history rides along on every call (the
       # fixed prompt is only ~13.5k tokens). Keep the long Telegram chat small:
-      # - compact (summarise) at 50k tokens instead of near the 1M window,
-      # - drop bulky old tool output (emails, HA dumps) past 30k, no LLM needed,
+      # - compact (summarise) at 150k tokens instead of near the 1M window
+      #   (cheap on DeepSeek; 50k compacted mid-task too often),
+      # - drop bulky old tool output (emails, HA dumps) past 100k, no LLM needed,
       # - after 30 idle minutes compact before replying (the prompt cache has
       #   gone cold by then anyway, so it costs nothing extra).
       compression = {
         enabled = true;
-        threshold_tokens = 50000;
-        proactive_prune_tokens = 30000;
+        threshold_tokens = 150000;
+        proactive_prune_tokens = 100000;
         idle_compact_after_seconds = 1800;
       };
 
