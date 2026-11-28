@@ -29,15 +29,18 @@
       ./../../services/china-review.nix
     ];
 
+  # Vellum is switched off while Hermes is on trial (Nov 2026). Its Docker
+  # volumes (vellum-main-*, vellum-business-*) are kept and still backed up;
+  # put these instances back to bring it up exactly as it was.
   services.vellum.instances = {
-    main = {
-      domain = "vellum-main.delabere.com";
-      port = 7830;
-    };
-    business = {
-      domain = "vellum-business.delabere.com";
-      port = 7831;
-    };
+    # main = {
+    #   domain = "vellum-main.delabere.com";
+    #   port = 7830;
+    # };
+    # business = {
+    #   domain = "vellum-business.delabere.com";
+    #   port = 7831;
+    # };
   };
 
 
