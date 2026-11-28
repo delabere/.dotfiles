@@ -210,8 +210,10 @@ in
         };
 
       # If the main model errors or is rate-limited, carry on with this.
+      # GPT-6 Luna: as cheap as DeepSeek and as accurate in our tests, from a
+      # different model family in case DeepSeek is down or rate-limited.
       fallback_providers = [
-        { provider = "openrouter"; model = "google/gemini-3.6-flash"; }
+        { provider = "openrouter"; model = "openai/gpt-6-luna"; }
       ];
 
       # Voice replies: free Microsoft Edge voices, British. Whether a chat gets
