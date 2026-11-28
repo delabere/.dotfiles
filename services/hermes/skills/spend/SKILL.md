@@ -27,5 +27,8 @@ phone-friendly, e.g.
 For a breakdown by model or by kind of work, combine it with `/insights`
 (Hermes's own token logs, estimates) and say which numbers are estimates.
 
+For just the current chat session's own token use and estimated cost, the
+`/usage` command is a quicker alternative to `openrouter-spend`.
+
 Claude Code jobs ("use Claude") run on Jack's Claude subscription, not
 OpenRouter, so they don't appear here.
