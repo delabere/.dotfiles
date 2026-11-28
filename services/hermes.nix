@@ -62,6 +62,15 @@ let
           credits: ($credits + {left: ($credits.total_credits - $credits.total_usage)})}'
     '';
   };
+
+  # Stickers, message effects and dice for Brian's personality skill.
+  telegramFx = pkgs.writeShellApplication {
+    name = "telegram-fx";
+    runtimeInputs = [ pkgs.curl pkgs.jq pkgs.gnugrep pkgs.coreutils ];
+    text = ''
+      STICKER_DIR=${./hermes/mascot/stickers}
+    '' + builtins.readFile ./hermes/telegram-fx.sh;
+  };
 in
 {
   systemd.tmpfiles.rules = [ "d /var/lib/hermes/ms365 0700 hermes hermes -" ];
@@ -116,7 +125,7 @@ in
     # claude: the bundled claude-code skill delegates coding jobs to Claude
     # Code, signed in with Jack's subscription (CLAUDE_CODE_OAUTH_TOKEN, a
     # 1-year `claude setup-token` token in hermes-env.age; renew by Nov 2027).
-    extraPackages = [ pkgs.gws hermesPython pkgs.claude-code pkgs.git ms365Mcp openrouterSpend ];
+    extraPackages = [ pkgs.gws hermesPython pkgs.claude-code pkgs.git ms365Mcp openrouterSpend telegramFx ];
 
     # Official vendor-hosted MCP servers (OAuth with dynamic client
     # registration; tokens land in .hermes/mcp-tokens/, which restic covers).
