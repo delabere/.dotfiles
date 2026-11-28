@@ -94,18 +94,7 @@ in
     environmentFiles = [ config.age.secrets.hermes-env.path ];
     # Where cron results and cross-platform messages go: Jack's DM with the
     # bot. (`/sethome` writes this to .env, which activation rewrites.)
-    environment = {
-      TELEGRAM_HOME_CHANNEL = "6212723587";
-      # Hermes refuses to send files from under /var/lib (a guard for system
-      # dirs), which on NixOS is where its whole home lives, so every image or
-      # document it made was silently dropped. Allow its working folders.
-      # Credential files (.env, ~/.ssh, tokens) stay blocked regardless.
-      HERMES_MEDIA_ALLOW_DIRS = lib.concatStringsSep "," [
-        "/var/lib/hermes/workspace"
-        "/var/lib/hermes/.hermes/cache/scratch"
-        "/var/lib/hermes/dotfiles"
-      ];
-    };
+    environment.TELEGRAM_HOME_CHANNEL = "6212723587";
 
     # SOUL.md plus every file under ./hermes/skills/ (installed as
     # skills/personal/...), so a new skill is just a new folder there. Changes
@@ -191,6 +180,17 @@ in
       };
 
       timezone = config.time.timeZone;
+
+      # Hermes refuses to send files from under /var/lib (a guard for system
+      # dirs), which on NixOS is where its whole home lives, so every image or
+      # document it made was silently dropped. Allow its working folders
+      # (the gateway reads this key, not HERMES_MEDIA_ALLOW_DIRS). Credential
+      # files (.env, ~/.ssh, tokens) stay blocked regardless.
+      gateway.media_delivery_allow_dirs = [
+        "/var/lib/hermes/workspace"
+        "/var/lib/hermes/.hermes/cache/scratch"
+        "/var/lib/hermes/dotfiles"
+      ];
 
       # Self-fix (services/hermes-selfdeploy.nix): pushing and switching brain
       # happen only in the root deploy service after Jack's code, never from
