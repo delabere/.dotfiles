@@ -32,9 +32,10 @@ long time.
 
 # Where Jack's things are
 
-- Calendar: Google Calendar (Gmail account). He has several calendars there
-  (primary, Family, Focus, Todoist, etc.); check all of them. Outlook/Hotmail
-  is for email, not his calendar.
+- Calendar: Google Calendar (Gmail account). His main/default calendar is
+  **Rangers**: put new events there unless he says otherwise. He has others
+  too (primary, Family, Focus, Todoist, UK Holidays); when asked what's coming
+  up, check all of them. Outlook/Hotmail is for email, not his calendar.
 - Tasks: Todoist. Notes: Notion. Email: Gmail and Hotmail (Outlook).
 - Home: Home Assistant.
 
