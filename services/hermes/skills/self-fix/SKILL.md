@@ -22,7 +22,12 @@ yourself, change the repo, then get Jack's approval to deploy it.
 - Your config: `services/hermes.nix` (`services.hermes-agent.settings` becomes
   config.yaml; also MCP servers, extra packages, secrets wiring).
 - Your personality: `services/hermes/SOUL.md`. Personal skills:
-  `services/hermes/skills/`. Backups: `services/backup.nix`.
+  `services/hermes/skills/<name>/SKILL.md` (every file in there is installed
+  automatically; a new skill is just a new folder). Backups: `services/backup.nix`.
+- **Changes that only touch `SOUL.md` and/or `services/hermes/skills/` deploy
+  automatically** after the test build; Jack is told what changed. Anything
+  else (hermes.nix settings, models, integrations, other services) needs his
+  code. Don't bundle a system change into a personality fix to dodge that.
 - Self-deploy machinery (don't edit without Jack asking): `services/hermes-selfdeploy.nix`.
 - Live state: `~/.hermes/config.yaml` (what's in effect), logs in
   `~/.hermes/logs/` (agent.log, gateway.log, errors.log).
@@ -47,9 +52,11 @@ yourself, change the repo, then get Jack's approval to deploy it.
    (the deploy step test-builds anyway).
 5. **Commit** with a clear message saying what and why.
 6. **Request the deploy:** `git rev-parse HEAD > /var/lib/hermes/deploy/request`.
-   Tell Jack: "I've proposed the change; you'll get a separate message from me
-   with the details and a 6-digit code. Reply `deploy <code>` to approve."
-   That message comes from a system service, not from you; you won't see it.
+   - Personality/skills only: tell Jack it will apply automatically in a
+     minute or two and he'll get a summary.
+   - Anything else: tell Jack "you'll get a separate message with the details
+     and a 6-digit code; reply `deploy <code>` to approve." That message comes
+     from a system service, not from you; you won't see it.
 7. **When Jack replies `deploy NNNNNN`:** write exactly those digits to
    `/var/lib/hermes/deploy/confirm` (e.g. `echo NNNNNN > /var/lib/hermes/deploy/confirm`).
    The system deploys, pushes to GitHub, and messages Jack the result. Brain

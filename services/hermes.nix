@@ -96,13 +96,17 @@ in
     # bot. (`/sethome` writes this to .env, which activation rewrites.)
     environment.TELEGRAM_HOME_CHANNEL = "6212723587";
 
-    hermesHomeFiles = {
-      "SOUL.md" = ./hermes/SOUL.md;
-      # Personal skills, version-controlled here
-      "skills/personal/use-claude/SKILL.md" = ./hermes/skills/use-claude/SKILL.md;
-      "skills/personal/spend/SKILL.md" = ./hermes/skills/spend/SKILL.md;
-      "skills/personal/self-fix/SKILL.md" = ./hermes/skills/self-fix/SKILL.md;
-    };
+    # SOUL.md plus every file under ./hermes/skills/ (installed as
+    # skills/personal/...), so a new skill is just a new folder there. Changes
+    # confined to these files are auto-deployed by hermes-selfdeploy.nix.
+    hermesHomeFiles =
+      let
+        skillsDir = ./hermes/skills;
+        skillFiles = lib.filesystem.listFilesRecursive skillsDir;
+        rel = f: lib.removePrefix "${toString skillsDir}/" (toString f);
+      in
+      { "SOUL.md" = ./hermes/SOUL.md; }
+      // lib.listToAttrs (map (f: lib.nameValuePair "skills/personal/${rel f}" f) skillFiles);
 
     # The google-workspace skill (Gmail, Calendar, Drive, Docs, Sheets) prefers
     # the gws CLI and points it at Hermes's own google_token.json; its Python

@@ -11,6 +11,9 @@
 #      never receives its own outgoing messages, so the agent can't see it.
 #   3. Jack replies "deploy <code>"; Brian writes the code to
 #      /var/lib/hermes/deploy/confirm.
+#      Exception: if every changed file is services/hermes/SOUL.md or under
+#      services/hermes/skills/ (instructions to Brian, not system config), it
+#      is applied straight away and Jack is just told what changed.
 #   4. hermes-deploy-apply (root) checks the code (one attempt, 15 minutes),
 #      switches brain to the built system, pushes the commit to GitHub master
 #      and reports back. Any wrong code cancels the request.
@@ -38,6 +41,20 @@ let
       token=$(grep '^TELEGRAM_BOT_TOKEN=' ${envFile} | cut -d= -f2-)
       curl -fsS -o /dev/null "https://api.telegram.org/bot$token/sendMessage" \
         --data-urlencode "chat_id=${chat}" --data-urlencode "text=$1" || true
+    }
+    # apply REV PATH: switch brain to the built system, push REV to master.
+    apply() {
+      local rev=$1 path=$2 short
+      short=$(g rev-parse --short "$rev")
+      nix-env -p /nix/var/nix/profiles/system --set "$path"
+      if ! "$path/bin/switch-to-configuration" switch; then
+        tg "Deploying $short failed partway; check the deploy service's journal on brain."; return 1
+      fi
+      if g push -q origin "$rev:refs/heads/master"; then
+        tg "Deployed $short and pushed it to GitHub master. On the Mac, git pull before build-brain."
+      else
+        tg "Deployed $short, but pushing to GitHub failed. Push it from brain by hand."
+      fi
     }
   '';
 
@@ -109,14 +126,28 @@ in
         exit 0
       fi
 
+      summary=$(g log --format='• %s' "origin/master..$rev")
+      stat=$(g diff --stat origin/master "$rev" | tail -15)
+
+      # Changes confined to Brian's personality and personal skills are just
+      # instructions to Brian, not system config: apply them without a code
+      # and tell Jack what changed. Anything else needs his code.
+      changed=$(g diff --name-only origin/master "$rev")
+      other=$(printf '%s\n' "$changed" | grep -vE '^services/hermes/(SOUL\.md|skills/.+)$' | grep -c . || true)
+      if [ -n "$changed" ] && [ "$other" = 0 ]; then
+        diff=$(g diff origin/master "$rev" | head -c 1800)
+        tg "$(printf 'Brian updated his personality/skills (no system changes), applying automatically:\n%s\n\n%s\n\n%s' \
+          "$summary" "$stat" "$diff")"
+        apply "$rev" "$path" || true
+        exit 0
+      fi
+
       code=$(shuf -i 100000-999999 -n 1)
       echo "$code" > ${runDir}/code
       echo "$rev" > ${runDir}/rev
       echo "$path" > ${runDir}/path
       echo $(( $(date +%s) + 900 )) > ${runDir}/expires
 
-      summary=$(g log --format='• %s' "origin/master..$rev")
-      stat=$(g diff --stat origin/master "$rev" | tail -15)
       diff=$(g diff origin/master "$rev" | head -c 1800)
       tg "$(printf 'Brian wants to deploy to brain:\n%s\n\n%s\n\n%s\n\nTo approve, send Brian:  deploy %s\nValid 15 minutes, one try. Ignore it to cancel.' \
         "$summary" "$stat" "$diff" "$code")"
@@ -142,17 +173,8 @@ in
       if [ "$(date +%s)" -gt "$expires" ]; then tg "That deploy code had expired; nothing was deployed."; exit 0; fi
       if [ "$got" != "$want" ]; then tg "Wrong deploy code, so the request was cancelled and nothing was deployed."; exit 0; fi
 
-      short=$(g rev-parse --short "$rev")
-      tg "Approved. Deploying $short to brain…"
-      nix-env -p /nix/var/nix/profiles/system --set "$path"
-      if ! "$path/bin/switch-to-configuration" switch; then
-        tg "Deploying $short failed partway; check 'journalctl -u hermes-deploy-apply' on brain."; exit 0
-      fi
-      if g push -q origin "$rev:refs/heads/master"; then
-        tg "Deployed $short and pushed it to GitHub master. On the Mac, git pull before build-brain."
-      else
-        tg "Deployed $short, but pushing to GitHub failed. Push it from brain by hand."
-      fi
+      tg "Approved. Deploying $(g rev-parse --short "$rev") to brain…"
+      apply "$rev" "$path" || true
     '';
   };
 }
