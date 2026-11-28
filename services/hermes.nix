@@ -233,9 +233,11 @@ in
         provider = "local";
         # Echo each voice note's transcript back (🎙️) while checking Whisper's accuracy.
         echo_transcripts = true;
-        # turbo (Whisper large-v3-turbo): much better than small, esp. accents;
-        # freed after 10 idle minutes since brain is short on RAM.
-        local.model = "turbo";
+        # small.en: English-only Whisper small (~0.5 GB), several times faster
+        # than turbo on brain's CPU; the 🎙️ echo shows if it mishears. Back to
+        # "turbo" if accuracy isn't good enough (or for non-English notes).
+        # Freed after 10 idle minutes since brain is short on RAM.
+        local.model = "small.en";
         local.unload_after_idle_seconds = 600;
       };
 
