@@ -92,6 +92,9 @@ in
     enable = true;
     addToSystemPackages = true;
     environmentFiles = [ config.age.secrets.hermes-env.path ];
+    # Where cron results and cross-platform messages go: Jack's DM with the
+    # bot. (`/sethome` writes this to .env, which activation rewrites.)
+    environment.TELEGRAM_HOME_CHANNEL = "6212723587";
 
     hermesHomeFiles = {
       "SOUL.md" = ./hermes/SOUL.md;
