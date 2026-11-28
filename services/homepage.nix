@@ -160,7 +160,7 @@
           {
             Btop = {
               icon = "terminal.png";
-              href = "http://brain.degu-vega.ts.net:7681";
+              href = "https://brain.degu-vega.ts.net/btop/";
               description = "btop";
             };
           }

@@ -54,7 +54,17 @@
       reverse_proxy 127.0.0.1:8123
     '';
     virtualHosts."brain.degu-vega.ts.net".extraConfig = ''
-      reverse_proxy 0.0.0.0:4040
+      # btop (ttyd) over HTTPS: *.ts.net is HSTS-preloaded, so the raw
+      # http :7681 link can't work in browsers. ttyd is bound to tailscale0
+      # only (not loopback), hence the tailnet IP. ttyd builds its websocket
+      # URL from the page path, so handle_path stripping /btop is enough.
+      redir /btop /btop/ permanent
+      handle_path /btop/* {
+        reverse_proxy 100.122.31.50:7681
+      }
+      handle {
+        reverse_proxy 0.0.0.0:4040
+      }
     '';
     virtualHosts."podcasts.delabere.com".extraConfig = ''
       # RSS, enclosures, transcripts, chapters, and artwork are public so
